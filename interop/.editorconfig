@@ -1,4 +1,0 @@
-# EditorConfig is awesome: https://EditorConfig.org
-
-[build/generated/**.{kt,kts,java}]
-ktlint_standard = disabled
