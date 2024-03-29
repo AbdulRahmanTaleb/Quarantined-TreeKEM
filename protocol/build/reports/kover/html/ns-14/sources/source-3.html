@@ -1,0 +1,372 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > Credential</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types</a>
+</div>
+
+<h1>Coverage Summary for Class: Credential (com.github.traderjoe95.mls.protocol.types)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">Credential</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Credential$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Credential$Companion$T$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (62/62)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Credential$Companion$T$2$invoke$lambda$3$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Credential$Companion$T$2$invoke$lambda$3$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (81/81)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.Struct1
+&nbsp;import com.github.traderjoe95.mls.codec.error.DecoderError
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.EnumT
+&nbsp;import com.github.traderjoe95.mls.codec.type.ProtocolEnum
+&nbsp;import com.github.traderjoe95.mls.codec.type.V
+&nbsp;import com.github.traderjoe95.mls.codec.type.derive
+&nbsp;import com.github.traderjoe95.mls.codec.type.enum
+&nbsp;import com.github.traderjoe95.mls.codec.type.get
+&nbsp;import com.github.traderjoe95.mls.codec.type.opaque
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.member.then
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.util.throwAnyError
+&nbsp;import org.bouncycastle.cert.X509CertificateHolder
+&nbsp;import kotlin.random.Random
+&nbsp;
+&nbsp;enum class CredentialType(ord: UInt, override val isValid: Boolean = true) : ProtocolEnum&lt;CredentialType&gt; {
+&nbsp;  @Deprecated(&quot;This reserved value isn&#39;t used by the protocol for now&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  Reserved(0x0000U, false),
+&nbsp;
+&nbsp;  Basic(0x0001U),
+&nbsp;  X509(0x0002U),
+&nbsp;
+&nbsp;  // GREASE
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_1(0x0A0AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_2(0x1A1AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_3(0x2A2AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_4(0x3A3AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_5(0x4A4AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_6(0x5A5AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_7(0x6A6AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_8(0x7A7AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_9(0x8A8AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_10(0x9A9AU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_11(0xAAAAU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_12(0xBABAU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_13(0xCACAU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_14(0xDADAU, false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_15(0xEAEAU, false),
+&nbsp;  ;
+&nbsp;
+&nbsp;  override val ord: UIntRange = ord..ord
+&nbsp;  val asUShort: UShort = ord.toUShort()
+&nbsp;
+&nbsp;  override fun toString(): String = &quot;$name($asUShort)&quot;
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: EnumT&lt;CredentialType&gt; = throwAnyError { enum(upperBound = 0xFFFFU) }
+&nbsp;
+&nbsp;    operator fun invoke(type: UShort): CredentialType? = entries.find { it.isValid &amp;&amp; type in it.ord }
+&nbsp;
+&nbsp;    fun grease(individualProbability: Double = 0.1): List&lt;UShort&gt; =
+&nbsp;      entries
+&nbsp;        .filter { it.name.startsWith(&quot;GREASE&quot;) &amp;&amp; Random.nextDouble() &lt; individualProbability }
+&nbsp;        .map { it.asUShort }
+&nbsp;  }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;sealed class Credential(</b>
+<b class="fc">&nbsp;  val credentialType: CredentialType,</b>
+&nbsp;) : Struct2T.Shape&lt;CredentialType, Credential&gt; {
+<b class="fc">&nbsp;  override fun component1(): CredentialType = credentialType</b>
+&nbsp;
+<b class="fc">&nbsp;  override fun component2(): Credential = this</b>
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Credential&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;Credential&gt; by lazy {</b>
+<b class="fc">&nbsp;      throwAnyError {</b>
+<b class="fc">&nbsp;        struct(&quot;Credential&quot;) {</b>
+<b class="fc">&nbsp;          it.field(&quot;credential_type&quot;, CredentialType.T)</b>
+<b class="fc">&nbsp;            .select&lt;Credential, _&gt;(CredentialType.T, &quot;credential_type&quot;) {</b>
+<b class="fc">&nbsp;              case(CredentialType.Basic).then(BasicCredential.T, &quot;identity&quot;)</b>
+<b class="fc">&nbsp;                .case(CredentialType.X509).then(X509Credential.T, &quot;certificates&quot;)</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }.lift { _, cred -&gt; cred }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;val Certificate: DataType&lt;X509CertificateHolder&gt; =
+&nbsp;  struct(&quot;Certificate&quot;) {
+&nbsp;    it.field(&quot;cert_data&quot;, opaque[V])
+&nbsp;  }.derive(
+&nbsp;    {
+&nbsp;      try {
+&nbsp;        X509CertificateHolder(it.field1)
+&nbsp;      } catch (e: Exception) {
+&nbsp;        raise(DecoderError.UnexpectedError(&quot;Invalid certificate: $e&quot;))
+&nbsp;      }
+&nbsp;    },
+&nbsp;    { Struct1(it.encoded) },
+&nbsp;  )
+&nbsp;
+&nbsp;class BasicCredential(val identity: ByteArray) : Credential(CredentialType.Basic) {
+&nbsp;  override fun equals(other: Any?): Boolean {
+&nbsp;    if (this === other) return true
+&nbsp;    if (javaClass != other?.javaClass) return false
+&nbsp;
+&nbsp;    other as BasicCredential
+&nbsp;
+&nbsp;    return identity.contentEquals(other.identity)
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+&nbsp;    return identity.contentHashCode()
+&nbsp;  }
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;BasicCredential&gt; = opaque[V].derive({ BasicCredential(it) }, { it.identity })
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;class X509Credential(
+&nbsp;  val certificates: List&lt;X509CertificateHolder&gt;,
+&nbsp;) : Credential(CredentialType.X509) {
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;X509Credential&gt; = Certificate[V].derive({ X509Credential(it) }, { it.certificates })
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

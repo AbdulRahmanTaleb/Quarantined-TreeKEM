@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > OperationsKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.group</a>
+</div>
+
+<h1>Coverage Summary for Class: OperationsKt (com.github.traderjoe95.mls.protocol.group)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">OperationsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (18/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (63/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.group
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.error.GroupContextUpdateError
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext.ConfirmedTranscriptHashInput
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext.ConfirmedTranscriptHashInput.Companion.encodeUnsafe
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext.InterimTranscriptHashInput
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext.InterimTranscriptHashInput.Companion.encodeUnsafe
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.RatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.treeHash
+&nbsp;import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Mac
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Signature
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.Commit
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.FramedContent
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
+&nbsp;
+&nbsp;context(Raise&lt;GroupContextUpdateError&gt;)
+&nbsp;internal fun GroupContext.evolve(
+&nbsp;  wireFormat: WireFormat,
+&nbsp;  framedContent: FramedContent&lt;Commit&gt;,
+&nbsp;  signature: Signature,
+&nbsp;  newTree: RatchetTree,
+<b class="nc">&nbsp;  newExtensions: List&lt;GroupContextExtension&lt;*&gt;&gt;? = null,</b>
+&nbsp;): GroupContext {
+<b class="fc">&nbsp;  val newConfirmedTranscriptHash =</b>
+<b class="fc">&nbsp;    newConfirmedTranscriptHash(cipherSuite, interimTranscriptHash, wireFormat, framedContent, signature)</b>
+&nbsp;
+<b class="fc">&nbsp;  return GroupContext(</b>
+<b class="fc">&nbsp;    protocolVersion,</b>
+<b class="fc">&nbsp;    cipherSuite,</b>
+<b class="fc">&nbsp;    groupId,</b>
+<b class="fc">&nbsp;    epoch + 1U,</b>
+<b class="fc">&nbsp;    newTree.treeHash,</b>
+<b class="fc">&nbsp;    newConfirmedTranscriptHash,</b>
+<b class="fc">&nbsp;    newExtensions ?: extensions,</b>
+&nbsp;  )
+&nbsp;}
+&nbsp;
+&nbsp;internal fun newConfirmedTranscriptHash(
+&nbsp;  cipherSuite: ICipherSuite,
+&nbsp;  interimTranscriptHash: ByteArray,
+&nbsp;  wireFormat: WireFormat,
+&nbsp;  framedContent: FramedContent&lt;Commit&gt;,
+&nbsp;  signature: Signature,
+&nbsp;): ByteArray =
+<b class="fc">&nbsp;  cipherSuite.hash(</b>
+<b class="fc">&nbsp;    interimTranscriptHash +</b>
+<b class="fc">&nbsp;      ConfirmedTranscriptHashInput(</b>
+<b class="fc">&nbsp;        wireFormat,</b>
+<b class="fc">&nbsp;        framedContent,</b>
+<b class="fc">&nbsp;        signature,</b>
+<b class="fc">&nbsp;      ).encodeUnsafe(),</b>
+&nbsp;  )
+&nbsp;
+&nbsp;internal fun newInterimTranscriptHash(
+&nbsp;  cipherSuite: ICipherSuite,
+&nbsp;  confirmedTranscriptHash: ByteArray,
+&nbsp;  confirmationTag: Mac,
+<b class="fc">&nbsp;): ByteArray = cipherSuite.hash(confirmedTranscriptHash + InterimTranscriptHashInput(confirmationTag).encodeUnsafe())</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

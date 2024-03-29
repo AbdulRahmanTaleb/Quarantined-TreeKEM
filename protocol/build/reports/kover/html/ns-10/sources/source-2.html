@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > GaussianRandom</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.message.padding.randomized</a>
+</div>
+
+<h1>Coverage Summary for Class: GaussianRandom (com.github.traderjoe95.mls.protocol.message.padding.randomized)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">GaussianRandom</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GaussianRandom$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.message.padding.randomized
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.protocol.message.padding.PaddingStrategy
+&nbsp;import com.github.traderjoe95.mls.protocol.util.TruncatedRoundedGaussian
+&nbsp;import com.github.traderjoe95.mls.protocol.util.wipe
+&nbsp;
+<b class="nc">&nbsp;data class GaussianRandom(val meanPadding: UInt, val stdDev: Double) : PaddingStrategy {</b>
+<b class="nc">&nbsp;  init {</b>
+<b class="nc">&nbsp;    require(meanPadding &gt; 0U) { &quot;The mean padding must be positive&quot; }</b>
+<b class="nc">&nbsp;    require(stdDev &gt; 0) { &quot;The standard deviation must be positive&quot; }</b>
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  override fun applyPadding(content: ByteArray): ByteArray =
+<b class="nc">&nbsp;    ByteArray(content.size + RAND.next(meanPadding, stdDev).toInt()).also {</b>
+<b class="nc">&nbsp;      content.copyInto(it)</b>
+<b class="nc">&nbsp;      content.wipe()</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;  companion object {</b>
+<b class="nc">&nbsp;    private val RAND = TruncatedRoundedGaussian()</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

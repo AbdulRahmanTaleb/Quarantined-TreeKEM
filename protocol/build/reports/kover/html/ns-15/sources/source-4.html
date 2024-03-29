@@ -1,0 +1,379 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > EncryptContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types.crypto</a>
+</div>
+
+<h1>Coverage Summary for Class: EncryptContext (com.github.traderjoe95.mls.protocol.types.crypto)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">EncryptContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.2%
+  </span>
+  <span class="absValue">
+    (2/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.8%
+  </span>
+  <span class="absValue">
+    (19/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EncryptContext$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EncryptContext$special$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">EncryptContext$special$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.8%
+  </span>
+  <span class="absValue">
+    (4/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (26/78)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types.crypto
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.derive
+&nbsp;import com.github.traderjoe95.mls.codec.type.opaque
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.util.fromBytes
+&nbsp;import com.github.traderjoe95.mls.codec.util.toBytes
+&nbsp;import com.github.traderjoe95.mls.codec.util.uSize
+&nbsp;import com.github.traderjoe95.mls.protocol.types.MoveCopyWipe
+&nbsp;import com.github.traderjoe95.mls.protocol.types.RefinedBytes
+&nbsp;import com.github.traderjoe95.mls.protocol.util.wipe
+&nbsp;import java.security.SecureRandom
+&nbsp;import kotlin.experimental.xor
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class HpkePrivateKey(override val bytes: ByteArray) : RefinedBytes&lt;HpkePrivateKey&gt;, MoveCopyWipe&lt;HpkePrivateKey&gt; {
+&nbsp;  override fun copy() = HpkePrivateKey(bytes.copyOf())
+&nbsp;
+&nbsp;  override fun wipe() = bytes.wipe()
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val ByteArray.asHpkePrivateKey: HpkePrivateKey
+&nbsp;      get() = HpkePrivateKey(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class HpkePublicKey(override val bytes: ByteArray) : RefinedBytes&lt;HpkePublicKey&gt; {
+&nbsp;  companion object : Encodable&lt;HpkePublicKey&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;HpkePublicKey&gt; = RefinedBytes.dataT(::HpkePublicKey, name = &quot;HPKEPublicKey&quot;)
+&nbsp;
+&nbsp;    val ByteArray.asHpkePublicKey: HpkePublicKey
+&nbsp;      get() = HpkePublicKey(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class HpkeKeyPair(val private: HpkePrivateKey, val public: HpkePublicKey) : MoveCopyWipe&lt;HpkeKeyPair&gt; {
+&nbsp;  override fun copy(): HpkeKeyPair = HpkeKeyPair(private.copy(), public)
+&nbsp;
+&nbsp;  override fun wipe() {
+&nbsp;    private.wipe()
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class Nonce(override val bytes: ByteArray) : RefinedBytes&lt;Nonce&gt; {
+&nbsp;  val size: UInt
+&nbsp;    get() = bytes.uSize
+&nbsp;
+&nbsp;  infix fun xor(reuseGuard: ReuseGuard): Nonce =
+&nbsp;    Nonce(
+&nbsp;      bytes.mapIndexed { index, byte -&gt;
+&nbsp;        when (index) {
+&nbsp;          0 -&gt; byte xor (reuseGuard.value shr 24).toByte()
+&nbsp;          1 -&gt; byte xor (reuseGuard.value shr 16).toByte()
+&nbsp;          2 -&gt; byte xor (reuseGuard.value shr 8).toByte()
+&nbsp;          3 -&gt; byte xor reuseGuard.value.toByte()
+&nbsp;          else -&gt; byte
+&nbsp;        }
+&nbsp;      }.toByteArray(),
+&nbsp;    )
+&nbsp;
+&nbsp;  fun wipe(): Unit = bytes.wipe()
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Nonce&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;Nonce&gt; = RefinedBytes.dataT(::Nonce)
+&nbsp;
+&nbsp;    val ByteArray.asNonce: Nonce
+&nbsp;      get() = Nonce(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class ReuseGuard(val value: Int) {
+&nbsp;  companion object : Encodable&lt;ReuseGuard&gt; {
+&nbsp;    private val RANDOM = SecureRandom()
+&nbsp;
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;ReuseGuard&gt; =
+&nbsp;      opaque[4U].derive(
+&nbsp;        { ReuseGuard(Int.fromBytes(it)) },
+&nbsp;        { it.value.toBytes(4U) },
+&nbsp;      )
+&nbsp;
+&nbsp;    fun random(random: SecureRandom = RANDOM): ReuseGuard = ReuseGuard(random.nextInt())
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class Aad(override val bytes: ByteArray) : RefinedBytes&lt;Aad&gt; {
+&nbsp;  companion object {
+&nbsp;    val empty: Aad
+&nbsp;      get() = Aad(byteArrayOf())
+&nbsp;
+&nbsp;    val ByteArray.asAad: Aad
+&nbsp;      get() = Aad(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class Ciphertext(override val bytes: ByteArray) : RefinedBytes&lt;Ciphertext&gt; {
+&nbsp;  val size: Int
+&nbsp;    get() = bytes.size
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Ciphertext&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;Ciphertext&gt; = RefinedBytes.dataT(::Ciphertext)
+&nbsp;
+&nbsp;    val ByteArray.asCiphertext: Ciphertext
+&nbsp;      get() = Ciphertext(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;@JvmInline
+&nbsp;value class KemOutput(override val bytes: ByteArray) : RefinedBytes&lt;KemOutput&gt; {
+&nbsp;  val size: Int
+&nbsp;    get() = bytes.size
+&nbsp;
+&nbsp;  companion object : Encodable&lt;KemOutput&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;KemOutput&gt; = RefinedBytes.dataT(::KemOutput)
+&nbsp;
+&nbsp;    val ByteArray.asKemOutput: KemOutput
+&nbsp;      get() = KemOutput(this)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class HpkeCiphertext(
+&nbsp;  val kemOutput: KemOutput,
+&nbsp;  val ciphertext: Ciphertext,
+&nbsp;) : Struct2T.Shape&lt;KemOutput, Ciphertext&gt; {
+&nbsp;  companion object : Encodable&lt;HpkeCiphertext&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;HpkeCiphertext&gt; =
+&nbsp;      struct(&quot;HPKECiphertext&quot;) {
+&nbsp;        it.field(&quot;kem_output&quot;, KemOutput.T)
+&nbsp;          .field(&quot;ciphertext&quot;, Ciphertext.T)
+&nbsp;      }.lift(::HpkeCiphertext)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;internal data class EncryptContext(val label: String, val context: ByteArray) : Struct2T.Shape&lt;String, ByteArray&gt; {</b>
+&nbsp;  companion object : Encodable&lt;EncryptContext&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T = bytesAndLabel(&quot;EncryptContext&quot;, &quot;context&quot;).lift(::EncryptContext)</b>
+&nbsp;
+&nbsp;    fun create(
+&nbsp;      label: String,
+&nbsp;      context: ByteArray,
+<b class="fc">&nbsp;    ): EncryptContext = EncryptContext(&quot;MLS 1.0 $label&quot;, context)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun equals(other: Any?): Boolean {
+<b class="nc">&nbsp;    if (this === other) return true</b>
+<b class="nc">&nbsp;    if (javaClass != other?.javaClass) return false</b>
+&nbsp;
+<b class="nc">&nbsp;    other as SignContent</b>
+&nbsp;
+<b class="nc">&nbsp;    if (label != other.label) return false</b>
+<b class="nc">&nbsp;    if (!context.contentEquals(other.content)) return false</b>
+&nbsp;
+<b class="nc">&nbsp;    return true</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+<b class="nc">&nbsp;    var result = label.hashCode()</b>
+<b class="nc">&nbsp;    result = 31 * result + context.contentHashCode()</b>
+<b class="nc">&nbsp;    return result</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

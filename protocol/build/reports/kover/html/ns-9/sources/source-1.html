@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > PassiveClientTestVector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.interop.group</a>
+</div>
+
+<h1>Coverage Summary for Class: PassiveClientTestVector (com.github.traderjoe95.mls.protocol.interop.group)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">PassiveClientTestVector</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (23/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (181/181)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PassiveClientTestVector$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (37/37)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PassiveClientTestVector$Companion$load$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">PassiveClientTestVector$ExternalPsk</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (21/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PassiveClientTestVector$GroupEpoch</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (65/65)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (39/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (304/304)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.interop.group
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getCipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getHexBinary
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getHexBinaryOrNull
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getHpkePrivateKey
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getSecret
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.getSignaturePrivateKey
+&nbsp;import com.github.traderjoe95.mls.protocol.message.KeyPackage
+&nbsp;import com.github.traderjoe95.mls.protocol.message.MlsCommitMessage
+&nbsp;import com.github.traderjoe95.mls.protocol.message.MlsMessage
+&nbsp;import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.coerceFormat
+&nbsp;import com.github.traderjoe95.mls.protocol.message.MlsProposalMessage
+&nbsp;import com.github.traderjoe95.mls.protocol.message.Welcome
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.PublicRatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkePrivateKey
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
+&nbsp;import io.vertx.core.Vertx
+&nbsp;import io.vertx.core.json.JsonObject
+&nbsp;import io.vertx.kotlin.coroutines.coAwait
+&nbsp;
+<b class="fc">&nbsp;data class PassiveClientTestVector(</b>
+<b class="fc">&nbsp;  val cipherSuite: CipherSuite,</b>
+<b class="fc">&nbsp;  val externalPsks: List&lt;ExternalPsk&gt;,</b>
+&nbsp;  // Initial client info
+<b class="fc">&nbsp;  val keyPackage: MlsMessage&lt;KeyPackage&gt;,</b>
+<b class="fc">&nbsp;  val signaturePriv: SignaturePrivateKey,</b>
+<b class="fc">&nbsp;  val encryptionPriv: HpkePrivateKey,</b>
+<b class="fc">&nbsp;  val initPriv: HpkePrivateKey,</b>
+&nbsp;  // Joining
+<b class="fc">&nbsp;  val welcome: MlsMessage&lt;Welcome&gt;,</b>
+<b class="fc">&nbsp;  val ratchetTree: PublicRatchetTree?,</b>
+<b class="fc">&nbsp;  val initialEpochAuthenticator: Secret,</b>
+&nbsp;  // Epochs
+<b class="fc">&nbsp;  val epochs: List&lt;GroupEpoch&gt;,</b>
+&nbsp;) {
+<b class="fc">&nbsp;  constructor(json: JsonObject) : this(</b>
+<b class="fc">&nbsp;    json.getCipherSuite(&quot;cipher_suite&quot;),</b>
+<b class="fc">&nbsp;    json.getJsonArray(&quot;external_psks&quot;).map { ExternalPsk(it as JsonObject) },</b>
+<b class="fc">&nbsp;    MlsMessage.decodeUnsafe(json.getHexBinary(&quot;key_package&quot;)).coerceFormat(),</b>
+<b class="fc">&nbsp;    json.getSignaturePrivateKey(&quot;signature_priv&quot;),</b>
+<b class="fc">&nbsp;    json.getHpkePrivateKey(&quot;encryption_priv&quot;),</b>
+<b class="fc">&nbsp;    json.getHpkePrivateKey(&quot;init_priv&quot;),</b>
+<b class="fc">&nbsp;    MlsMessage.decodeUnsafe(json.getHexBinary(&quot;welcome&quot;)).coerceFormat(),</b>
+<b class="fc">&nbsp;    json.getHexBinaryOrNull(&quot;ratchet_tree&quot;)?.let { PublicRatchetTree.decodeUnsafe(it) },</b>
+<b class="fc">&nbsp;    json.getSecret(&quot;initial_epoch_authenticator&quot;),</b>
+<b class="fc">&nbsp;    json.getJsonArray(&quot;epochs&quot;).map { GroupEpoch(it as JsonObject) },</b>
+&nbsp;  )
+&nbsp;
+&nbsp;  val privateKeyPackage: KeyPackage.Private
+<b class="fc">&nbsp;    get() = KeyPackage.Private(keyPackage.message, initPriv, encryptionPriv, signaturePriv)</b>
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    suspend fun load(
+&nbsp;      vertx: Vertx,
+&nbsp;      file: String,
+&nbsp;    ): List&lt;PassiveClientTestVector&gt; =
+<b class="fc">&nbsp;      vertx.fileSystem()</b>
+<b class="fc">&nbsp;        .readFile(file)</b>
+<b class="fc">&nbsp;        .coAwait()</b>
+<b class="fc">&nbsp;        .toJsonArray()</b>
+<b class="fc">&nbsp;        .map { PassiveClientTestVector(it as JsonObject) }</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  data class ExternalPsk(val pskId: ByteArray, val psk: Secret) {</b>
+<b class="fc">&nbsp;    constructor(json: JsonObject) : this(json.getHexBinary(&quot;psk_id&quot;), json.getSecret(&quot;psk&quot;))</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  data class GroupEpoch(</b>
+<b class="fc">&nbsp;    val proposals: List&lt;MlsProposalMessage&gt;,</b>
+<b class="fc">&nbsp;    val commit: MlsCommitMessage,</b>
+<b class="fc">&nbsp;    val epochAuthenticator: Secret,</b>
+&nbsp;  ) {
+&nbsp;    @OptIn(ExperimentalStdlibApi::class)
+<b class="fc">&nbsp;    constructor(json: JsonObject) : this(</b>
+<b class="fc">&nbsp;      json.getJsonArray(&quot;proposals&quot;).map {</b>
+<b class="fc">&nbsp;        MlsMessage.decodeUnsafe((it as String).hexToByteArray()).coerceFormat()</b>
+&nbsp;      },
+<b class="fc">&nbsp;      MlsCommitMessage.decodeUnsafe(json.getHexBinary(&quot;commit&quot;)).coerceFormat(),</b>
+<b class="fc">&nbsp;      json.getSecret(&quot;epoch_authenticator&quot;),</b>
+&nbsp;    )
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

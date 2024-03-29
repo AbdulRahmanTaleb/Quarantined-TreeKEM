@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > Lifetime</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types.tree.leaf</a>
+</div>
+
+<h1>Coverage Summary for Class: Lifetime (com.github.traderjoe95.mls.protocol.types.tree.leaf)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">Lifetime</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (56/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Lifetime$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Lifetime$special$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Lifetime$special$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.4%
+  </span>
+  <span class="absValue">
+    (14/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.9%
+  </span>
+  <span class="absValue">
+    (57/84)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types.tree.leaf
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.type.uint64
+&nbsp;import java.time.Instant
+&nbsp;
+<b class="fc">&nbsp;data class Lifetime(</b>
+<b class="fc">&nbsp;  val notBefore: ULong,</b>
+<b class="fc">&nbsp;  val notAfter: ULong,</b>
+&nbsp;) : Struct2T.Shape&lt;ULong, ULong&gt;, LeafNodeInfo {
+<b class="fc">&nbsp;  constructor(notBefore: Instant, notAfter: Instant) : this(</b>
+<b class="fc">&nbsp;    notBefore.epochSecond.toULong(),</b>
+<b class="fc">&nbsp;    notAfter.epochSecond.toULong(),</b>
+&nbsp;  )
+&nbsp;
+&nbsp;  val notBeforeInstant: Instant
+<b class="nc">&nbsp;    get() = Instant.ofEpochSecond(notBefore.toLong())</b>
+&nbsp;  val notAfterInstant: Instant
+<b class="nc">&nbsp;    get() = Instant.ofEpochSecond(notAfter.toLong())</b>
+&nbsp;
+<b class="fc">&nbsp;  operator fun contains(instant: Instant): Boolean = instant.epochSecond in this</b>
+&nbsp;
+<b class="pc">&nbsp;  operator fun contains(epochSeconds: ULong): Boolean = epochSeconds in notBefore..notAfter</b>
+&nbsp;
+<b class="fc">&nbsp;  operator fun contains(epochSeconds: Long): Boolean = epochSeconds.toULong() in this</b>
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Lifetime&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;Lifetime&gt; =</b>
+<b class="fc">&nbsp;      struct(&quot;Lifetime&quot;) {</b>
+<b class="fc">&nbsp;        it.field(&quot;not_before&quot;, uint64.asULong)</b>
+<b class="fc">&nbsp;          .field(&quot;not_after&quot;, uint64.asULong)</b>
+<b class="fc">&nbsp;      }.lift(::Lifetime)</b>
+&nbsp;
+<b class="nc">&nbsp;    fun always(): Lifetime = Lifetime(0U, ULong.MAX_VALUE)</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

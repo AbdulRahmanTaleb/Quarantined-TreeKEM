@@ -1,0 +1,8 @@
+/home/ataleb/github_repos/mls-kotlin/protocol/build/kover/bin-reports/test.ic
+false
+false
+true
+false
+-exclude
+android\..*
+com\.android\..*

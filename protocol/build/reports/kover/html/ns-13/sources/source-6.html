@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > OperationsKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.tree</a>
+</div>
+
+<h1>Coverage Summary for Class: OperationsKt (com.github.traderjoe95.mls.protocol.tree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">OperationsKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (30/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.1%
+  </span>
+  <span class="absValue">
+    (44/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.1%
+  </span>
+  <span class="absValue">
+    (359/498)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OperationsKt$findEquivalentLeaf$2</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">OperationsKt$WhenMappings</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (30/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.1%
+  </span>
+  <span class="absValue">
+    (44/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.1%
+  </span>
+  <span class="absValue">
+    (359/498)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;@file:Suppress(&quot;kotlin:S1481&quot;)
+&nbsp;
+&nbsp;package com.github.traderjoe95.mls.protocol.tree
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import arrow.core.raise.nullable
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.error.IsSameClientError
+&nbsp;import com.github.traderjoe95.mls.protocol.error.VerifySignatureError
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext
+&nbsp;import com.github.traderjoe95.mls.protocol.message.KeyPackage
+&nbsp;import com.github.traderjoe95.mls.protocol.service.AuthenticationService
+&nbsp;import com.github.traderjoe95.mls.protocol.types.ExternalSenders
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePublicKey
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.Add
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.Commit
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.FramedContent
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.SenderType
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.hash.ParentHashInput
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.hash.ParentHashInput.Companion.encodeUnsafe
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.hash.TreeHashInput
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.hash.TreeHashInput.Companion.encodeUnsafe
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.leaf.ParentHash
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.leaf.ParentHash.Companion.asParentHash
+&nbsp;
+&nbsp;val RatchetTree.treeHash: ByteArray
+<b class="fc">&nbsp;  get() = treeHash(root, cipherSuite)</b>
+&nbsp;
+<b class="fc">&nbsp;fun RatchetTreeOps.treeHash(cipherSuite: ICipherSuite): ByteArray = treeHash(root, cipherSuite)</b>
+&nbsp;
+<b class="nc">&nbsp;fun RatchetTree.treeHash(subtreeRoot: TreeIndex): ByteArray = treeHash(subtreeRoot, cipherSuite)</b>
+&nbsp;
+&nbsp;fun RatchetTreeOps.treeHash(
+&nbsp;  subtreeRoot: TreeIndex,
+&nbsp;  cipherSuite: ICipherSuite,
+&nbsp;): ByteArray =
+<b class="fc">&nbsp;  cipherSuite.hash(</b>
+<b class="fc">&nbsp;    if (subtreeRoot.isLeaf) {</b>
+<b class="fc">&nbsp;      TreeHashInput.forLeaf(subtreeRoot.leafIndex, this[subtreeRoot]?.asLeaf).encodeUnsafe()</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      val subtreeRootIdx = subtreeRoot.nodeIndex</b>
+<b class="fc">&nbsp;      TreeHashInput.forParent(</b>
+<b class="fc">&nbsp;        this@treeHash[subtreeRoot]?.asParent,</b>
+<b class="fc">&nbsp;        treeHash(subtreeRootIdx.leftChild, cipherSuite),</b>
+<b class="fc">&nbsp;        treeHash(subtreeRootIdx.rightChild, cipherSuite),</b>
+<b class="fc">&nbsp;      ).encodeUnsafe()</b>
+&nbsp;    },
+&nbsp;  )
+&nbsp;
+&nbsp;fun RatchetTreeOps.parentHash(
+&nbsp;  cipherSuite: ICipherSuite,
+&nbsp;  p: NodeIndex,
+&nbsp;  l: TreeIndex,
+&nbsp;): ParentHash =
+<b class="pc">&nbsp;  if (l.nodeIndex == root) {</b>
+<b class="nc">&nbsp;    ParentHash.empty</b>
+&nbsp;  } else {
+<b class="fc">&nbsp;    val pNode = parentNode(p)</b>
+&nbsp;
+<b class="fc">&nbsp;    val s =</b>
+<b class="fc">&nbsp;      if (l &lt; p) {</b>
+<b class="fc">&nbsp;        p.rightChild</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        p.leftChild</b>
+&nbsp;      }
+&nbsp;
+<b class="fc">&nbsp;    cipherSuite.hash(</b>
+<b class="fc">&nbsp;      ParentHashInput(</b>
+<b class="fc">&nbsp;        pNode.encryptionKey,</b>
+<b class="fc">&nbsp;        if (p == root) ParentHash.empty else pNode.parentHash,</b>
+<b class="fc">&nbsp;        removeLeaves(pNode.unmergedLeaves.toSet()).treeHash(s, cipherSuite),</b>
+<b class="fc">&nbsp;      ).encodeUnsafe(),</b>
+<b class="fc">&nbsp;    ).asParentHash</b>
+&nbsp;  }
+&nbsp;
+&nbsp;private fun RatchetTreeOps.removeLeaves(leaves: Set&lt;LeafIndex&gt;): RatchetTreeOps =
+<b class="fc">&nbsp;  when (this) {</b>
+<b class="fc">&nbsp;    is RatchetTree -&gt; removeLeaves(leaves)</b>
+<b class="fc">&nbsp;    is PublicRatchetTree -&gt; removeLeaves(leaves)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;context(Raise&lt;IsSameClientError&gt;)
+&nbsp;fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage.Private): LeafIndex? =
+<b class="fc">&nbsp;  findEquivalentLeaf(keyPackage.public)</b>
+&nbsp;
+&nbsp;context(Raise&lt;IsSameClientError&gt;)
+&nbsp;fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage): LeafIndex? =
+<b class="pc">&nbsp;  findLeaf { this == keyPackage.leafNode }?.second</b>
+&nbsp;
+&nbsp;context(AuthenticationService&lt;Identity&gt;, Raise&lt;IsSameClientError&gt;)
+&nbsp;suspend fun &lt;Identity : Any&gt; RatchetTreeOps.findEquivalentLeaf(leafNode: LeafNode&lt;*&gt;): LeafIndex? =
+<b class="pc">&nbsp;  leaves.zipWithLeafIndex().find { (n, _) -&gt;</b>
+<b class="pc">&nbsp;    n?.credential?.let { cred -&gt;</b>
+<b class="fc">&nbsp;      isSameClient(cred, leafNode.credential).bind()</b>
+<b class="fc">&nbsp;    } ?: false</b>
+<b class="pc">&nbsp;  }?.second</b>
+&nbsp;
+&nbsp;inline fun RatchetTreeOps.findLeaf(predicate: LeafNode&lt;*&gt;.() -&gt; Boolean): Pair&lt;LeafNode&lt;*&gt;, LeafIndex&gt;? =
+<b class="fc">&nbsp;  leaves.zipWithLeafIndex()</b>
+<b class="fc">&nbsp;    .mapNotNull { (maybeNode, idx) -&gt;</b>
+<b class="fc">&nbsp;      nullable { maybeNode.bind() to idx }</b>
+&nbsp;    }
+<b class="pc">&nbsp;    .find { (n, _) -&gt; n.predicate() }</b>
+&nbsp;
+&nbsp;val RatchetTreeOps.nonBlankParentNodeIndices: List&lt;NodeIndex&gt;
+<b class="fc">&nbsp;  get() = parentNodeIndices.filterNot { it.isBlank }</b>
+&nbsp;
+&nbsp;val RatchetTreeOps.nonBlankLeafNodeIndices: List&lt;NodeIndex&gt;
+<b class="fc">&nbsp;  get() = leafNodeIndices.filterNot { it.isBlank }</b>
+&nbsp;
+&nbsp;val RatchetTreeOps.nonBlankLeafIndices: List&lt;LeafIndex&gt;
+<b class="fc">&nbsp;  get() = leafNodeIndices.filterNot { it.isBlank }.map { it.leafIndex }</b>
+&nbsp;
+&nbsp;val RatchetTreeOps.nonBlankNodeIndices: List&lt;NodeIndex&gt;
+<b class="nc">&nbsp;  get() = nonBlankParentNodeIndices + nonBlankLeafNodeIndices</b>
+&nbsp;
+&nbsp;interface SignaturePublicKeyLookup {
+&nbsp;  context(Raise&lt;VerifySignatureError.SignaturePublicKeyKeyNotFound&gt;)
+&nbsp;  fun getSignaturePublicKey(
+&nbsp;    groupContext: GroupContext,
+&nbsp;    framedContent: FramedContent&lt;*&gt;,
+&nbsp;  ): SignaturePublicKey
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    // For testing purposes
+&nbsp;    internal fun only(signaturePublicKey: SignaturePublicKey): SignaturePublicKeyLookup =
+&nbsp;      object : SignaturePublicKeyLookup {
+&nbsp;        context(Raise&lt;VerifySignatureError.SignaturePublicKeyKeyNotFound&gt;)
+&nbsp;        override fun getSignaturePublicKey(
+&nbsp;          groupContext: GroupContext,
+&nbsp;          framedContent: FramedContent&lt;*&gt;,
+&nbsp;        ): SignaturePublicKey = signaturePublicKey
+&nbsp;      }
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;context(Raise&lt;VerifySignatureError.SignaturePublicKeyKeyNotFound&gt;)
+&nbsp;fun findSignaturePublicKey(
+&nbsp;  framedContent: FramedContent&lt;*&gt;,
+&nbsp;  groupContext: GroupContext,
+&nbsp;  tree: RatchetTreeOps,
+&nbsp;): SignaturePublicKey =
+<b class="pc">&nbsp;  when (framedContent.sender.type) {</b>
+&nbsp;    SenderType.Member -&gt;
+<b class="fc">&nbsp;      tree.leafNodeOrNull(framedContent.sender.index!!)</b>
+<b class="pc">&nbsp;        ?.signaturePublicKey</b>
+&nbsp;
+&nbsp;    SenderType.External -&gt;
+<b class="nc">&nbsp;      groupContext.extension&lt;ExternalSenders&gt;()</b>
+<b class="nc">&nbsp;        ?.externalSenders</b>
+<b class="nc">&nbsp;        ?.getOrNull(framedContent.sender.index!!.value.toInt())</b>
+<b class="nc">&nbsp;        ?.signaturePublicKey</b>
+&nbsp;
+&nbsp;    SenderType.NewMemberCommit -&gt;
+<b class="nc">&nbsp;      (framedContent.content as? Commit)</b>
+<b class="nc">&nbsp;        ?.updatePath?.getOrNull()</b>
+<b class="nc">&nbsp;        ?.leafNode</b>
+<b class="nc">&nbsp;        ?.signaturePublicKey</b>
+&nbsp;
+&nbsp;    SenderType.NewMemberProposal -&gt;
+<b class="nc">&nbsp;      (framedContent.content as? Add)</b>
+<b class="nc">&nbsp;        ?.keyPackage</b>
+<b class="nc">&nbsp;        ?.leafNode</b>
+<b class="nc">&nbsp;        ?.signaturePublicKey</b>
+&nbsp;
+<b class="nc">&nbsp;    else -&gt; error(&quot;Unreachable&quot;)</b>
+<b class="nc">&nbsp;  } ?: raise(VerifySignatureError.SignaturePublicKeyKeyNotFound(framedContent.sender))</b>
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

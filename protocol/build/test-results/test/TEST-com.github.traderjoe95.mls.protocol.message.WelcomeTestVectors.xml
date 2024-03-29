@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" tests="14" skipped="0" failures="0" errors="0" timestamp="2024-03-25T12:31:44" hostname="ataleb-ThinkPad-X13-Gen-1" time="0.081">
+  <properties/>
+  <testcase name="should be able to decrypt a welcome message with init key c697caf7ae54f695f9411d9dc81a206b91fabcaac62a13763213a045ecd72b1e" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 5ca1558498a000f102180eb9ca3f574a17eb80be1888972564fae3e480deb6b2" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 0c627e5642c6a01adb63f130222b66eea352ebe47b85dfef57d123f7d17fcaf7" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.003"/>
+  <testcase name="should be able to decrypt a welcome message with init key 86c3c2c54d42afbc268eefb79ded6e2679c73dda6946905574985104555d8515" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.003"/>
+  <testcase name="should be able to decrypt a welcome message with init key c697caf7ae54f695f9411d9dc81a206b91fabcaac62a13763213a045ecd72b1e" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key d68b7e1eb900779e107663f46c7577533f8de75b1f2a9779789d47fe9af11933" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.0"/>
+  <testcase name="should be able to decrypt a welcome message with init key 82ed1d24a7ec333e8496e2360d27a64f79cd823e1e887b62e5a406b1f4f39522a5fb7eb2952f013e272dbfe270d4b3cf87a7be304bea7fea" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 9ce108d28ea5cbb69cde308004e58d05b87d818f3d8b2a262c865bf26b05223deff3dddcbb9102a4014688a8c0dc3dd0edb0e5174578df64" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 0111cc38e3c7fee8090bee1f46038c27c5505d8bec0027c1c691d6a93347dfe4a9e3a645949b88a4e75144bebf1ac488f6fbcc488545056c3d013e4d260e971c35ac" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.017"/>
+  <testcase name="should be able to decrypt a welcome message with init key 01bb34ddd1f87aeac22d86f2e5d0afc1a4e9b7e7aba94485ae3feb7a4e5ba669939568f2984eb28e16813bb69aa28643ddf7ad9f61531a71c6420437464daf08518b" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.006"/>
+  <testcase name="should be able to decrypt a welcome message with init key 82ed1d24a7ec333e8496e2360d27a64f79cd823e1e887b62e5a406b1f4f39522a5fb7eb2952f013e272dbfe270d4b3cf87a7be304bea7fea" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 278f02ec0d834eb305e05855ab6fded461154fadffd839555be380af8325d5ed7acf8a6061ee679863d83b532f1e79bfef2855abbde91796" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.001"/>
+  <testcase name="should be able to decrypt a welcome message with init key 7030615798d67f97665e9aeb8ac61fb1ef7311a92e5b6e6d97f3f4d9e57dd39537ce886f48d928e09a694c7e0ebaf449" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.004"/>
+  <testcase name="should be able to decrypt a welcome message with init key 94f8245fb36a91ee18b5e4140f480724ea88d315e6bc6ec7d60b7fcf9e5db75bb86aebb58a7988f3f8257685cfaa9502" classname="com.github.traderjoe95.mls.protocol.message.WelcomeTestVectors" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

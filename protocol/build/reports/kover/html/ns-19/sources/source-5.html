@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > UpdatePathNode</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types.tree</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdatePathNode (com.github.traderjoe95.mls.protocol.types.tree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpdatePathNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UpdatePathNode$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UpdatePathNode$special$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">UpdatePathNode$special$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types.tree
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.V
+&nbsp;import com.github.traderjoe95.mls.codec.type.get
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.util.uSize
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
+&nbsp;
+<b class="fc">&nbsp;data class UpdatePathNode(</b>
+<b class="fc">&nbsp;  val encryptionKey: HpkePublicKey,</b>
+<b class="fc">&nbsp;  val encryptedPathSecret: List&lt;HpkeCiphertext&gt;,</b>
+&nbsp;) : Struct2T.Shape&lt;HpkePublicKey, List&lt;HpkeCiphertext&gt;&gt; {
+&nbsp;  companion object : Encodable&lt;UpdatePathNode&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;UpdatePathNode&gt; =</b>
+<b class="fc">&nbsp;      struct(&quot;UpdatePathNode&quot;) {</b>
+<b class="fc">&nbsp;        it.field(&quot;encryption_key&quot;, HpkePublicKey.T)</b>
+<b class="fc">&nbsp;          .field(&quot;encrypted_path_secret&quot;, HpkeCiphertext.T[V])</b>
+<b class="fc">&nbsp;      }.lift(::UpdatePathNode)</b>
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class UpdatePath(
+&nbsp;  val leafNode: CommitLeafNode,
+&nbsp;  val nodes: List&lt;UpdatePathNode&gt;,
+&nbsp;) : Struct2T.Shape&lt;CommitLeafNode, List&lt;UpdatePathNode&gt;&gt; {
+&nbsp;  val size: UInt
+&nbsp;    get() = nodes.uSize
+&nbsp;
+&nbsp;  companion object : Encodable&lt;UpdatePath&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;UpdatePath&gt; =
+&nbsp;      struct(&quot;UpdatePath&quot;) {
+&nbsp;        it.field(&quot;leaf_node&quot;, LeafNode.t(LeafNodeSource.Commit))
+&nbsp;          .field(&quot;nodes&quot;, UpdatePathNode.T[V])
+&nbsp;      }.lift(::UpdatePath)
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

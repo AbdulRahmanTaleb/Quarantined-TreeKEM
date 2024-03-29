@@ -1,0 +1,94 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > AuthenticationServiceError</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.error</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthenticationServiceError (com.github.traderjoe95.mls.protocol.error)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthenticationServiceError</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.error
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.protocol.types.CredentialType
+&nbsp;
+&nbsp;sealed interface IsSameClientError : CommitError, JoinError, ResumptionJoinError, RemoveValidationError
+&nbsp;
+&nbsp;sealed interface CredentialValidationError : LeafNodeCheckError, ResumptionError, CredentialIdentityValidationError {
+&nbsp;  data object InvalidCredential : CredentialValidationError
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CredentialIdentityValidationError {
+&nbsp;  data object IdentityMismatch : CredentialIdentityValidationError
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface CredentialError : CredentialValidationError, IsSameClientError {
+&nbsp;  data class BadCredentialFormat(val reason: String) : CredentialError
+&nbsp;
+&nbsp;  data class UnsupportedCredential(val type: CredentialType) : CredentialError
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface AuthenticationServiceError : CredentialError
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > MlsMessage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.message</a>
+</div>
+
+<h1>Coverage Summary for Class: MlsMessage (com.github.traderjoe95.mls.protocol.message)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">MlsMessage</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (18/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.4%
+  </span>
+  <span class="absValue">
+    (145/152)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MlsMessage$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (8/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.6%
+  </span>
+  <span class="absValue">
+    (51/185)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MlsMessage$encoded$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MlsMessage$T$lambda$3$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">MlsMessage$T$lambda$3$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    65%
+  </span>
+  <span class="absValue">
+    (13/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.4%
+  </span>
+  <span class="absValue">
+    (26/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.5%
+  </span>
+  <span class="absValue">
+    (196/341)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.message
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import arrow.core.raise.ensure
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct3T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.member.then
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.util.throwAnyError
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.error.MessageRecipientError
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Ciphertext
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.Content
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion.MLS_1_0
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
+&nbsp;
+<b class="fc">&nbsp;class MlsMessage&lt;out M : Message&gt;</b>
+&nbsp;  @PublishedApi
+&nbsp;  internal constructor(
+<b class="fc">&nbsp;    val protocolVersion: ProtocolVersion,</b>
+<b class="fc">&nbsp;    val message: M,</b>
+&nbsp;  ) : Struct3T.Shape&lt;ProtocolVersion, WireFormat, M&gt; {
+<b class="nc">&nbsp;    constructor(message: M) : this(MLS_1_0, message)</b>
+&nbsp;
+&nbsp;    @get:JvmName(&quot;encoded&quot;)
+<b class="pc">&nbsp;    val encoded: ByteArray by lazy { encodeUnsafe() }</b>
+&nbsp;
+&nbsp;    val wireFormat: WireFormat
+<b class="nc">&nbsp;      get() = message.wireFormat</b>
+&nbsp;
+<b class="fc">&nbsp;    override fun component1(): ProtocolVersion = protocolVersion</b>
+&nbsp;
+<b class="fc">&nbsp;    override fun component2(): WireFormat = message.wireFormat</b>
+&nbsp;
+<b class="fc">&nbsp;    override fun component3(): M = message</b>
+&nbsp;
+&nbsp;    companion object : Encodable&lt;MlsMessage&lt;*&gt;&gt; {
+<b class="fc">&nbsp;      internal fun &lt;C : Content&lt;C&gt;&gt; public(message: PublicMessage&lt;C&gt;): MlsMessage&lt;PublicMessage&lt;C&gt;&gt; = MlsMessage(MLS_1_0, message)</b>
+&nbsp;
+<b class="fc">&nbsp;      internal fun &lt;C : Content&lt;C&gt;&gt; private(message: PrivateMessage&lt;C&gt;): MlsMessage&lt;PrivateMessage&lt;C&gt;&gt; = MlsMessage(MLS_1_0, message)</b>
+&nbsp;
+&nbsp;      internal fun welcome(
+&nbsp;        cipherSuite: CipherSuite,
+&nbsp;        encryptedGroupSecrets: List&lt;EncryptedGroupSecrets&gt;,
+&nbsp;        encryptedGroupInfo: Ciphertext,
+<b class="fc">&nbsp;      ): MlsMessage&lt;Welcome&gt; = welcome(Welcome(cipherSuite, encryptedGroupSecrets, encryptedGroupInfo))</b>
+&nbsp;
+&nbsp;      @JvmStatic
+<b class="fc">&nbsp;      fun welcome(message: Welcome): MlsMessage&lt;Welcome&gt; = MlsMessage(MLS_1_0, message)</b>
+&nbsp;
+&nbsp;      @JvmStatic
+<b class="fc">&nbsp;      fun groupInfo(message: GroupInfo): MlsMessage&lt;GroupInfo&gt; = MlsMessage(MLS_1_0, message)</b>
+&nbsp;
+&nbsp;      @JvmStatic
+<b class="fc">&nbsp;      fun keyPackage(message: KeyPackage): MlsMessage&lt;KeyPackage&gt; = MlsMessage(MLS_1_0, message)</b>
+&nbsp;
+<b class="fc">&nbsp;      inline fun &lt;reified M : Message&gt; MlsMessage&lt;Message&gt;.coerceFormat(): MlsMessage&lt;M&gt; = MlsMessage(protocolVersion, message as M)</b>
+&nbsp;
+&nbsp;      context(Raise&lt;MessageRecipientError.UnexpectedWireFormat&gt;)
+<b class="nc">&nbsp;      inline fun &lt;reified M : Message&gt; MlsMessage&lt;Message&gt;.ensureFormat(wireFormat: WireFormat? = null): MlsMessage&lt;M&gt; =</b>
+<b class="nc">&nbsp;        if (message is M) {</b>
+<b class="nc">&nbsp;          MlsMessage(protocolVersion, message)</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          raise(MessageRecipientError.UnexpectedWireFormat(this.wireFormat, wireFormat))</b>
+&nbsp;        }
+&nbsp;
+&nbsp;      context(Raise&lt;MessageRecipientError&gt;)
+&nbsp;      inline fun &lt;C : Content&lt;C&gt;, reified M : GroupMessage&lt;C&gt;&gt; MlsMessage&lt;Message&gt;.ensureFormatAndContent(
+&nbsp;        wireFormat: WireFormat,
+&nbsp;        contentType: ContentType&lt;C&gt;,
+&nbsp;      ): MlsMessage&lt;M&gt; =
+<b class="nc">&nbsp;        if (message is M &amp;&amp; this.wireFormat == wireFormat) {</b>
+<b class="nc">&nbsp;          MlsMessage(protocolVersion, message).also {</b>
+<b class="nc">&nbsp;            ensure(message.contentType == contentType) {</b>
+<b class="nc">&nbsp;              MessageRecipientError.UnexpectedContent(</b>
+<b class="nc">&nbsp;                message.contentType,</b>
+<b class="nc">&nbsp;                contentType,</b>
+&nbsp;              )
+&nbsp;            }
+<b class="nc">&nbsp;          }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          raise(MessageRecipientError.UnexpectedWireFormat(this.wireFormat, wireFormat))</b>
+&nbsp;        }
+&nbsp;
+&nbsp;      @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;      override val T: DataType&lt;MlsMessage&lt;*&gt;&gt; =</b>
+<b class="fc">&nbsp;        throwAnyError {</b>
+<b class="fc">&nbsp;          struct(&quot;MLSMessage&quot;) {</b>
+<b class="fc">&nbsp;            it.field(&quot;version&quot;, ProtocolVersion.T, MLS_1_0)</b>
+<b class="fc">&nbsp;              .field(&quot;wire_format&quot;, WireFormat.T)</b>
+<b class="fc">&nbsp;              .select&lt;Message, _&gt;(WireFormat.T, &quot;wire_format&quot;) {</b>
+<b class="fc">&nbsp;                case(WireFormat.MlsPublicMessage).then(PublicMessage.T, &quot;public_message&quot;)</b>
+<b class="fc">&nbsp;                  .case(WireFormat.MlsPrivateMessage).then(PrivateMessage.T, &quot;private_message&quot;)</b>
+<b class="fc">&nbsp;                  .case(WireFormat.MlsWelcome).then(Welcome.T, &quot;welcome&quot;)</b>
+<b class="fc">&nbsp;                  .case(WireFormat.MlsGroupInfo).then(GroupInfo.T, &quot;group_info&quot;)</b>
+<b class="fc">&nbsp;                  .case(WireFormat.MlsKeyPackage).then(KeyPackage.T, &quot;key_package&quot;)</b>
+&nbsp;              }
+<b class="fc">&nbsp;          }.lift { v, _, msg -&gt; MlsMessage(v, msg) }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;  }
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > HashReference</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types.crypto</a>
+</div>
+
+<h1>Coverage Summary for Class: HashReference (com.github.traderjoe95.mls.protocol.types.crypto)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">HashReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.9%
+  </span>
+  <span class="absValue">
+    (35/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HashReference$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HashReference$special$$inlined$dataT$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.5%
+  </span>
+  <span class="absValue">
+    (37/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types.crypto
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.protocol.message.KeyPackage
+&nbsp;import com.github.traderjoe95.mls.protocol.types.RefinedBytes
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.content.Proposal
+&nbsp;
+<b class="nc">&nbsp;@JvmInline</b>
+<b class="fc">&nbsp;value class HashReference(override val bytes: ByteArray) : RefinedBytes&lt;HashReference&gt; {</b>
+&nbsp;  val asKeyPackageRef: KeyPackage.Ref
+<b class="fc">&nbsp;    get() = KeyPackage.Ref(bytes)</b>
+&nbsp;  val asProposalRef: Proposal.Ref
+<b class="fc">&nbsp;    get() = Proposal.Ref(bytes)</b>
+&nbsp;
+&nbsp;  companion object : Encodable&lt;HashReference&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="pc">&nbsp;    override val T: DataType&lt;HashReference&gt; = RefinedBytes.dataT(::HashReference, name = &quot;HashReference&quot;)</b>
+&nbsp;
+&nbsp;    val ByteArray.asHashReference: HashReference
+<b class="fc">&nbsp;      get() = HashReference(this)</b>
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;internal data class RefHashInput(val label: String, val value: ByteArray) : Struct2T.Shape&lt;String, ByteArray&gt; {
+&nbsp;  companion object : Encodable&lt;RefHashInput&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T = bytesAndLabel(&quot;RefHashInput&quot;, &quot;value&quot;).lift(::RefHashInput)
+&nbsp;
+&nbsp;    fun keyPackage(value: ByteArray): RefHashInput = RefHashInput(&quot;MLS 1.0 KeyPackage Reference&quot;, value)
+&nbsp;
+&nbsp;    fun proposal(value: ByteArray): RefHashInput = RefHashInput(&quot;MLS 1.0 Proposal Reference&quot;, value)
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun equals(other: Any?): Boolean {
+&nbsp;    if (this === other) return true
+&nbsp;    if (javaClass != other?.javaClass) return false
+&nbsp;
+&nbsp;    other as SignContent
+&nbsp;
+&nbsp;    if (label != other.label) return false
+&nbsp;    if (!value.contentEquals(other.content)) return false
+&nbsp;
+&nbsp;    return true
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+&nbsp;    var result = label.hashCode()
+&nbsp;    result = 31 * result + value.contentHashCode()
+&nbsp;    return result
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

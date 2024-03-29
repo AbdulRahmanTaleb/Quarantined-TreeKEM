@@ -1,0 +1,295 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > KeySchedule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.crypto</a>
+</div>
+
+<h1>Coverage Summary for Class: KeySchedule (com.github.traderjoe95.mls.protocol.crypto)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeySchedule</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (118/118)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">KeySchedule$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.9%
+  </span>
+  <span class="absValue">
+    (28/61)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">KeySchedule$externalKeyPair$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (25/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.3%
+  </span>
+  <span class="absValue">
+    (153/186)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.crypto
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.protocol.group.GroupContext
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+&nbsp;
+&nbsp;sealed class KeyScheduleEvolution {
+&nbsp;  protected abstract val cipherSuite: ICipherSuite
+&nbsp;  internal abstract val initSecret: Secret
+&nbsp;
+&nbsp;  fun nextEpoch(
+&nbsp;    commitSecret: Secret,
+&nbsp;    groupContext: GroupContext,
+&nbsp;    pskSecret: Secret,
+&nbsp;    forceInitSecret: Secret? = null,
+&nbsp;  ): Triple&lt;KeySchedule, Secret, Secret&gt; {
+&nbsp;    val initSecret = forceInitSecret ?: this.initSecret
+&nbsp;
+&nbsp;    val joinerSecret =
+&nbsp;      cipherSuite.expandWithLabel(
+&nbsp;        cipherSuite.extract(initSecret, commitSecret),
+&nbsp;        &quot;joiner&quot;,
+&nbsp;        groupContext.encoded,
+&nbsp;      )
+&nbsp;    initSecret.wipe()
+&nbsp;
+&nbsp;    val joinerExtracted = cipherSuite.extract(joinerSecret, pskSecret)
+&nbsp;    val welcomeSecret = cipherSuite.deriveSecret(joinerExtracted, &quot;welcome&quot;)
+&nbsp;    val epochSecret = cipherSuite.expandWithLabel(joinerExtracted, &quot;epoch&quot;, groupContext.encoded)
+&nbsp;
+&nbsp;    return Triple(
+&nbsp;      KeySchedule(cipherSuite, epochSecret),
+&nbsp;      joinerSecret,
+&nbsp;      welcomeSecret,
+&nbsp;    )
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;class KeySchedule internal constructor(
+<b class="fc">&nbsp;  override val cipherSuite: ICipherSuite,</b>
+&nbsp;  epochSecret: Secret,
+<b class="fc">&nbsp;) : KeyScheduleEvolution() {</b>
+<b class="fc">&nbsp;  internal val senderDataSecret: Secret = cipherSuite.deriveSecret(epochSecret, &quot;sender data&quot;)</b>
+<b class="fc">&nbsp;  internal val encryptionSecret: Secret = cipherSuite.deriveSecret(epochSecret, &quot;encryption&quot;)</b>
+<b class="fc">&nbsp;  internal val exporterSecret: Secret = cipherSuite.deriveSecret(epochSecret, &quot;exporter&quot;)</b>
+<b class="fc">&nbsp;  internal val externalSecret: Secret = cipherSuite.deriveSecret(epochSecret, &quot;external&quot;)</b>
+<b class="fc">&nbsp;  val confirmationKey: Secret = cipherSuite.deriveSecret(epochSecret, &quot;confirm&quot;)</b>
+<b class="fc">&nbsp;  val membershipKey: Secret = cipherSuite.deriveSecret(epochSecret, &quot;membership&quot;)</b>
+<b class="fc">&nbsp;  val resumptionPsk: Secret = cipherSuite.deriveSecret(epochSecret, &quot;resumption&quot;)</b>
+<b class="fc">&nbsp;  val epochAuthenticator: Secret = cipherSuite.deriveSecret(epochSecret, &quot;authentication&quot;)</b>
+&nbsp;
+<b class="fc">&nbsp;  override val initSecret: Secret = cipherSuite.deriveSecret(epochSecret, &quot;init&quot;)</b>
+&nbsp;
+<b class="fc">&nbsp;  val externalKeyPair: HpkeKeyPair by lazy { cipherSuite.deriveKeyPair(externalSecret) }</b>
+&nbsp;
+&nbsp;  fun mlsExporter(
+&nbsp;    label: String,
+&nbsp;    context: ByteArray,
+&nbsp;    length: UShort,
+&nbsp;  ): Secret =
+<b class="fc">&nbsp;    cipherSuite.expandWithLabel(</b>
+<b class="fc">&nbsp;      cipherSuite.deriveSecret(exporterSecret, label),</b>
+<b class="fc">&nbsp;      &quot;exported&quot;,</b>
+<b class="fc">&nbsp;      cipherSuite.hash(context),</b>
+<b class="fc">&nbsp;      length,</b>
+&nbsp;    )
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    internal fun uninitialized(
+&nbsp;      cipherSuite: CipherSuite,
+<b class="nc">&nbsp;      initSecret: Secret = cipherSuite.generateSecret(cipherSuite.hashLen),</b>
+<b class="fc">&nbsp;    ): KeyScheduleEvolution = KeyScheduleInit(cipherSuite, initSecret)</b>
+&nbsp;
+&nbsp;    fun init(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupContext: GroupContext,
+<b class="nc">&nbsp;      initSecret: Secret = cipherSuite.generateSecret(cipherSuite.hashLen),</b>
+<b class="nc">&nbsp;      commitSecret: Secret = Secret.zeroes(cipherSuite.hashLen),</b>
+<b class="nc">&nbsp;      pskSecret: Secret = Secret.zeroes(cipherSuite.hashLen),</b>
+<b class="nc">&nbsp;    ): KeySchedule = uninitialized(cipherSuite, initSecret).nextEpoch(commitSecret, groupContext, pskSecret).first</b>
+&nbsp;
+&nbsp;    fun join(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      joinerSecret: Secret,
+&nbsp;      pskSecret: Secret,
+&nbsp;      groupContext: GroupContext,
+&nbsp;    ): KeySchedule =
+<b class="fc">&nbsp;      KeySchedule(</b>
+<b class="fc">&nbsp;        cipherSuite,</b>
+<b class="fc">&nbsp;        cipherSuite.expandWithLabel(</b>
+<b class="fc">&nbsp;          cipherSuite.extract(joinerSecret, pskSecret),</b>
+<b class="fc">&nbsp;          &quot;epoch&quot;,</b>
+<b class="fc">&nbsp;          groupContext.encoded,</b>
+&nbsp;        ),
+&nbsp;      )
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;internal class KeyScheduleInit(
+&nbsp;  override val cipherSuite: CipherSuite,
+&nbsp;  override val initSecret: Secret,
+&nbsp;) : KeyScheduleEvolution()
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

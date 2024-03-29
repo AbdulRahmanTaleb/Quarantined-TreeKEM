@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > TestTree</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.interop.tree</a>
+</div>
+
+<h1>Coverage Summary for Class: TestTree (com.github.traderjoe95.mls.protocol.interop.tree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.4%
+  </span>
+  <span class="absValue">
+    (62/63)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (474/476)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TestTree$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (54/54)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (16/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (74/75)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (528/530)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.interop.tree
+&nbsp;
+&nbsp;import com.github.traderjoe95.mls.codec.util.uSize
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.nextGroupContext
+&nbsp;import com.github.traderjoe95.mls.protocol.interop.util.nextKeyPackage
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.LeafIndex
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.PrivateRatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.PublicRatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.RatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.RatchetTree.Companion.join
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.createUpdatePath
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.nonBlankLeafIndices
+&nbsp;import com.github.traderjoe95.mls.protocol.types.GroupId
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
+&nbsp;import com.github.traderjoe95.mls.protocol.util.unsafe
+&nbsp;import kotlin.random.Random
+&nbsp;
+&nbsp;sealed interface TreeStructure {
+&nbsp;  fun generateTree(
+&nbsp;    cipherSuite: CipherSuite,
+&nbsp;    groupId: GroupId,
+&nbsp;  ): TestTree
+&nbsp;
+&nbsp;  data class FullTree(val leaves: UInt) : TreeStructure {
+&nbsp;    override fun generateTree(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree = TestTree.full(cipherSuite, groupId, leaves)
+&nbsp;  }
+&nbsp;
+&nbsp;  data object InternalBlanksNoSkipping : TreeStructure {
+&nbsp;    override fun generateTree(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree =
+&nbsp;      TestTree
+&nbsp;        .full(cipherSuite, groupId, 8U)
+&nbsp;        .removeMembersAndAddNew(listOf(2U, 3U), LeafIndex(0U))
+&nbsp;  }
+&nbsp;
+&nbsp;  data object InternalBlanksWithSkipping : TreeStructure {
+&nbsp;    override fun generateTree(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree =
+&nbsp;      TestTree
+&nbsp;        .full(cipherSuite, groupId, 8U)
+&nbsp;        .removeMembers(listOf(1U, 2U, 3U), LeafIndex(0U))
+&nbsp;  }
+&nbsp;
+&nbsp;  data object UnmergedLeavesNoSkipping : TreeStructure {
+&nbsp;    override fun generateTree(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree =
+&nbsp;      TestTree
+&nbsp;        .full(cipherSuite, groupId, 7U)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;  }
+&nbsp;
+&nbsp;  data object UnmergedLeavesWithSkipping : TreeStructure {
+&nbsp;    override fun generateTree(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree =
+&nbsp;      TestTree.new(cipherSuite, groupId)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;        .removeMembers(listOf(5U), LeafIndex(0U))
+&nbsp;        .updatePath(LeafIndex(4U))
+&nbsp;        .addMember(LeafIndex(0U), updatePath = false)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;data class TestTree(</b>
+<b class="fc">&nbsp;  val cipherSuite: CipherSuite,</b>
+<b class="fc">&nbsp;  val groupId: GroupId,</b>
+<b class="fc">&nbsp;  val public: PublicRatchetTree,</b>
+<b class="fc">&nbsp;  val private: List&lt;PrivateRatchetTree?&gt;,</b>
+<b class="fc">&nbsp;  val signaturePrivateKeys: List&lt;SignaturePrivateKey?&gt;,</b>
+&nbsp;) {
+<b class="fc">&nbsp;  operator fun get(index: UInt): RatchetTree? = private.getOrNull(index.toInt())?.let { RatchetTree(cipherSuite, public, it) }</b>
+&nbsp;
+<b class="fc">&nbsp;  operator fun get(index: LeafIndex): RatchetTree? = this[index.value]</b>
+&nbsp;
+&nbsp;  fun addMember(
+&nbsp;    committer: LeafIndex,
+<b class="nc">&nbsp;    updatePath: Boolean = true,</b>
+&nbsp;  ): TestTree {
+<b class="fc">&nbsp;    val newMember = Random.nextKeyPackage(cipherSuite)</b>
+&nbsp;
+<b class="fc">&nbsp;    val (newPublic, newLeaf) = public.insert(newMember.leafNode)</b>
+&nbsp;
+<b class="fc">&nbsp;    return copy(</b>
+<b class="fc">&nbsp;      public = newPublic,</b>
+<b class="fc">&nbsp;      private = private.replace(newLeaf, newPublic.join(cipherSuite, newLeaf, newMember.encPrivateKey).private),</b>
+<b class="fc">&nbsp;      signaturePrivateKeys = signaturePrivateKeys.replace(newLeaf, newMember.signaturePrivateKey),</b>
+<b class="fc">&nbsp;    ).let {</b>
+<b class="fc">&nbsp;      if (updatePath) {</b>
+<b class="fc">&nbsp;        it.updatePath(committer, setOf(newLeaf))</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        it</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  fun removeMembers(
+&nbsp;    removed: List&lt;UInt&gt;,
+&nbsp;    committer: LeafIndex,
+&nbsp;  ): TestTree =
+<b class="fc">&nbsp;    copy(</b>
+<b class="fc">&nbsp;      public = public.remove(removed.map(::LeafIndex)),</b>
+<b class="fc">&nbsp;      private = private.filterIndices(removed.toSet()),</b>
+<b class="fc">&nbsp;      signaturePrivateKeys = signaturePrivateKeys.filterIndices(removed.toSet()),</b>
+<b class="fc">&nbsp;    ).updatePath(committer)</b>
+&nbsp;
+&nbsp;  fun removeMembersAndAddNew(
+&nbsp;    removed: List&lt;UInt&gt;,
+&nbsp;    committer: LeafIndex,
+&nbsp;  ): TestTree {
+<b class="fc">&nbsp;    val newMember = Random.nextKeyPackage(cipherSuite)</b>
+&nbsp;
+<b class="fc">&nbsp;    val newPublic = public.remove(removed.map(::LeafIndex))</b>
+<b class="fc">&nbsp;    val newPrivate = private.filterIndices(removed.toSet())</b>
+<b class="fc">&nbsp;    val newSig = signaturePrivateKeys.filterIndices(removed.toSet())</b>
+&nbsp;
+<b class="fc">&nbsp;    val (publicAfterInsert, newLeaf) = newPublic.insert(newMember.leafNode)</b>
+&nbsp;
+<b class="fc">&nbsp;    return copy(</b>
+<b class="fc">&nbsp;      public = publicAfterInsert,</b>
+<b class="fc">&nbsp;      private = newPrivate.replace(newLeaf, newPublic.join(cipherSuite, newLeaf, newMember.encPrivateKey).private),</b>
+<b class="fc">&nbsp;      signaturePrivateKeys = newSig.replace(newLeaf, newMember.signaturePrivateKey),</b>
+<b class="fc">&nbsp;    ).updatePath(committer, setOf(newLeaf))</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  fun updatePath(
+&nbsp;    committer: LeafIndex,
+<b class="fc">&nbsp;    newLeaves: Set&lt;LeafIndex&gt; = setOf(),</b>
+&nbsp;  ): TestTree {
+<b class="fc">&nbsp;    val (updatedTreeSender, _, pathSecrets) =</b>
+<b class="fc">&nbsp;      unsafe {</b>
+<b class="fc">&nbsp;        createUpdatePath(</b>
+<b class="fc">&nbsp;          RatchetTree(cipherSuite, public, private[committer]!!),</b>
+<b class="fc">&nbsp;          committer,</b>
+<b class="fc">&nbsp;          newLeaves,</b>
+<b class="fc">&nbsp;          Random.nextGroupContext(cipherSuite, groupId),</b>
+<b class="fc">&nbsp;          signaturePrivateKeys[committer]!!,</b>
+&nbsp;        )
+&nbsp;      }
+&nbsp;
+<b class="fc">&nbsp;    val newPublic = updatedTreeSender.public</b>
+<b class="fc">&nbsp;    var newPrivate = private.replace(committer, updatedTreeSender.private)</b>
+&nbsp;
+<b class="fc">&nbsp;    val fdp = newPublic.filteredDirectPath(committer)</b>
+&nbsp;    // Inject path secrets for all other members
+<b class="fc">&nbsp;    newPublic.nonBlankLeafIndices</b>
+<b class="fc">&nbsp;      .filter { it neq committer }</b>
+<b class="fc">&nbsp;      .forEach { leaf -&gt;</b>
+<b class="fc">&nbsp;        val commonAncestorIdx = fdp.indexOfFirst { leaf.isInSubtreeOf(it.first) }</b>
+<b class="fc">&nbsp;        val commonAncestor = fdp[commonAncestorIdx].first</b>
+<b class="fc">&nbsp;        val secret = pathSecrets[commonAncestorIdx]</b>
+&nbsp;
+<b class="fc">&nbsp;        newPrivate = newPrivate.replace(leaf, this[leaf]!!.insertPathSecrets(commonAncestor, secret).private)</b>
+<b class="fc">&nbsp;      }</b>
+&nbsp;
+<b class="fc">&nbsp;    return copy(public = newPublic, private = newPrivate)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private fun &lt;T : Any&gt; List&lt;T?&gt;.filterIndices(indices: Set&lt;UInt&gt;): List&lt;T?&gt; =
+<b class="fc">&nbsp;    mapIndexed { idx, t -&gt; t.takeUnless { idx.toUInt() in indices } }</b>
+&nbsp;
+&nbsp;  private fun &lt;T : Any&gt; List&lt;T?&gt;.replace(
+&nbsp;    index: UInt,
+&nbsp;    value: T?,
+<b class="fc">&nbsp;  ): List&lt;T?&gt; = ensureMinSize(index + 1U).mapIndexed { idx, t -&gt; if (idx.toUInt() == index) value else t }</b>
+&nbsp;
+&nbsp;  private fun &lt;T : Any&gt; List&lt;T?&gt;.replace(
+&nbsp;    index: LeafIndex,
+&nbsp;    value: T?,
+<b class="fc">&nbsp;  ): List&lt;T?&gt; = replace(index.value, value)</b>
+&nbsp;
+<b class="fc">&nbsp;  private operator fun &lt;T : Any&gt; List&lt;T?&gt;.get(index: UInt): T? = this[index.toInt()]</b>
+&nbsp;
+<b class="fc">&nbsp;  private operator fun &lt;T : Any&gt; List&lt;T?&gt;.get(index: LeafIndex): T? = this[index.value]</b>
+&nbsp;
+&nbsp;  private fun &lt;T : Any&gt; List&lt;T?&gt;.ensureMinSize(minSize: UInt): List&lt;T?&gt; =
+<b class="fc">&nbsp;    if (uSize &gt;= minSize) {</b>
+<b class="fc">&nbsp;      this</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      List(minSize.toInt()) { if (it &lt; size) this[it] else null }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    fun new(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;    ): TestTree {
+<b class="fc">&nbsp;      val firstMember = Random.nextKeyPackage(cipherSuite)</b>
+<b class="fc">&nbsp;      val tree = RatchetTree.new(firstMember)</b>
+&nbsp;
+<b class="fc">&nbsp;      return TestTree(</b>
+<b class="fc">&nbsp;        cipherSuite,</b>
+<b class="fc">&nbsp;        groupId,</b>
+<b class="fc">&nbsp;        tree.public,</b>
+<b class="fc">&nbsp;        listOf(tree.private),</b>
+<b class="fc">&nbsp;        listOf(firstMember.signaturePrivateKey),</b>
+&nbsp;      )
+&nbsp;    }
+&nbsp;
+&nbsp;    fun full(
+&nbsp;      cipherSuite: CipherSuite,
+&nbsp;      groupId: GroupId,
+&nbsp;      leaves: UInt,
+&nbsp;    ): TestTree {
+<b class="fc">&nbsp;      var tree = new(cipherSuite, groupId)</b>
+&nbsp;
+<b class="fc">&nbsp;      for (l in 1U..&lt;leaves) {</b>
+<b class="fc">&nbsp;        tree = tree.addMember(LeafIndex(l - 1U), updatePath = true)</b>
+&nbsp;      }
+&nbsp;
+<b class="fc">&nbsp;      return tree</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

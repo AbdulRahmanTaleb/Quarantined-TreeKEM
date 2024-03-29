@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.github.traderjoe95.mls.protocol.message.MessageProtection" tests="154" skipped="0" failures="0" errors="0" timestamp="2024-03-25T12:31:35" hostname="ataleb-ThinkPad-X13-Gen-1" time="0.512">
+  <properties/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.009"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.009"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.0"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.001"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.007"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <testcase name="should be able to unprotect a public message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a public message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to unprotect a public message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.003"/>
+  <testcase name="should be able to protect a public message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to unprotect a private message containing a Proposal" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.008"/>
+  <testcase name="should be able to protect a private message containing a Proposal, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.006"/>
+  <testcase name="should be able to unprotect a private message containing a Commit" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing a Commit, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.005"/>
+  <testcase name="should be able to unprotect a private message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.004"/>
+  <testcase name="should be able to protect a private message containing application data, which can be unprotected again" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.01"/>
+  <testcase name="should raise an error when trying to protect a public message containing application data" classname="com.github.traderjoe95.mls.protocol.message.MessageProtection" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

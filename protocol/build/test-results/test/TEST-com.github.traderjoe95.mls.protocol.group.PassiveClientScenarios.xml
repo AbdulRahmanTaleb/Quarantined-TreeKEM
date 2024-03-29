@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" tests="912" skipped="0" failures="0" errors="0" timestamp="2024-03-25T12:31:26" hostname="ataleb-ThinkPad-X13-Gen-1" time="9.292">
+  <properties/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.11"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.073"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.064"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.053"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.056"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.051"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.048"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.057"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.052"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.088"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.094"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.096"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.088"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.093"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.085"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.093"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.091"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.075"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.071"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.091"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.064"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.082"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.07"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.064"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.07"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.036"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.067"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.031"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.078"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.047"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.053"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.05"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.047"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.057"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.065"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.049"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.045"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.062"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.058"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.059"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.038"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.071"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.013"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.023"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.027"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.034"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.034"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.034"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.037"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.041"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.038"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.035"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.032"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.035"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.048"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.025"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.113"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.035"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.133"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.09"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.112"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.093"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.027"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.104"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.04"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.103"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.032"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.1"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.08"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.086"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.08"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.013"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.082"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.063"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.119"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.029"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.028"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.027"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.023"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.074"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.059"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.058"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.069"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.069"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.067"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.03"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.078"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.072"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.063"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.062"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.068"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.066"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.053"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.106"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.025"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.013"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.027"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.028"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.026"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.026"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.013"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.025"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.026"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.026"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.029"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.039"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.023"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.025"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.022"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.008"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.011"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.01"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.02"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.006"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.018"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.019"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.007"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.015"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.009"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.023"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.012"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.002"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.005"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.016"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.021"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.017"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.025"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.004"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.014"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.003"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.001"/>
+  <testcase name="the commit should be successfully applied" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.024"/>
+  <testcase name="and the epoch authenticator should be as expected" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="0.0"/>
+  <testcase name="the client should be able to join the group" classname="com.github.traderjoe95.mls.protocol.group.PassiveClientScenarios" time="2.37"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

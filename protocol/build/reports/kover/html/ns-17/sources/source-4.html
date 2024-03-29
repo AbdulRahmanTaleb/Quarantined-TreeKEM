@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > Commit</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types.framing.content</a>
+</div>
+
+<h1>Coverage Summary for Class: Commit (com.github.traderjoe95.mls.protocol.types.framing.content)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">Commit</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.2%
+  </span>
+  <span class="absValue">
+    (16/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.7%
+  </span>
+  <span class="absValue">
+    (109/152)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Commit$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Commit$special$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Commit$special$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Commit$T$lambda$2$$inlined$get$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Commit$T$lambda$2$$inlined$get$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.9%
+  </span>
+  <span class="absValue">
+    (17/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.2%
+  </span>
+  <span class="absValue">
+    (110/159)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types.framing.content
+&nbsp;
+&nbsp;import arrow.core.None
+&nbsp;import arrow.core.Option
+&nbsp;import arrow.core.some
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.Struct2
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.EnumT
+&nbsp;import com.github.traderjoe95.mls.codec.type.ProtocolEnum
+&nbsp;import com.github.traderjoe95.mls.codec.type.V
+&nbsp;import com.github.traderjoe95.mls.codec.type.enum
+&nbsp;import com.github.traderjoe95.mls.codec.type.get
+&nbsp;import com.github.traderjoe95.mls.codec.type.optional
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.member.then
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.util.throwAnyError
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.UpdatePath
+&nbsp;import com.github.traderjoe95.mls.protocol.util.zipWithIndex
+&nbsp;
+<b class="fc">&nbsp;data class Commit(</b>
+<b class="fc">&nbsp;  val proposals: List&lt;ProposalOrRef&gt;,</b>
+<b class="fc">&nbsp;  val updatePath: Option&lt;UpdatePath&gt;,</b>
+&nbsp;) : Content.Handshake&lt;Commit&gt;, Struct2T.Shape&lt;List&lt;ProposalOrRef&gt;, Option&lt;UpdatePath&gt;&gt; {
+<b class="nc">&nbsp;  constructor(proposals: List&lt;ProposalOrRef&gt;, updatePath: UpdatePath) : this(proposals, updatePath.some())</b>
+<b class="fc">&nbsp;  constructor(proposals: List&lt;ProposalOrRef&gt;) : this(proposals, None)</b>
+&nbsp;
+<b class="fc">&nbsp;  override val contentType: ContentType.Commit = ContentType.Commit</b>
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Commit&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;Commit&gt; =</b>
+<b class="fc">&nbsp;      struct(&quot;Commit&quot;) {</b>
+<b class="fc">&nbsp;        it.field(&quot;proposals&quot;, ProposalOrRef.T[V])</b>
+<b class="fc">&nbsp;          .field(&quot;update_path&quot;, optional[UpdatePath.T])</b>
+<b class="fc">&nbsp;      }.lift(::Commit)</b>
+&nbsp;
+&nbsp;    val empty: Commit
+<b class="nc">&nbsp;      get() = Commit(listOf(), None)</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun equals(other: Any?): Boolean {
+<b class="fc">&nbsp;    if (this === other) return true</b>
+<b class="pc">&nbsp;    if (javaClass != other?.javaClass) return false</b>
+&nbsp;
+<b class="fc">&nbsp;    other as Commit</b>
+&nbsp;
+<b class="pc">&nbsp;    if (proposals.size != other.proposals.size) return false</b>
+<b class="pc">&nbsp;    if (proposals.zipWithIndex().any { (proposalOrRef, idx) -&gt; proposalOrRef neq other.proposals[idx] }) return false</b>
+<b class="pc">&nbsp;    if (updatePath != other.updatePath) return false</b>
+&nbsp;
+<b class="fc">&nbsp;    return true</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+<b class="nc">&nbsp;    var result = proposals.fold(1) { hc, el -&gt; hc * 31 + el.hashCode }</b>
+<b class="nc">&nbsp;    result = 31 * result + updatePath.hashCode()</b>
+<b class="nc">&nbsp;    result = 31 * result + contentType.hashCode()</b>
+<b class="nc">&nbsp;    return result</b>
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface ProposalOrRef {
+&nbsp;  val proposalOrRef: ProposalOrRefType
+&nbsp;
+&nbsp;  infix fun eq(other: ProposalOrRef): Boolean =
+&nbsp;    when {
+&nbsp;      this is Proposal &amp;&amp; other is Proposal -&gt; this == other
+&nbsp;      this is Proposal.Ref &amp;&amp; other is Proposal.Ref -&gt; this eq other
+&nbsp;      else -&gt; false
+&nbsp;    }
+&nbsp;
+&nbsp;  infix fun neq(other: ProposalOrRef): Boolean = !(this eq other)
+&nbsp;
+&nbsp;  val hashCode: Int
+&nbsp;    get() = hashCode()
+&nbsp;
+&nbsp;  companion object : Encodable&lt;ProposalOrRef&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;ProposalOrRef&gt; =
+&nbsp;      struct(&quot;ProposalOrRef&quot;) {
+&nbsp;        it.field(&quot;type&quot;, ProposalOrRefType.T)
+&nbsp;          .select&lt;ProposalOrRef, _&gt;(ProposalOrRefType.T, &quot;type&quot;) {
+&nbsp;            case(ProposalOrRefType.Proposal).then(Proposal.T)
+&nbsp;              .case(ProposalOrRefType.Reference).then(Proposal.Ref.T)
+&nbsp;          }
+&nbsp;      }.lift({ _, p -&gt; p }, { Struct2(it.proposalOrRef, it) })
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;enum class ProposalOrRefType(ord: UInt, override val isValid: Boolean = true) : ProtocolEnum&lt;ProposalOrRefType&gt; {
+&nbsp;  @Deprecated(&quot;This reserved value isn&#39;t used by the protocol for now&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  Reserved(0U, false),
+&nbsp;
+&nbsp;  Proposal(1U),
+&nbsp;  Reference(2U),
+&nbsp;  ;
+&nbsp;
+&nbsp;  override val ord: UIntRange = ord..ord
+&nbsp;
+&nbsp;  override fun toString(): String = &quot;$name[${ord.first}]&quot;
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: EnumT&lt;ProposalOrRefType&gt; = throwAnyError { enum(upperBound = 0xFFU) }
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

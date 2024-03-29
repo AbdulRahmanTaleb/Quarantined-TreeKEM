@@ -1,0 +1,556 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > GroupContextExtension</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.types</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupContextExtension (com.github.traderjoe95.mls.protocol.types)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+  <tr>
+    <td class="name">GroupContextExtension$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroupContextExtension$Companion$special$$inlined$asSubtype$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GroupContextExtension$DefaultImpls</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (7/10)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.types
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.Struct2
+&nbsp;import com.github.traderjoe95.mls.codec.decodeAs
+&nbsp;import com.github.traderjoe95.mls.codec.error.DecoderError
+&nbsp;import com.github.traderjoe95.mls.codec.error.EncoderError
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.EnumT
+&nbsp;import com.github.traderjoe95.mls.codec.type.ProtocolEnum
+&nbsp;import com.github.traderjoe95.mls.codec.type.V
+&nbsp;import com.github.traderjoe95.mls.codec.type.derive
+&nbsp;import com.github.traderjoe95.mls.codec.type.enum
+&nbsp;import com.github.traderjoe95.mls.codec.type.get
+&nbsp;import com.github.traderjoe95.mls.codec.type.opaque
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct1T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct3T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.codec.type.uint16
+&nbsp;import com.github.traderjoe95.mls.codec.util.Slice
+&nbsp;import com.github.traderjoe95.mls.codec.util.throwAnyError
+&nbsp;import com.github.traderjoe95.mls.protocol.tree.PublicRatchetTree
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePublicKey
+&nbsp;import com.github.traderjoe95.mls.protocol.types.tree.leaf.Capabilities
+&nbsp;import kotlin.random.Random
+&nbsp;
+&nbsp;enum class ExtensionType(
+&nbsp;  ord: UInt,
+&nbsp;  override val isValid: Boolean = true,
+&nbsp;) : ProtocolEnum&lt;ExtensionType&gt; {
+&nbsp;  @Deprecated(&quot;This reserved value isn&#39;t used by the protocol for now&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  Reserved(0x0000U, isValid = false),
+&nbsp;
+&nbsp;  ApplicationId(0x0001U),
+&nbsp;  RatchetTree(0x0002U),
+&nbsp;  RequiredCapabilities(0x0003U),
+&nbsp;  ExternalPub(0x0004U),
+&nbsp;  ExternalSenders(0x0005U),
+&nbsp;
+&nbsp;  // GREASE
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_1(0x0A0AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_2(0x1A1AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_3(0x2A2AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_4(0x3A3AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_5(0x4A4AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_6(0x5A5AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_7(0x6A6AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_8(0x7A7AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_9(0x8A8AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_10(0x9A9AU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_11(0xAAAAU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_12(0xBABAU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_13(0xCACAU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_14(0xDADAU, isValid = false),
+&nbsp;
+&nbsp;  @Deprecated(&quot;This is technically required, but must not be used&quot;, level = DeprecationLevel.ERROR)
+&nbsp;  GREASE_15(0xEAEAU, isValid = false),
+&nbsp;  ;
+&nbsp;
+&nbsp;  override val ord: UIntRange = ord..ord
+&nbsp;  val asUShort: UShort = ord.toUShort()
+&nbsp;
+&nbsp;  override fun toString(): String = &quot;$name($asUShort)&quot;
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: EnumT&lt;ExtensionType&gt; = throwAnyError { enum(upperBound = 0xFFFFU) }
+&nbsp;
+&nbsp;    operator fun invoke(type: UShort): ExtensionType? = entries.find { it.isValid &amp;&amp; type in it.ord }
+&nbsp;
+&nbsp;    fun grease(individualProbability: Double = 0.1): List&lt;UShort&gt; =
+&nbsp;      entries
+&nbsp;        .filter { it.name.startsWith(&quot;GREASE&quot;) &amp;&amp; Random.nextDouble() &lt; individualProbability }
+&nbsp;        .map { it.asUShort }
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;sealed interface Extension&lt;V : Extension&lt;V&gt;&gt; {
+&nbsp;  val type: UShort
+&nbsp;  val valueT: DataType&lt;V&gt;
+&nbsp;
+&nbsp;  val extensionType: ExtensionType?
+&nbsp;    get() = ExtensionType(type)
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;, &quot;UNCHECKED_CAST&quot;)
+&nbsp;    val T: DataType&lt;Extension&lt;*&gt;&gt; =
+&nbsp;      struct(&quot;Extension&quot;) {
+&nbsp;        it.field(&quot;extension_type&quot;, uint16.asUShort)
+&nbsp;          .field(&quot;extension_data&quot;, opaque[V])
+&nbsp;      }.derive(
+&nbsp;        { (type, extensionValue) -&gt; decodeExtension(type, extensionValue) },
+&nbsp;        { Struct2(it.type, (it.valueT as DataType&lt;Extension&lt;*&gt;&gt;).encode(it)) },
+&nbsp;      )
+&nbsp;
+&nbsp;    fun Raise&lt;DecoderError&gt;.decodeExtension(
+&nbsp;      type: UShort,
+&nbsp;      value: ByteArray,
+&nbsp;    ): Extension&lt;*&gt; =
+&nbsp;      when (type) {
+&nbsp;        in ExtensionType.ApplicationId.ord -&gt;
+&nbsp;          value.decodeAs(ApplicationId.T)
+&nbsp;
+&nbsp;        in ExtensionType.RatchetTree.ord -&gt;
+&nbsp;          value.decodeAs(RatchetTree.T)
+&nbsp;
+&nbsp;        in ExtensionType.RequiredCapabilities.ord -&gt;
+&nbsp;          value.decodeAs(RequiredCapabilities.T)
+&nbsp;
+&nbsp;        in ExtensionType.ExternalPub.ord -&gt;
+&nbsp;          value.decodeAs(ExternalPub.T)
+&nbsp;
+&nbsp;        in ExtensionType.ExternalSenders.ord -&gt;
+&nbsp;          value.decodeAs(ExternalSenders.T)
+&nbsp;
+&nbsp;        else -&gt; UnknownExtension(type, value)
+&nbsp;      }
+&nbsp;
+&nbsp;    fun grease(
+&nbsp;      individualProbability: Double = 0.1,
+&nbsp;      maxValueSize: UInt = 255U,
+&nbsp;    ): Array&lt;UnknownExtension&gt; =
+&nbsp;      ExtensionType.grease(individualProbability)
+&nbsp;        .map { UnknownExtension(it, Random.nextBytes(maxValueSize.toInt())) }
+&nbsp;        .toTypedArray()
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;abstract class HasExtensions&lt;V : Extension&lt;*&gt;&gt; {
+&nbsp;  abstract val extensions: List&lt;V&gt;
+&nbsp;
+&nbsp;  inline fun &lt;reified T : V&gt; extension(): T? = extensions.filterIsInstance&lt;T&gt;().firstOrNull()
+&nbsp;
+&nbsp;  inline fun &lt;reified T : V&gt; hasExtension(): Boolean = extensions.filterIsInstance&lt;T&gt;().isNotEmpty()
+&nbsp;}
+&nbsp;
+&nbsp;inline fun &lt;reified E : Extension&lt;*&gt;&gt; DataType&lt;Extension&lt;*&gt;&gt;.asSubtype(): DataType&lt;E&gt; =
+&nbsp;  derive(
+&nbsp;    up = { ext -&gt;
+&nbsp;      if (ext is E) {
+&nbsp;        ext
+&nbsp;      } else {
+&nbsp;        raise(
+&nbsp;          DecoderError.UnexpectedError(
+&nbsp;            &quot;Unsupported extension ${ext::class.simpleName} in context of ${E::class.simpleName}&quot;,
+&nbsp;          ),
+&nbsp;        )
+&nbsp;      }
+&nbsp;    },
+&nbsp;    down = { it },
+&nbsp;    name = E::class.simpleName,
+&nbsp;  )
+&nbsp;
+&nbsp;fun &lt;E : Extension&lt;*&gt;&gt; DataType&lt;E&gt;.extensionList(): DataType&lt;List&lt;E&gt;&gt; =
+&nbsp;  this[V].derive(
+&nbsp;    up = { extensions -&gt;
+&nbsp;      extensions
+&nbsp;        .groupBy { it.type }
+&nbsp;        .filter { it.value.size &gt; 1 }
+&nbsp;        .takeIf { it.isNotEmpty() }
+&nbsp;        ?.keys
+&nbsp;        ?.let { duplicates -&gt;
+&nbsp;          raise(DecoderError.UnexpectedError(&quot;Duplicate extensions: ${duplicates.map { ExtensionType(it) ?: it }}&quot;))
+&nbsp;        }
+&nbsp;
+&nbsp;      extensions
+&nbsp;    },
+&nbsp;    down = { it },
+&nbsp;  )
+&nbsp;
+<b class="nc">&nbsp;sealed interface GroupContextExtension&lt;V : GroupContextExtension&lt;V&gt;&gt; : Extension&lt;V&gt; {</b>
+&nbsp;  companion object : Encodable&lt;GroupContextExtension&lt;*&gt;&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;GroupContextExtension&lt;*&gt;&gt; = Extension.T.asSubtype&lt;GroupContextExtension&lt;*&gt;&gt;()</b>
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;typealias GroupContextExtensions = List&lt;GroupContextExtension&lt;*&gt;&gt;
+&nbsp;
+&nbsp;sealed interface GroupInfoExtension&lt;V : GroupInfoExtension&lt;V&gt;&gt; : Extension&lt;V&gt; {
+&nbsp;  companion object : Encodable&lt;GroupInfoExtension&lt;*&gt;&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;GroupInfoExtension&lt;*&gt;&gt; = Extension.T.asSubtype&lt;GroupInfoExtension&lt;*&gt;&gt;()
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;typealias GroupInfoExtensions = List&lt;GroupInfoExtension&lt;*&gt;&gt;
+&nbsp;
+&nbsp;sealed interface KeyPackageExtension&lt;V : KeyPackageExtension&lt;V&gt;&gt; : Extension&lt;V&gt; {
+&nbsp;  companion object : Encodable&lt;KeyPackageExtension&lt;*&gt;&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;KeyPackageExtension&lt;*&gt;&gt; = Extension.T.asSubtype&lt;KeyPackageExtension&lt;*&gt;&gt;()
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;typealias KeyPackageExtensions = List&lt;KeyPackageExtension&lt;*&gt;&gt;
+&nbsp;
+&nbsp;sealed interface LeafNodeExtension&lt;V : LeafNodeExtension&lt;V&gt;&gt; : Extension&lt;V&gt; {
+&nbsp;  companion object : Encodable&lt;LeafNodeExtension&lt;*&gt;&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;LeafNodeExtension&lt;*&gt;&gt; = Extension.T.asSubtype&lt;LeafNodeExtension&lt;*&gt;&gt;()
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;typealias LeafNodeExtensions = List&lt;LeafNodeExtension&lt;*&gt;&gt;
+&nbsp;
+&nbsp;data class ApplicationId(
+&nbsp;  override val bytes: ByteArray,
+&nbsp;) : LeafNodeExtension&lt;ApplicationId&gt;, RefinedBytes&lt;ApplicationId&gt; {
+&nbsp;  override val type: UShort
+&nbsp;    get() = ExtensionType.ApplicationId.asUShort
+&nbsp;  override val valueT: DataType&lt;ApplicationId&gt;
+&nbsp;    get() = T
+&nbsp;
+&nbsp;  override fun equals(other: Any?): Boolean {
+&nbsp;    if (this === other) return true
+&nbsp;    if (javaClass != other?.javaClass) return false
+&nbsp;
+&nbsp;    other as ApplicationId
+&nbsp;
+&nbsp;    return bytes.contentEquals(other.bytes)
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+&nbsp;    return bytes.contentHashCode()
+&nbsp;  }
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;ApplicationId&gt; = RefinedBytes.dataT(::ApplicationId, &quot;ApplicationId&quot;)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class RequiredCapabilities(
+&nbsp;  val extensionTypes: List&lt;ExtensionType&gt; = listOf(),
+&nbsp;  val proposalTypes: List&lt;ProposalType&gt; = listOf(),
+&nbsp;  val credentialTypes: List&lt;CredentialType&gt; = listOf(),
+&nbsp;) : GroupContextExtension&lt;RequiredCapabilities&gt;,
+&nbsp;  Struct3T.Shape&lt;List&lt;ExtensionType&gt;, List&lt;ProposalType&gt;, List&lt;CredentialType&gt;&gt; {
+&nbsp;  override val type: UShort = ExtensionType.RequiredCapabilities.asUShort
+&nbsp;  override val valueT: DataType&lt;RequiredCapabilities&gt; = T
+&nbsp;
+&nbsp;  fun isCompatible(capabilities: Capabilities): Boolean =
+&nbsp;    extensionTypes in capabilities &amp;&amp; proposalTypes in capabilities &amp;&amp; credentialTypes in capabilities
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;RequiredCapabilities&gt; =
+&nbsp;      struct(&quot;RequiredCapabilities&quot;) {
+&nbsp;        it.field(&quot;extension_types&quot;, ExtensionType.T[V])
+&nbsp;          .field(&quot;proposal_types&quot;, ProposalType.T[V])
+&nbsp;          .field(&quot;credential_types&quot;, CredentialType.T[V])
+&nbsp;      }.lift(::RequiredCapabilities)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class ExternalSenders(
+&nbsp;  val externalSenders: List&lt;ExternalSender&gt;,
+&nbsp;) : GroupContextExtension&lt;ExternalSenders&gt; {
+&nbsp;  override val type: UShort = ExtensionType.ExternalSenders.asUShort
+&nbsp;  override val valueT: DataType&lt;ExternalSenders&gt; = T
+&nbsp;
+&nbsp;  constructor(externalSender: ExternalSender) : this(listOf(externalSender))
+&nbsp;
+&nbsp;  operator fun plus(externalSender: ExternalSender): ExternalSenders = ExternalSenders(externalSenders + externalSender)
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;ExternalSenders&gt; =
+&nbsp;      ExternalSender.T[V].derive(
+&nbsp;        { ExternalSenders(it) },
+&nbsp;        { it.externalSenders },
+&nbsp;        &quot;ExternalSenders&quot;,
+&nbsp;      )
+&nbsp;  }
+&nbsp;
+&nbsp;  data class ExternalSender(
+&nbsp;    val signaturePublicKey: SignaturePublicKey,
+&nbsp;    val credential: Credential,
+&nbsp;  ) : Struct2T.Shape&lt;SignaturePublicKey, Credential&gt; {
+&nbsp;    companion object {
+&nbsp;      val T: DataType&lt;ExternalSender&gt; =
+&nbsp;        struct(&quot;ExternalSender&quot;) {
+&nbsp;          it.field(&quot;signature_key&quot;, SignaturePublicKey.T)
+&nbsp;            .field(&quot;credential&quot;, Credential.T)
+&nbsp;        }.lift(::ExternalSender)
+&nbsp;    }
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class RatchetTree(
+&nbsp;  val tree: PublicRatchetTree,
+&nbsp;) : GroupInfoExtension&lt;RatchetTree&gt; {
+&nbsp;  constructor(tree: com.github.traderjoe95.mls.protocol.tree.RatchetTree) : this(tree.public)
+&nbsp;
+&nbsp;  override val type: UShort = ExtensionType.RatchetTree.asUShort
+&nbsp;  override val valueT: DataType&lt;RatchetTree&gt; = T
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;RatchetTree&gt; = PublicRatchetTree.T.derive({ RatchetTree(it) }, { it.tree })
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class ExternalPub(
+&nbsp;  val externalPub: HpkePublicKey,
+&nbsp;) : GroupInfoExtension&lt;ExternalPub&gt;, Struct1T.Shape&lt;HpkePublicKey&gt; {
+&nbsp;  override val type: UShort = ExtensionType.ExternalPub.asUShort
+&nbsp;  override val valueT: DataType&lt;ExternalPub&gt; = T
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    val T: DataType&lt;ExternalPub&gt; =
+&nbsp;      struct(&quot;ExternalPub&quot;) {
+&nbsp;        it.field(&quot;external_pub&quot;, HpkePublicKey.T)
+&nbsp;      }.lift(::ExternalPub)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class UnknownExtension(
+&nbsp;  override val type: UShort,
+&nbsp;  val value: ByteArray,
+&nbsp;) : LeafNodeExtension&lt;UnknownExtension&gt;,
+&nbsp;  KeyPackageExtension&lt;UnknownExtension&gt;,
+&nbsp;  GroupInfoExtension&lt;UnknownExtension&gt; {
+&nbsp;  override val valueT: DataType&lt;UnknownExtension&gt; =
+&nbsp;    object : DataType&lt;UnknownExtension&gt; {
+&nbsp;      override val name: String = &quot;Unknown Extension&quot;
+&nbsp;
+&nbsp;      context(Raise&lt;EncoderError&gt;)
+&nbsp;      override fun encode(value: UnknownExtension): ByteArray = value.value
+&nbsp;
+&nbsp;      context(Raise&lt;DecoderError&gt;)
+&nbsp;      override fun decode(bytes: Slice): Pair&lt;UnknownExtension, Slice&gt; = raise(DecoderError.UnexpectedError(&quot;Decoding not supported&quot;))
+&nbsp;    }
+&nbsp;
+&nbsp;  override fun equals(other: Any?): Boolean {
+&nbsp;    if (this === other) return true
+&nbsp;    if (javaClass != other?.javaClass) return false
+&nbsp;
+&nbsp;    other as UnknownExtension
+&nbsp;
+&nbsp;    if (type != other.type) return false
+&nbsp;    if (!value.contentEquals(other.value)) return false
+&nbsp;
+&nbsp;    return true
+&nbsp;  }
+&nbsp;
+&nbsp;  override fun hashCode(): Int {
+&nbsp;    var result = type.hashCode()
+&nbsp;    result = 31 * result + value.contentHashCode()
+&nbsp;    return result
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

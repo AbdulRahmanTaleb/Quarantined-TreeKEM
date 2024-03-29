@@ -1,0 +1,355 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > GroupSecrets</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.message</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupSecrets (com.github.traderjoe95.mls.protocol.message)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupSecrets</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (87/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroupSecrets$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroupSecrets$special$$inlined$lift$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GroupSecrets$special$$inlined$lift$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GroupSecrets$T$lambda$1$$inlined$get$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">GroupSecrets$T$lambda$1$$inlined$get$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (88/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.message
+&nbsp;
+&nbsp;import arrow.core.Either
+&nbsp;import arrow.core.None
+&nbsp;import arrow.core.Option
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import arrow.core.raise.either
+&nbsp;import com.github.traderjoe95.mls.codec.Encodable
+&nbsp;import com.github.traderjoe95.mls.codec.decodeAs
+&nbsp;import com.github.traderjoe95.mls.codec.type.DataType
+&nbsp;import com.github.traderjoe95.mls.codec.type.V
+&nbsp;import com.github.traderjoe95.mls.codec.type.get
+&nbsp;import com.github.traderjoe95.mls.codec.type.optional
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.Struct3T
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.lift
+&nbsp;import com.github.traderjoe95.mls.codec.type.struct.struct
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.error.DecoderError
+&nbsp;import com.github.traderjoe95.mls.protocol.error.HpkeDecryptError
+&nbsp;import com.github.traderjoe95.mls.protocol.error.HpkeEncryptError
+&nbsp;import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
+&nbsp;import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Aad
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Ciphertext
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
+&nbsp;
+&nbsp;data class Welcome(
+&nbsp;  val cipherSuite: CipherSuite,
+&nbsp;  val secrets: List&lt;EncryptedGroupSecrets&gt;,
+&nbsp;  val encryptedGroupInfo: Ciphertext,
+&nbsp;) : Message, Struct3T.Shape&lt;CipherSuite, List&lt;EncryptedGroupSecrets&gt;, Ciphertext&gt; {
+&nbsp;  override val wireFormat: WireFormat = WireFormat.MlsWelcome
+&nbsp;
+&nbsp;  override val encoded: ByteArray by lazy { encodeUnsafe() }
+&nbsp;
+&nbsp;  fun decryptGroupSecrets(keyPackage: KeyPackage.Private): Either&lt;WelcomeJoinError, GroupSecrets&gt; =
+&nbsp;    decryptGroupSecrets(keyPackage.ref, keyPackage.initKeyPair)
+&nbsp;
+&nbsp;  fun decryptGroupSecrets(
+&nbsp;    keyPackageRef: KeyPackage.Ref,
+&nbsp;    initKeyPair: HpkeKeyPair,
+&nbsp;  ): Either&lt;WelcomeJoinError, GroupSecrets&gt; =
+&nbsp;    either {
+&nbsp;      secrets
+&nbsp;        .find { it.newMember.eq(keyPackageRef) }
+&nbsp;        ?.decrypt(cipherSuite, initKeyPair, encryptedGroupInfo)
+&nbsp;        ?: raise(WelcomeJoinError.NoGroupSecretsForKeyPackage)
+&nbsp;    }
+&nbsp;
+&nbsp;  fun decryptGroupInfo(
+&nbsp;    joinerSecret: Secret,
+&nbsp;    pskSecret: Secret,
+&nbsp;  ): Either&lt;WelcomeJoinError, GroupInfo&gt; =
+&nbsp;    either {
+&nbsp;      val joinerExtracted = cipherSuite.extract(joinerSecret, pskSecret)
+&nbsp;      val welcomeSecret = cipherSuite.deriveSecret(joinerExtracted, &quot;welcome&quot;)
+&nbsp;
+&nbsp;      val nonce = cipherSuite.expandWithLabel(welcomeSecret, &quot;nonce&quot;, byteArrayOf(), cipherSuite.nonceLen).asNonce
+&nbsp;      val key = cipherSuite.expandWithLabel(welcomeSecret, &quot;key&quot;, byteArrayOf(), cipherSuite.keyLen)
+&nbsp;
+&nbsp;      DecoderError.wrap {
+&nbsp;        GroupInfo.decode(cipherSuite.decryptAead(key, nonce, Aad.empty, encryptedGroupInfo).bind())
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;  companion object : Encodable&lt;Welcome&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;Welcome&gt; =
+&nbsp;      struct(&quot;Welcome&quot;) {
+&nbsp;        it.field(&quot;cipher_suite&quot;, CipherSuite.T)
+&nbsp;          .field(&quot;secrets&quot;, EncryptedGroupSecrets.T[V])
+&nbsp;          .field(&quot;encrypted_group_info&quot;, Ciphertext.T)
+&nbsp;      }.lift(::Welcome)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;data class GroupSecrets(</b>
+<b class="fc">&nbsp;  val joinerSecret: Secret,</b>
+<b class="fc">&nbsp;  val pathSecret: Option&lt;Secret&gt; = None,</b>
+<b class="fc">&nbsp;  val preSharedKeyIds: List&lt;PreSharedKeyId&gt; = listOf(),</b>
+&nbsp;) : Struct3T.Shape&lt;Secret, Option&lt;Secret&gt;, List&lt;PreSharedKeyId&gt;&gt; {
+&nbsp;  fun encrypt(
+&nbsp;    cipherSuite: CipherSuite,
+&nbsp;    forKeyPackage: KeyPackage,
+&nbsp;    encryptedGroupInfo: Ciphertext,
+&nbsp;  ): Either&lt;HpkeEncryptError, EncryptedGroupSecrets&gt; =
+<b class="fc">&nbsp;    either {</b>
+<b class="fc">&nbsp;      EncryptedGroupSecrets(</b>
+<b class="fc">&nbsp;        forKeyPackage.ref,</b>
+<b class="fc">&nbsp;        cipherSuite.encryptWithLabel(</b>
+<b class="fc">&nbsp;          forKeyPackage.initKey,</b>
+<b class="fc">&nbsp;          &quot;Welcome&quot;,</b>
+<b class="fc">&nbsp;          encryptedGroupInfo.bytes,</b>
+<b class="fc">&nbsp;          encodeUnsafe(),</b>
+<b class="fc">&nbsp;        ).bind(),</b>
+&nbsp;      )
+&nbsp;    }
+&nbsp;
+&nbsp;  companion object : Encodable&lt;GroupSecrets&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+<b class="fc">&nbsp;    override val T: DataType&lt;GroupSecrets&gt; =</b>
+<b class="fc">&nbsp;      struct(&quot;GroupSecrets&quot;) {</b>
+<b class="fc">&nbsp;        it.field(&quot;joiner_secret&quot;, Secret.T)</b>
+<b class="fc">&nbsp;          .field(&quot;path_secret&quot;, optional[Secret.T])</b>
+<b class="fc">&nbsp;          .field(&quot;psks&quot;, PreSharedKeyId.T[V])</b>
+<b class="fc">&nbsp;      }.lift(::GroupSecrets)</b>
+&nbsp;  }
+&nbsp;}
+&nbsp;
+&nbsp;data class EncryptedGroupSecrets(
+&nbsp;  val newMember: KeyPackage.Ref,
+&nbsp;  val encryptedGroupSecrets: HpkeCiphertext,
+&nbsp;) : Struct2T.Shape&lt;KeyPackage.Ref, HpkeCiphertext&gt; {
+&nbsp;  context(Raise&lt;HpkeDecryptError&gt;, Raise&lt;DecoderError&gt;)
+&nbsp;  internal fun decrypt(
+&nbsp;    cipherSuite: ICipherSuite,
+&nbsp;    initKeyPair: HpkeKeyPair,
+&nbsp;    encryptedGroupInfo: Ciphertext,
+&nbsp;  ): GroupSecrets =
+&nbsp;    DecoderError.wrap {
+&nbsp;      cipherSuite.decryptWithLabel(
+&nbsp;        initKeyPair,
+&nbsp;        &quot;Welcome&quot;,
+&nbsp;        encryptedGroupInfo.bytes,
+&nbsp;        encryptedGroupSecrets,
+&nbsp;      ).bind().decodeAs(GroupSecrets.T)
+&nbsp;    }
+&nbsp;
+&nbsp;  companion object : Encodable&lt;EncryptedGroupSecrets&gt; {
+&nbsp;    @Suppress(&quot;kotlin:S6531&quot;, &quot;ktlint:standard:property-naming&quot;)
+&nbsp;    override val T: DataType&lt;EncryptedGroupSecrets&gt; =
+&nbsp;      struct(&quot;GroupSecrets&quot;) {
+&nbsp;        it.field(&quot;new_member&quot;, KeyPackage.Ref.T)
+&nbsp;          .field(&quot;encrypted_group_secrets&quot;, HpkeCiphertext.T)
+&nbsp;      }.lift(::EncryptedGroupSecrets)
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>

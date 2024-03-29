@@ -1,0 +1,391 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>protocol Coverage Report > Ratchet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: protocol<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.traderjoe95.mls.protocol.tree</a>
+</div>
+
+<h1>Coverage Summary for Class: Ratchet (com.github.traderjoe95.mls.protocol.tree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">Ratchet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (29/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.3%
+  </span>
+  <span class="absValue">
+    (242/287)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Ratchet$Companion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Ratchet$consume$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">Ratchet$consume$3</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.6%
+  </span>
+  <span class="absValue">
+    (31/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.9%
+  </span>
+  <span class="absValue">
+    (253/298)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.traderjoe95.mls.protocol.tree
+&nbsp;
+&nbsp;import arrow.core.raise.Raise
+&nbsp;import com.github.traderjoe95.mls.codec.util.toBytes
+&nbsp;import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
+&nbsp;import com.github.traderjoe95.mls.protocol.error.RatchetError
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Nonce
+&nbsp;import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+&nbsp;import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
+&nbsp;import com.github.traderjoe95.mls.protocol.util.get
+&nbsp;import com.github.traderjoe95.mls.protocol.util.log2
+&nbsp;import kotlinx.coroutines.sync.Mutex
+&nbsp;import kotlinx.coroutines.sync.withLock
+&nbsp;
+&nbsp;interface SecretTree {
+&nbsp;  context(Raise&lt;RatchetError&gt;)
+&nbsp;  suspend fun getNonceAndKey(
+&nbsp;    leafIndex: LeafIndex,
+&nbsp;    contentType: ContentType&lt;*&gt;,
+&nbsp;    generation: UInt,
+&nbsp;  ): Pair&lt;Nonce, Secret&gt;
+&nbsp;
+&nbsp;  suspend fun getNonceAndKey(
+&nbsp;    leafIndex: LeafIndex,
+&nbsp;    contentType: ContentType&lt;*&gt;,
+&nbsp;  ): Triple&lt;Nonce, Secret, UInt&gt;
+&nbsp;
+&nbsp;  interface Lookup
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    fun create(
+&nbsp;      cipherSuite: ICipherSuite,
+&nbsp;      encryptionSecret: Secret,
+&nbsp;      leaves: UInt,
+&nbsp;    ): SecretTree = SecretTreeImpl.create(leaves, encryptionSecret, cipherSuite)
+&nbsp;  }
+&nbsp;}
+&nbsp;
+<b class="fc">&nbsp;class Ratchet(</b>
+<b class="fc">&nbsp;  val type: String,</b>
+<b class="fc">&nbsp;  val cipherSuite: ICipherSuite,</b>
+<b class="fc">&nbsp;  private var currentSecret: Secret,</b>
+<b class="fc">&nbsp;  private var currentGeneration: UInt = 0U,</b>
+<b class="fc">&nbsp;  private val unused: MutableMap&lt;UInt, Pair&lt;Nonce, Secret&gt;&gt; = mutableMapOf(),</b>
+&nbsp;) {
+&nbsp;  companion object {
+&nbsp;    const val SKIP_LIMIT = 255U
+&nbsp;    const val BACKLOG_LIMIT = 255U
+&nbsp;
+&nbsp;    internal fun ICipherSuite.deriveTreeSecret(
+&nbsp;      secret: Secret,
+&nbsp;      label: String,
+&nbsp;      generation: UInt,
+<b class="fc">&nbsp;      length: UShort = hashLen,</b>
+<b class="fc">&nbsp;    ): Secret = expandWithLabel(secret, label, generation.toBytes(4U), length)</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private val mutex: Mutex = Mutex()</b>
+&nbsp;
+&nbsp;  suspend fun consume(): Triple&lt;Nonce, Secret, UInt&gt; =
+<b class="fc">&nbsp;    mutex.withLock {</b>
+<b class="fc">&nbsp;      Triple(nonce, key, currentGeneration).also { advance() }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  context(Raise&lt;RatchetError&gt;)
+&nbsp;  suspend fun consume(generation: UInt): Pair&lt;Nonce, Secret&gt; =
+<b class="fc">&nbsp;    mutex.withLock {</b>
+<b class="pc">&nbsp;      if (generation &gt; currentGeneration + SKIP_LIMIT) raise(RatchetError.StepTooLarge(type, generation))</b>
+&nbsp;
+<b class="pc">&nbsp;      if (generation &lt; currentGeneration) {</b>
+<b class="nc">&nbsp;        unused.remove(generation) ?: raise(RatchetError.GenerationGone(type, generation))</b>
+<b class="fc">&nbsp;      } else if (generation == currentGeneration) {</b>
+<b class="fc">&nbsp;        (nonce to key).also { advance() }</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        skipTo(generation).run { nonce to key }.also { advance() }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;  private fun skipTo(generation: UInt): Ratchet =
+<b class="fc">&nbsp;    apply {</b>
+<b class="fc">&nbsp;      (currentGeneration..&lt;generation).forEach {</b>
+<b class="fc">&nbsp;        unused += it to (nonce to key)</b>
+<b class="fc">&nbsp;        advance()</b>
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;  private fun advance() {
+<b class="fc">&nbsp;    val oldSecret = currentSecret</b>
+<b class="fc">&nbsp;    currentSecret = next</b>
+<b class="fc">&nbsp;    currentGeneration++</b>
+&nbsp;
+<b class="fc">&nbsp;    oldSecret.wipe()</b>
+&nbsp;
+<b class="pc">&nbsp;    unused.remove(currentGeneration - BACKLOG_LIMIT)?.also { (n, s) -&gt;</b>
+<b class="nc">&nbsp;      n.wipe()</b>
+<b class="nc">&nbsp;      s.wipe()</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private val next: Secret
+<b class="fc">&nbsp;    get() = cipherSuite.deriveTreeSecret(currentSecret, &quot;secret&quot;, currentGeneration)</b>
+&nbsp;
+&nbsp;  private val nonce: Nonce
+<b class="fc">&nbsp;    get() = cipherSuite.deriveTreeSecret(currentSecret, &quot;nonce&quot;, currentGeneration, cipherSuite.nonceLen).asNonce</b>
+&nbsp;
+&nbsp;  private val key: Secret
+<b class="fc">&nbsp;    get() = cipherSuite.deriveTreeSecret(currentSecret, &quot;key&quot;, currentGeneration, cipherSuite.keyLen)</b>
+&nbsp;}
+&nbsp;
+&nbsp;data class SecretTreeLeaf(
+&nbsp;  private val handshakeRatchet: Ratchet,
+&nbsp;  private val applicationRatchet: Ratchet,
+&nbsp;) {
+&nbsp;  constructor(handshakeSeed: Secret, applicationSeed: Secret, cipherSuite: ICipherSuite) : this(
+&nbsp;    Ratchet(&quot;handshake&quot;, cipherSuite, handshakeSeed),
+&nbsp;    Ratchet(&quot;application&quot;, cipherSuite, applicationSeed),
+&nbsp;  )
+&nbsp;
+&nbsp;  context(Raise&lt;RatchetError&gt;)
+&nbsp;  suspend fun consumeHandshakeRatchet(generation: UInt): Pair&lt;Nonce, Secret&gt; = handshakeRatchet.consume(generation)
+&nbsp;
+&nbsp;  suspend fun consumeHandshakeRatchet(): Triple&lt;Nonce, Secret, UInt&gt; = handshakeRatchet.consume()
+&nbsp;
+&nbsp;  context(Raise&lt;RatchetError&gt;)
+&nbsp;  suspend fun consumeApplicationRatchet(generation: UInt): Pair&lt;Nonce, Secret&gt; = applicationRatchet.consume(generation)
+&nbsp;
+&nbsp;  suspend fun consumeApplicationRatchet(): Triple&lt;Nonce, Secret, UInt&gt; = applicationRatchet.consume()
+&nbsp;}
+&nbsp;
+&nbsp;internal class SecretTreeImpl private constructor(private val leaves: Array&lt;SecretTreeLeaf&gt;) : SecretTree {
+&nbsp;  context(Raise&lt;RatchetError&gt;)
+&nbsp;  override suspend fun getNonceAndKey(
+&nbsp;    leafIndex: LeafIndex,
+&nbsp;    contentType: ContentType&lt;*&gt;,
+&nbsp;    generation: UInt,
+&nbsp;  ): Pair&lt;Nonce, Secret&gt; =
+&nbsp;    when (contentType) {
+&nbsp;      ContentType.Application -&gt; leaves[leafIndex.value].consumeApplicationRatchet(generation)
+&nbsp;      ContentType.Proposal, ContentType.Commit -&gt; leaves[leafIndex.value].consumeHandshakeRatchet(generation)
+&nbsp;      else -&gt; error(&quot;Unreachable&quot;)
+&nbsp;    }
+&nbsp;
+&nbsp;  override suspend fun getNonceAndKey(
+&nbsp;    leafIndex: LeafIndex,
+&nbsp;    contentType: ContentType&lt;*&gt;,
+&nbsp;  ): Triple&lt;Nonce, Secret, UInt&gt; =
+&nbsp;    when (contentType) {
+&nbsp;      ContentType.Application -&gt; leaves[leafIndex.value].consumeApplicationRatchet()
+&nbsp;      ContentType.Proposal, ContentType.Commit -&gt; leaves[leafIndex.value].consumeHandshakeRatchet()
+&nbsp;      else -&gt; error(&quot;Unreachable&quot;)
+&nbsp;    }
+&nbsp;
+&nbsp;  companion object {
+&nbsp;    internal fun create(
+&nbsp;      leaves: UInt,
+&nbsp;      encryptionSecret: Secret,
+&nbsp;      cipherSuite: ICipherSuite,
+&nbsp;    ): SecretTree =
+&nbsp;      with(cipherSuite) {
+&nbsp;        // Traverse the tree in-order, that way every intermediate secret only needs to be computed once
+&nbsp;        // First generate the left flank of the tree: Start with the encryption secret and step down to the leaf, deriving
+&nbsp;        // the &quot;left&quot; child secret on each step.
+&nbsp;        generateSequence(encryptionSecret) { expandWithLabel(it, &quot;tree&quot;, &quot;left&quot;) }
+&nbsp;          .take(if (leaves == 1U) 1 else log2(leaves - 1U).toInt() + 2)
+&nbsp;          .toList()
+&nbsp;          .let { initSecrets -&gt;
+&nbsp;            var intermediate = initSecrets
+&nbsp;
+&nbsp;            Array(leaves.toInt()) { idx -&gt;
+&nbsp;              // Calculate the leaf init secrets
+&nbsp;              SecretTreeLeaf(
+&nbsp;                expandWithLabel(intermediate.last(), &quot;handshake&quot;, &quot;&quot;),
+&nbsp;                expandWithLabel(intermediate.last(), &quot;application&quot;, &quot;&quot;),
+&nbsp;                cipherSuite,
+&nbsp;              ).also {
+&nbsp;                val no = idx.toUInt() + 1U
+&nbsp;
+&nbsp;                // Find out how many steps to go back up the tree to reach the next leaf.
+&nbsp;                // This is basically done by finding the first non-zero bit in the current leafIdx + 1
+&nbsp;                generateSequence(1) { it + 1 }.find { no % (1U shl it) != 0U }!!.let { backTrack -&gt;
+&nbsp;                  // Wipe intermediate secrets that are no longer needed
+&nbsp;                  intermediate
+&nbsp;                    .takeLast(backTrack)
+&nbsp;                    .forEach { it.wipe() }
+&nbsp;
+&nbsp;                  if (no &lt; leaves) {
+&nbsp;                    // Backtrack by dropping the last n steps, then go one step right and continue by stepping down to
+&nbsp;                    // the left until reaching the leaf
+&nbsp;                    intermediate = intermediate.dropLast(backTrack)
+&nbsp;                    val stepRight = expandWithLabel(intermediate.lastOrNull() ?: encryptionSecret, &quot;tree&quot;, &quot;right&quot;)
+&nbsp;
+&nbsp;                    intermediate =
+&nbsp;                      intermediate +
+&nbsp;                      generateSequence(stepRight) { expandWithLabel(it, &quot;tree&quot;, &quot;left&quot;) }
+&nbsp;                        .take(backTrack)
+&nbsp;                        .toList()
+&nbsp;                  }
+&nbsp;                }
+&nbsp;              }
+&nbsp;            }
+&nbsp;          }
+&nbsp;      }.let(::SecretTreeImpl)
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-25 13:33</div>
+</div>
+</body>
+</html>
