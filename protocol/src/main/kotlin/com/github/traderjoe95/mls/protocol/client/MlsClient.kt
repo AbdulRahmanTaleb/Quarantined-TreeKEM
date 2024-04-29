@@ -174,10 +174,17 @@ class MlsClient<Identity : Any>(
   suspend fun processMessage(message: MlsMessage<*>): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
       when (message.message) {
-        is KeyPackage -> ProcessMessageResult.KeyPackageMessageReceived(message.message)
-        is Welcome -> ProcessMessageResult.WelcomeMessageReceived(message.message)
-        is GroupInfo -> ProcessMessageResult.GroupInfoMessageReceived(message.message)
-        is GroupMessage<*> -> processGroupMessage(message.message).bind()
+        is KeyPackage -> {println("key package received")
+                        ProcessMessageResult.KeyPackageMessageReceived(message.message)}
+
+        is Welcome -> {println("welcome received")
+                      ProcessMessageResult.WelcomeMessageReceived(message.message)}
+
+        is GroupInfo -> {println("groupInfo received")
+                        ProcessMessageResult.GroupInfoMessageReceived(message.message)}
+
+        is GroupMessage<*> -> {println("groupMessage received")
+                              processGroupMessage(message.message).bind()}
       }
     }
 
@@ -196,6 +203,7 @@ class MlsClient<Identity : Any>(
       when (groupMessage.contentType) {
         is ContentType.Handshake ->
           if (group is ActiveGroupClient<Identity>) {
+            println("handshake message received")
             ProcessMessageResult.HandshakeMessageReceived(
               groupId,
               group.processHandshake(groupMessage as HandshakeMessage).bind(),
@@ -206,8 +214,10 @@ class MlsClient<Identity : Any>(
 
         is ContentType.Application ->
           if (groupMessage is PublicMessage) {
+            println("public app message received")
             raise(PublicMessageError.ApplicationMessageMustNotBePublic)
           } else {
+            println("private app message received")
             ProcessMessageResult.ApplicationMessageReceived(
               groupId,
               group.open(groupMessage as ApplicationMessage).bind(),

@@ -80,6 +80,7 @@ internal fun createUpdatePath(
         from,
         groupContext.groupId,
         signaturePrivateKey,
+        groupContext.epoch + 1U,
       ).bind()
     val updatedTree =
       updatedTreeWithoutLeaf.set(
@@ -178,6 +179,7 @@ internal fun RatchetTree.mergeUpdatePath(
         raise(WrongParentHash(computedParentHash.bytes, updatePath.leafNode.parentHash!!.bytes))
       }
 
+      // updatePath.leafNode.epk = 1000U
       updatedWithoutLeaf.set(fromLeafIdx, updatePath.leafNode)
     }
 }

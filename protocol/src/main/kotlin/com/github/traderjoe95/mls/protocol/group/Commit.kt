@@ -178,6 +178,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
 
     val (updatedTree, commitSecret) =
       updatePath.map { path ->
+        path.leafNode.epk = commit.epoch + 1u
         preTree.applyCommitUpdatePath(
           groupContext.withExtensions((proposalResult as? ProcessProposalsResult.CommitByMember)?.extensions),
           path,
@@ -373,6 +374,8 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
 
           val cached = cachedUpdate
 
+          proposal.leafNode.epk = groupContext.epoch + 1u
+
           updatedTree =
             when {
               from != leafIndex -> updatedTree.update(from, proposal.leafNode)
@@ -385,7 +388,9 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
               cached != null ->
                 raise(CommitError.CachedUpdateDoesNotMatch(cached.leafNode, proposal.leafNode))
 
-              else -> raise(CommitError.CachedUpdateMissing)
+              else -> {
+                raise(CommitError.CachedUpdateMissing)
+              }
             }
 
           requiresUpdatePath = true
@@ -408,6 +413,8 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
 
         is Add -> {
           validations.validated(proposal, updatedTree).bind()
+
+          proposal.keyPackage.leafNode.epk = groupContext.epoch + 1u
 
           with(authenticationService) { updatedTree.findEquivalentLeaf(proposal.keyPackage.leafNode) }
             ?.also { raise(InvalidCommit.AlreadyMember(proposal.keyPackage, it)) }

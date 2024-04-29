@@ -49,8 +49,8 @@ data class LeafNode<S : LeafNodeSource>(
   val info: LeafNodeInfo?,
   override val extensions: LeafNodeExtensions,
   val signature: Signature,
-  val epk: UInt = 0U,
-  val equar: UInt = 0U,
+  var epk: ULong = 0U,
+  var equar: ULong = 0U,
 ) : HasExtensions<LeafNodeExtension<*>>(),
   Node,
   Struct8T.Shape<HpkePublicKey, SignaturePublicKey, Credential, Capabilities, S, LeafNodeInfo?, LeafNodeExtensions, Signature> {
@@ -110,8 +110,8 @@ data class LeafNode<S : LeafNodeSource>(
     if (signature neq other.signature) return false
     if (parentHash neqNullable other.parentHash) return false
     if (lifetime != other.lifetime) return false
-    if(epk != other.epk) return false
-    if(equar != other.equar) return false
+    // if(epk != other.epk) return false
+    // if(equar != other.equar) return false
 
     return true
   }
@@ -222,6 +222,7 @@ data class LeafNode<S : LeafNodeSource>(
       leafIndex: LeafIndex,
       groupId: GroupId,
       signaturePrivateKey: SignaturePrivateKey,
+      epk: ULong = 0U,
     ): Either<CreateSignatureError, CommitLeafNode> =
       either {
         val signature =
@@ -240,6 +241,7 @@ data class LeafNode<S : LeafNodeSource>(
           parentHash,
           oldLeafNode.extensions,
           signature,
+          epk,
         )
       }
 
@@ -280,6 +282,7 @@ data class LeafNode<S : LeafNodeSource>(
       extensions: LeafNodeExtensions,
       leafIndex: LeafIndex,
       groupId: GroupId,
+      epk: ULong = 0u,
     ): Either<CreateSignatureError, UpdateLeafNode> =
       either {
         val signature =
@@ -299,6 +302,7 @@ data class LeafNode<S : LeafNodeSource>(
           null,
           extensions,
           signature,
+          epk,
         )
       }
   }

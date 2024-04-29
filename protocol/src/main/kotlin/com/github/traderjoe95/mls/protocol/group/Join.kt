@@ -125,6 +125,12 @@ suspend fun <Identity : Any> Welcome.joinGroup(
           with(cipherSuite) { tree.insertPathSecrets(ownLeaf, groupInfo.signer, it) }
         }.getOrElse { tree }
 
+      for(i in 0..<tree.leaves.size){
+        if(tree.leaves[i] != null){
+          tree.leaves[i]!!.epk = groupContext.epoch
+        }
+      }
+
       val keySchedule =
         KeySchedule.join(
           cipherSuite,

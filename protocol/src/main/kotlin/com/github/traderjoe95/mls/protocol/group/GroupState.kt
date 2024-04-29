@@ -116,8 +116,8 @@ sealed class GroupState(
     internal var cachedUpdate: CachedUpdate? = null
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active =
-      Active(
+    private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active {
+      val g = Active(
         groupContext,
         tree,
         keySchedule,
@@ -128,6 +128,10 @@ sealed class GroupState(
             cipherSuite,
           ).let { it.ref.hex to it },
       )
+
+      g.cachedUpdate = cachedUpdate
+      return g
+    }
 
     fun getStoredProposals(): List<CachedProposal> = cachedProposals.values.toList()
 
@@ -191,12 +195,16 @@ sealed class GroupState(
         ProcessMessageError.HandshakeMessageForWrongEpoch(groupId, message.epoch, epoch)
       }
 
+      // println(cachedUpdate)
+
+      println(message.framedContent.content.contentType.name + " received")
       return when (message.framedContent.content) {
         is Proposal ->
           storeProposal(message as AuthenticatedContent<Proposal>)
 
         is Commit ->
           if (message.sender.type == Member && message.sender.index == leafIndex) {
+            println("processing own commit !!")
             cachedState ?: raise(ProcessMessageError.MustUseCachedStateForOwnCommit)
           } else {
             processCommit(message as AuthenticatedContent<Commit>, authenticationService, psks).bind()
@@ -225,6 +233,7 @@ sealed class GroupState(
           newExtensions ?: oldLeaf.extensions,
           leafIndex,
           groupId,
+          epoch+1u,
         ).bind()
 
       cachedUpdate = CachedUpdate(newLeaf, newEncryptionKeyPair.private, newSignatureKeyPair?.private)

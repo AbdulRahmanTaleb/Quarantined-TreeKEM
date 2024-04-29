@@ -49,6 +49,8 @@ sealed interface RatchetTreeOps : SignaturePublicKeyLookup {
 
   val TreeIndex.isBlank: Boolean
 
+
+
   operator fun get(nodeIndex: TreeIndex): Node?
 
   operator fun get(nodeIndices: Iterable<TreeIndex>): List<Node?>
