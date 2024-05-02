@@ -3,6 +3,7 @@ package com.github.traderjoe95.mls.protocol.group
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Tuple4
 import arrow.core.getOrElse
 import arrow.core.raise.Raise
 import arrow.core.raise.either
@@ -40,6 +41,7 @@ import com.github.traderjoe95.mls.protocol.types.Extension
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.ProposalType
 import com.github.traderjoe95.mls.protocol.types.crypto.Aad
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
 import com.github.traderjoe95.mls.protocol.types.framing.Sender
@@ -73,23 +75,31 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
   either {
     val proposalResult = processProposals(proposals, None, authenticationService, leafIndex, inReInit, inBranch, psks)
 
-    val (updatedTree, updatePath, pathSecrets) =
-      if (proposalResult.updatePathRequired || forcePath) {
+    // Determining new ghost members if any
+    val (newGhostMembers, _) = updateGhostMembers(proposalResult.updatedTree ?: tree)
+    println("Preparing Commit.")
+    printGhostUsers()
+
+    val forcePathGhost = newGhostMembers.isNotEmpty()
+
+    val (updatedTree, updatePath, pathSecrets, newGhostKeys) =
+      if (proposalResult.updatePathRequired || forcePath || forcePathGhost) {
         createUpdatePath(
           (proposalResult.updatedTree ?: tree),
           proposalResult.newMemberLeafIndices(),
           groupContext.withExtensions((proposalResult as? ProcessProposalsResult.CommitByMember)?.extensions),
           signaturePrivateKey,
+          newGhostMembers,
         )
       } else {
-        Triple((proposalResult.updatedTree ?: tree), null, listOf())
+        Tuple4((proposalResult.updatedTree ?: tree), null, listOf(), mutableListOf())
       }
 
     val commitSecret = nullable { deriveSecret(pathSecrets.lastOrNull().bind(), "path") } ?: zeroesNh
 
     val partialCommit =
       messages.createAuthenticatedContent(
-        Commit(proposals, updatePath.toOption()),
+        Commit(proposals, updatePath.toOption(), newGhostMembers, newGhostKeys),
         messageOptions,
         authenticatedData,
       )
@@ -160,6 +170,37 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
     )
   }
 
+private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Pair<List<LeafIndex> ,List<LeafIndex>>{
+
+  val deleteMembers = mutableListOf<LeafIndex>()
+
+  ghostMembers.forEach {
+    if((groupContext.epoch + 1u - tree.leaves[it.value.toInt()]!!.equar) >= QUARANTEEN_DELAY){
+      deleteMembers.add(it)
+    }
+  }
+
+  val newGhostMembers = mutableListOf<LeafIndex>()
+
+  tree.leafNodeIndices.forEach {
+    if(it.leafIndex != leafIndex){
+      val leaf = tree.leaves[it.leafIndex.value.toInt()]
+      if((leaf != null) && (leaf.equar.compareTo(0U) == 0) && ((groupContext.epoch + 1u - leaf.epk) >= INACTIVITY_DELAY)
+        && (!ghostMembers.contains(it.leafIndex))){
+
+        newGhostMembers.add(it.leafIndex)
+        leaf.equar = groupContext.epoch + 1u
+      }
+    }
+  }
+
+  if(newGhostMembers.isNotEmpty()){
+    ghostMembers.addAll(newGhostMembers)
+  }
+
+  return Pair(newGhostMembers, deleteMembers)
+}
+
 suspend fun <Identity : Any> GroupState.Active.processCommit(
   authenticatedCommit: AuthenticatedContent<Commit>,
   authenticationService: AuthenticationService<Identity>,
@@ -170,7 +211,16 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     val proposalResult = commit.content.validateAndApply(commit.sender, psks, authenticationService)
     val updatePath = commit.content.updatePath
 
+//    println("Processing Commit.")
+//    printGhostUsers()
+
     val preTree = proposalResult.updatedTree ?: tree
+
+    commit.content.ghostUsers.zip(commit.content.ghostKeys).forEach { (index, _) ->
+      val ghost = tree.leaves[index.value.toInt()] ?: raise(CommitError.GhostUserNotFound)
+      ghost.equar = commit.epoch+1u
+      ghostMembers.add(index)
+    }
 
     with(preTree) {
       if (leafIndex.isBlank) raise(RemovedFromGroup)

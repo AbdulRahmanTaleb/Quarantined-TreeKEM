@@ -183,7 +183,7 @@ class MlsClient<Identity : Any>(
         is GroupInfo -> {println("groupInfo received")
                         ProcessMessageResult.GroupInfoMessageReceived(message.message)}
 
-        is GroupMessage<*> -> {println("groupMessage received")
+        is GroupMessage<*> -> {//println("groupMessage received")
                               processGroupMessage(message.message).bind()}
       }
     }
@@ -203,7 +203,7 @@ class MlsClient<Identity : Any>(
       when (groupMessage.contentType) {
         is ContentType.Handshake ->
           if (group is ActiveGroupClient<Identity>) {
-            println("handshake message received")
+            // println("handshake message received")
             ProcessMessageResult.HandshakeMessageReceived(
               groupId,
               group.processHandshake(groupMessage as HandshakeMessage).bind(),

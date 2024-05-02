@@ -12,11 +12,14 @@ import com.github.traderjoe95.mls.codec.type.V
 import com.github.traderjoe95.mls.codec.type.enum
 import com.github.traderjoe95.mls.codec.type.get
 import com.github.traderjoe95.mls.codec.type.optional
-import com.github.traderjoe95.mls.codec.type.struct.Struct2T
+import com.github.traderjoe95.mls.codec.type.struct.Struct3T
+import com.github.traderjoe95.mls.codec.type.struct.Struct4T
 import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.member.then
 import com.github.traderjoe95.mls.codec.type.struct.struct
 import com.github.traderjoe95.mls.codec.util.throwAnyError
+import com.github.traderjoe95.mls.protocol.tree.LeafIndex
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
 import com.github.traderjoe95.mls.protocol.types.tree.UpdatePath
 import com.github.traderjoe95.mls.protocol.util.zipWithIndex
@@ -24,9 +27,14 @@ import com.github.traderjoe95.mls.protocol.util.zipWithIndex
 data class Commit(
   val proposals: List<ProposalOrRef>,
   val updatePath: Option<UpdatePath>,
-) : Content.Handshake<Commit>, Struct2T.Shape<List<ProposalOrRef>, Option<UpdatePath>> {
-  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath) : this(proposals, updatePath.some())
-  constructor(proposals: List<ProposalOrRef>) : this(proposals, None)
+  val ghostUsers: List<LeafIndex>,
+  val ghostKeys: List<HpkePublicKey>,
+) : Content.Handshake<Commit>, Struct4T.Shape<List<ProposalOrRef>, Option<UpdatePath>, List<LeafIndex>, List<HpkePublicKey>> {
+  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath, ghostUsers: List<LeafIndex>, ghostKeys: List<HpkePublicKey>) : this(proposals, updatePath.some(), ghostUsers, ghostKeys)
+
+  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath) : this(proposals, updatePath.some(), emptyList(), emptyList())
+
+  constructor(proposals: List<ProposalOrRef>) : this(proposals, None, emptyList(), emptyList())
 
   override val contentType: ContentType.Commit = ContentType.Commit
 
@@ -36,10 +44,12 @@ data class Commit(
       struct("Commit") {
         it.field("proposals", ProposalOrRef.T[V])
           .field("update_path", optional[UpdatePath.T])
+          .field("ghostUsers", LeafIndex.T[V])
+          .field("ghostKeys", HpkePublicKey.T[V])
       }.lift(::Commit)
 
     val empty: Commit
-      get() = Commit(listOf(), None)
+      get() = Commit(listOf(), None, listOf(), listOf())
   }
 
   override fun equals(other: Any?): Boolean {
@@ -59,6 +69,9 @@ data class Commit(
     var result = proposals.fold(1) { hc, el -> hc * 31 + el.hashCode }
     result = 31 * result + updatePath.hashCode()
     result = 31 * result + contentType.hashCode()
+    result = ghostUsers.fold(result) { hc, li -> hc * 31 + li.hashCode()}
+    result = ghostKeys.fold(result) { hc, li -> hc * 31 + li.hashCode()}
+
     return result
   }
 }

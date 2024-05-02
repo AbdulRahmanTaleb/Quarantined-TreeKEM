@@ -16,6 +16,8 @@ sealed interface RecipientCommitError : ProcessMessageError
 sealed interface CommitError : SenderCommitError, RecipientCommitError {
   data object CachedUpdateMissing : CommitError
 
+  data object GhostUserNotFound : CommitError
+
   data class CachedUpdateDoesNotMatch(val cachedLeafNode: LeafNode<*>, val proposalLeafNode: LeafNode<*>) : CommitError
 }
 

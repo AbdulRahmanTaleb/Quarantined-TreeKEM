@@ -215,6 +215,10 @@ class RatchetTree(
       )
     }
 
+  fun print(){
+    public.print()
+  }
+
   companion object {
     fun new(keyPackage: KeyPackage.Private): RatchetTree =
       RatchetTree(
@@ -305,6 +309,33 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
     firstBlankLeaf
       ?.let { insertAt(newLeaf, it) }
       ?: extend().insert(newLeaf)
+
+  fun print(){
+    println("Leaves:")
+    leafNodeIndices.forEach{
+      print(it)
+      if(nodes[it.value] == null){
+        print(" empty - ")
+      }
+      else{
+        print(" full - ")
+      }
+    }
+    println("")
+
+    println("Parents:")
+    parentNodeIndices.forEach{
+      print(it)
+      if(nodes[it.value] == null){
+        print(" empty - ")
+      }
+      else{
+        print(" full - ")
+      }
+
+    }
+    println("")
+  }
 
   internal fun insertAt(
     leafNode: LeafNode<*>,

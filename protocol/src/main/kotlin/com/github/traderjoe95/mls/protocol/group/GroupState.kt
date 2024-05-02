@@ -73,6 +73,10 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
+  val INACTIVITY_DELAY: ULong = 2U
+  val QUARANTEEN_DELAY: ULong = 2U
+
+
   fun isActive(): Boolean = this is Active
 
   context(Raise<GroupSuspended>)
@@ -115,6 +119,21 @@ sealed class GroupState(
 
     internal var cachedUpdate: CachedUpdate? = null
 
+    var ghostMembers: MutableList<LeafIndex> = mutableListOf()
+    var ghostMembersShares: MutableList<Secret> = mutableListOf()
+
+    fun printGhostUsers(){
+      if(ghostMembers.isNotEmpty()){
+        println("\nnew ghosts:")
+        println("current epoch:"+(groupContext.epoch+1u))
+        ghostMembers.forEach {
+          val leaf = tree.leaves[it.value.toInt()]!!
+          println(leaf.encryptionKey.hex + ", " + leaf.epk + ", "  + leaf.equar)
+        }
+        println("end of ghosts.\n")
+      }
+    }
+
     context(Raise<ProposalValidationError>)
     private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active {
       val g = Active(
@@ -129,6 +148,7 @@ sealed class GroupState(
           ).let { it.ref.hex to it },
       )
 
+      g.ghostMembers = ghostMembers
       g.cachedUpdate = cachedUpdate
       return g
     }
@@ -197,14 +217,14 @@ sealed class GroupState(
 
       // println(cachedUpdate)
 
-      println(message.framedContent.content.contentType.name + " received")
+      // println(message.framedContent.content.contentType.name + " received")
       return when (message.framedContent.content) {
         is Proposal ->
           storeProposal(message as AuthenticatedContent<Proposal>)
 
         is Commit ->
           if (message.sender.type == Member && message.sender.index == leafIndex) {
-            println("processing own commit !!")
+            // println("processing own commit !!")
             cachedState ?: raise(ProcessMessageError.MustUseCachedStateForOwnCommit)
           } else {
             processCommit(message as AuthenticatedContent<Commit>, authenticationService, psks).bind()
