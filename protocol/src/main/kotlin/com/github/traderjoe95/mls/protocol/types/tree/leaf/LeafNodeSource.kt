@@ -23,6 +23,8 @@ sealed class LeafNodeSource(ord: UInt, override val isValid: Boolean = true) : P
           KeyPackage,
           Update,
           Commit,
+          // Ghost
+          Ghost,
           upperBound = 0xFFU,
         )
       }
@@ -36,4 +38,6 @@ sealed class LeafNodeSource(ord: UInt, override val isValid: Boolean = true) : P
   data object Update : LeafNodeSource(2U)
 
   data object Commit : LeafNodeSource(3U)
+
+  data object Ghost : LeafNodeSource(4U)
 }

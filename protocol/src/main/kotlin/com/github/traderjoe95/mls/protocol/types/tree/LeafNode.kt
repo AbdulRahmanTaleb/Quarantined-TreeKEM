@@ -39,6 +39,7 @@ import com.github.traderjoe95.mls.protocol.types.tree.leaf.ParentHash
 typealias KeyPackageLeafNode = LeafNode<LeafNodeSource.KeyPackage>
 typealias CommitLeafNode = LeafNode<LeafNodeSource.Commit>
 typealias UpdateLeafNode = LeafNode<LeafNodeSource.Update>
+typealias GhostLeafNode = LeafNode<LeafNodeSource.Ghost>
 
 data class LeafNode<S : LeafNodeSource>(
   override val encryptionKey: HpkePublicKey,

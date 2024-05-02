@@ -1,6 +1,5 @@
 package com.github.traderjoe95.mls.protocol.tree
 
-import arrow.core.Tuple4
 import arrow.core.prependTo
 import arrow.core.raise.Raise
 import com.github.traderjoe95.mls.codec.util.uSize
@@ -13,7 +12,6 @@ import com.github.traderjoe95.mls.protocol.error.WrongParentHash
 import com.github.traderjoe95.mls.protocol.error.WrongUpdatePathLength
 import com.github.traderjoe95.mls.protocol.group.GroupContext
 import com.github.traderjoe95.mls.protocol.types.RefinedBytes.Companion.neqNullable
-import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret.Companion.asSecret
 import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
@@ -29,9 +27,8 @@ internal fun createUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
   signaturePrivateKey: SignaturePrivateKey,
-  newGhostMembers: List<LeafIndex> = emptyList(),
-): Tuple4<RatchetTree, UpdatePath, List<Secret>, MutableList<HpkePublicKey>> =
-  createUpdatePath(originalTree, originalTree.leafIndex, excludeNewLeaves, groupContext, signaturePrivateKey, newGhostMembers)
+): Triple<RatchetTree, UpdatePath, List<Secret>> =
+  createUpdatePath(originalTree, originalTree.leafIndex, excludeNewLeaves, groupContext, signaturePrivateKey)
 
 context(Raise<SenderTreeUpdateError>)
 internal fun createUpdatePath(
@@ -40,28 +37,13 @@ internal fun createUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
   signaturePrivateKey: SignaturePrivateKey,
-  newGhostMembers: List<LeafIndex>,
-): Tuple4<RatchetTree, UpdatePath, List<Secret>, MutableList<HpkePublicKey>> =
+): Triple<RatchetTree, UpdatePath, List<Secret>> =
   with(originalTree.cipherSuite) {
     val oldLeafNode = originalTree.leafNode(from)
 
     val leafPathSecret = generateSecret(hashLen)
     val leafNodeSecret = deriveSecret(leafPathSecret, "node")
     val leafKp = deriveKeyPair(leafNodeSecret)
-
-    val newGhostSecrets = mutableListOf<Secret>()
-    val newGhostKeys = mutableListOf<HpkePublicKey>()
-
-    newGhostMembers.forEach {
-      // Generating a new secret for each new ghost
-      val secret = generateSecret(hashLen)
-      newGhostSecrets.add(secret)
-
-      // Generating a new encryption key for each new ghost
-      // The public keys are returned in the commit message
-      val newKeys = deriveKeyPair(secret)
-      newGhostKeys.add(newKeys.public)
-    }
 
     val directPath = originalTree.directPath(from)
     val filteredDirectPath = originalTree.filteredDirectPath(from)
@@ -128,11 +110,10 @@ internal fun createUpdatePath(
         )
       }
 
-    return Tuple4(
+    return Triple(
       updatedTree,
       UpdatePath(newLeafNode, updatePathNodes),
       pathSecrets.drop(1),
-      newGhostKeys,
     )
   }
 
