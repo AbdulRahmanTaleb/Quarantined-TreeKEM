@@ -8,6 +8,7 @@ import com.github.traderjoe95.mls.codec.util.uSize
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
+import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.GroupActive
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
@@ -37,8 +38,10 @@ import com.github.traderjoe95.mls.protocol.types.GroupId
 import com.github.traderjoe95.mls.protocol.types.LeafNodeExtensions
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePrivateKey
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Mac
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+import com.github.traderjoe95.mls.protocol.types.crypto.Secret.Companion.asSecret
 import com.github.traderjoe95.mls.protocol.types.crypto.SignatureKeyPair
 import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
 import com.github.traderjoe95.mls.protocol.types.framing.content.AuthenticatedContent
@@ -73,8 +76,8 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
-  val INACTIVITY_DELAY: ULong = 2U
-  val QUARANTEEN_DELAY: ULong = 2U
+  val INACTIVITY_DELAY: ULong = 3U
+  val QUARANTEEN_DELAY: ULong = 3U
 
 
   fun isActive(): Boolean = this is Active
@@ -120,7 +123,8 @@ sealed class GroupState(
     internal var cachedUpdate: CachedUpdate? = null
 
     var ghostMembers: MutableList<LeafIndex> = mutableListOf()
-    var ghostMembersShares: MutableList<Secret> = mutableListOf()
+    var ghostMembersKeys: MutableList<HpkePublicKey> = mutableListOf()
+    var ghostMembersShares: MutableList<ShamirSecretSharing.SecretShare> = mutableListOf()
 
     fun printGhostUsers(){
       if(ghostMembers.isNotEmpty()){
@@ -133,6 +137,11 @@ sealed class GroupState(
         println("end of ghosts.\n")
       }
     }
+
+    fun derive(secret: ByteArray): HpkeKeyPair{
+      return deriveKeyPair(secret.asSecret)
+    }
+
 
     context(Raise<ProposalValidationError>)
     private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active {
@@ -149,6 +158,8 @@ sealed class GroupState(
       )
 
       g.ghostMembers = ghostMembers
+      g.ghostMembersKeys = ghostMembersKeys
+      g.ghostMembersShares = ghostMembersShares
       g.cachedUpdate = cachedUpdate
       return g
     }
@@ -266,7 +277,15 @@ sealed class GroupState(
       tree: RatchetTree,
       keySchedule: KeySchedule,
       newSignaturePrivateKey: SignaturePrivateKey = signaturePrivateKey,
-    ): Active = Active(groupContext, tree, keySchedule, newSignaturePrivateKey)
+    ): Active {
+      val g = Active(groupContext, tree, keySchedule, newSignaturePrivateKey)
+
+      g.ghostMembers = ghostMembers
+      g.ghostMembersKeys = ghostMembersKeys
+      g.ghostMembersShares = ghostMembersShares
+
+      return g
+    }
 
     fun suspend(
       groupContext: GroupContext,

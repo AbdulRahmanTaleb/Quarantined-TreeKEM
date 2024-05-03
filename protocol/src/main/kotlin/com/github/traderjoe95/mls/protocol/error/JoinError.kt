@@ -20,6 +20,8 @@ sealed interface WelcomeJoinError {
 
 sealed interface ExternalJoinError {
   data object MissingExternalPub : ExternalJoinError
+
+  data object UnexpectedError : ExternalJoinError
 }
 
 sealed interface NewMemberAddProposalError

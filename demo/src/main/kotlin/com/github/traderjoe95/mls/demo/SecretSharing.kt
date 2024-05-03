@@ -15,19 +15,24 @@ import java.security.SecureRandom
 
 suspend fun main() {
 
- for(i in 1..1000){
+    val l = listOf<Int>(1,2)
+
+    println(l.map{ 1 })
+
+ for(i in 1..10){
+     val secret = SecureRandom().nextBytes(32)
+
+     val shares = ShamirSecretSharing.generateShares(secret, 3, 5)
+
+     val newShares = shares.map{
+         assert(it.encode().size == 256)
+         ShamirSecretSharing.SecretShare.decode(it.encode())
+     }
 
 
-   val secret = SecureRandom().nextBytes(32)
+     val s = ShamirSecretSharing.retrieveSecret(newShares)
 
-   val sh = ShamirSecretSharing(3, 5)
-
-   val shares = sh.generateShares(secret)
-
-   val s = sh.retrieveSecret(shares)
-
-   assert(BigInteger(1, s) == BigInteger(1, secret))
-
+     assert(BigInteger(1, s) == BigInteger(1, secret))
   }
 
 }

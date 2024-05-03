@@ -6,6 +6,7 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
+import com.github.traderjoe95.mls.protocol.error.CommitError
 import com.github.traderjoe95.mls.protocol.error.DecoderError
 import com.github.traderjoe95.mls.protocol.error.ExtensionSupportError
 import com.github.traderjoe95.mls.protocol.error.ExternalJoinError
@@ -210,8 +211,8 @@ suspend fun <Identity : Any> GroupInfo.joinGroupExternal(
         ),
       )
 
-    val (updatedTree, updatePath, pathSecrets) =
-      createUpdatePath(newTree, setOf(), groupContext, keyPackage.signaturePrivateKey)
+    val (updatedTree, updatePath, pathSecrets, _) =
+      createUpdatePath(newTree, setOf(), groupContext, keyPackage.signaturePrivateKey).bind()
 
     val commitSecret = cipherSuite.deriveSecret(pathSecrets.last(), "path")
 

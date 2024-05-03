@@ -18,6 +18,8 @@ sealed interface CommitError : SenderCommitError, RecipientCommitError {
 
   data object GhostUserNotFound : CommitError
 
+  data object NotEnoughNodesForSecretSharing : CommitError
+
   data class CachedUpdateDoesNotMatch(val cachedLeafNode: LeafNode<*>, val proposalLeafNode: LeafNode<*>) : CommitError
 }
 
