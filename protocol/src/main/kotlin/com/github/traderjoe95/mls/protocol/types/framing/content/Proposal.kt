@@ -9,6 +9,7 @@ import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.member.then
 import com.github.traderjoe95.mls.codec.type.struct.struct
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
@@ -17,6 +18,7 @@ import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.GroupId
 import com.github.traderjoe95.mls.protocol.types.ProposalType
 import com.github.traderjoe95.mls.protocol.types.RefinedBytes
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
 import com.github.traderjoe95.mls.protocol.types.crypto.KemOutput
 import com.github.traderjoe95.mls.protocol.types.extensionList
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
@@ -46,6 +48,7 @@ sealed class Proposal(
               .case(ProposalType.ReInit).then(ReInit.T)
               .case(ProposalType.ExternalInit).then(ExternalInit.T)
               .case(ProposalType.GroupContextExtensions).then(GroupContextExtensions.T)
+              .case(ProposalType.ShareRecoveryMessage).then(ShareRecoveryMessage.T)
           }
       }.lift({ _, p -> p }, { Struct2(it.type, it) })
     }
@@ -89,6 +92,17 @@ data class Update(
       struct("Update") {
         it.field("leaf_node", LeafNode.T)
       }.lift(::Update)
+  }
+}
+
+data class ShareRecoveryMessage(
+  val encryptedSecretShare: HpkeCiphertext
+) : Proposal(ProposalType.ShareRecoveryMessage), Struct1T.Shape<HpkeCiphertext> {
+  companion object {
+    val T: DataType<ShareRecoveryMessage> =
+      struct("ShareRecoveryMessage") {
+        it.field("encrypted_secret_share", HpkeCiphertext.T)
+      }.lift(::ShareRecoveryMessage)
   }
 }
 

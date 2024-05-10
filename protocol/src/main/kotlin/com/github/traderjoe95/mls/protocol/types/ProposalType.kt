@@ -17,6 +17,7 @@ enum class ProposalType(ord: UInt, override val isValid: Boolean = true) : Proto
   ReInit(0x0005U),
   ExternalInit(0x0006U),
   GroupContextExtensions(0x0007U),
+  ShareRecoveryMessage(0x0008u),
 
   // GREASE
   @Deprecated("This is technically required, but must not be used", level = DeprecationLevel.ERROR)
@@ -91,6 +92,7 @@ enum class ProposalType(ord: UInt, override val isValid: Boolean = true) : Proto
         Psk,
         ExternalInit,
         ReInit,
+        ShareRecoveryMessage,
       )
   }
 }

@@ -7,6 +7,7 @@ import com.github.traderjoe95.mls.demo.service.DeliveryService
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.types.BasicCredential
+import com.github.traderjoe95.mls.protocol.types.crypto.Secret.Companion.asSecret
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 import com.github.traderjoe95.mls.protocol.util.debug
 import com.github.traderjoe95.mls.protocol.util.nextBytes
@@ -15,24 +16,31 @@ import java.security.SecureRandom
 
 suspend fun main() {
 
-    val l = listOf<Int>(1,2)
+    for(i in 1..100){
 
-    println(l.map{ 1 })
+        val secret = SecureRandom().nextBytes(64)
+        val shares = ShamirSecretSharing.generateShares(secret, 4,4)
 
- for(i in 1..10){
-     val secret = SecureRandom().nextBytes(32)
+        val newShares = shares.map{
+            ShamirSecretSharing.SecretShare.decode(it.encode()).second
+        }
+        val s = BigInteger(1, ShamirSecretSharing.retrieveSecret(newShares))
 
-     val shares = ShamirSecretSharing.generateShares(secret, 3, 5)
+        assert(s == BigInteger(1, secret))
+    }
 
-     val newShares = shares.map{
-         assert(it.encode().size == 256)
-         ShamirSecretSharing.SecretShare.decode(it.encode())
-     }
+    for(i in 1..100){
+        val secret = SecureRandom().nextBytes(64)
 
+        val shares = ShamirSecretSharing.generateShares(secret, 4,4)
 
-     val s = ShamirSecretSharing.retrieveSecret(newShares)
+        val sharesBytes = shares.fold(ByteArray(0)) { acc, share -> acc + share.encode() }
 
-     assert(BigInteger(1, s) == BigInteger(1, secret))
-  }
+        val newShares = ShamirSecretSharing.SecretShare.decodeListOfShares(sharesBytes, 4)
+
+        val s = BigInteger(1, ShamirSecretSharing.retrieveSecret(newShares))
+
+        assert(s == BigInteger(1, secret))
+    }
 
 }

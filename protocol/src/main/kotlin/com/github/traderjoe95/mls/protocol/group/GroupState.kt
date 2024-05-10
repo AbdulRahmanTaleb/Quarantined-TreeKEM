@@ -77,7 +77,7 @@ sealed class GroupState(
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
   val INACTIVITY_DELAY: ULong = 3U
-  val QUARANTEEN_DELAY: ULong = 3U
+  val QUARANTEEN_DELAY: ULong = 100U
 
 
   fun isActive(): Boolean = this is Active
@@ -125,18 +125,7 @@ sealed class GroupState(
     var ghostMembers: MutableList<LeafIndex> = mutableListOf()
     var ghostMembersKeys: MutableList<HpkePublicKey> = mutableListOf()
     var ghostMembersShares: MutableList<ShamirSecretSharing.SecretShare> = mutableListOf()
-
-    fun printGhostUsers(){
-      if(ghostMembers.isNotEmpty()){
-        println("\nnew ghosts:")
-        println("current epoch:"+(groupContext.epoch+1u))
-        ghostMembers.forEach {
-          val leaf = tree.leaves[it.value.toInt()]!!
-          println(leaf.encryptionKey.hex + ", " + leaf.epk + ", "  + leaf.equar)
-        }
-        println("end of ghosts.\n")
-      }
-    }
+    var ghostMembersShareHolderRank: MutableList<Int> = mutableListOf()
 
     fun derive(secret: ByteArray): HpkeKeyPair{
       return deriveKeyPair(secret.asSecret)
@@ -160,6 +149,7 @@ sealed class GroupState(
       g.ghostMembers = ghostMembers
       g.ghostMembersKeys = ghostMembersKeys
       g.ghostMembersShares = ghostMembersShares
+      g.ghostMembersShareHolderRank = ghostMembersShareHolderRank
       g.cachedUpdate = cachedUpdate
       return g
     }
@@ -226,9 +216,6 @@ sealed class GroupState(
         ProcessMessageError.HandshakeMessageForWrongEpoch(groupId, message.epoch, epoch)
       }
 
-      // println(cachedUpdate)
-
-      // println(message.framedContent.content.contentType.name + " received")
       return when (message.framedContent.content) {
         is Proposal ->
           storeProposal(message as AuthenticatedContent<Proposal>)
@@ -283,6 +270,7 @@ sealed class GroupState(
       g.ghostMembers = ghostMembers
       g.ghostMembersKeys = ghostMembersKeys
       g.ghostMembersShares = ghostMembersShares
+      g.ghostMembersShareHolderRank = ghostMembersShareHolderRank
 
       return g
     }

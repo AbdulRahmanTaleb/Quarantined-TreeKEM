@@ -5,6 +5,9 @@ import com.github.traderjoe95.mls.demo.service.DeliveryService
 import com.github.traderjoe95.mls.demo.util.makePublic
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
+import com.github.traderjoe95.mls.protocol.types.BasicCredential
+import com.github.traderjoe95.mls.protocol.types.X509Credential
+import com.github.traderjoe95.mls.protocol.types.crypto.Secret.Companion.asSecret
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 import com.github.traderjoe95.mls.protocol.types.framing.content.Update
 import com.github.traderjoe95.mls.protocol.util.debug
@@ -14,19 +17,29 @@ fun printGroup(group: ActiveGroupClient<String>, name: String, nbMembers: Int){
 
   println("================================================================")
   for(i in 0..<nbMembers) {
-    println("Leaf[" + i + "]: epk = " + group.state.members[i].epk + ", source = " + group.state.members[i].source + " , equar = " + group.state.members[i].equar)
+    when(val credential = group.state.members[i].credential){
+      is BasicCredential -> println("Leaf[" + i + "] - " + credential.identity.decodeToString() + ": source = " + group.state.members[i].source + ", epk = " + group.state.members[i].epk + " , equar = " + group.state.members[i].equar)
+      else -> println("Leaf[" + i + "]: source = " + group.state.members[i].source + ", epk = " + group.state.members[i].epk + " , equar = " + group.state.members[i].equar)
+    }
+
   }
   println("================================================================")
   println()
 }
 
-suspend fun updateKeys(updaterGroup: ActiveGroupClient<String>, committerGroup: ActiveGroupClient<String>, clients: MutableList<Client>, excludeClients: MutableList<Client> = mutableListOf()){
-  val updateMember = updaterGroup.update().getOrThrow()
-  DeliveryService.sendMessageToGroup(updateMember, updaterGroup.groupId).getOrThrow()
+suspend fun updateKeys(updaterGroups: List<ActiveGroupClient<String>>, committerGroup: ActiveGroupClient<String>, clients: MutableList<Client>, excludeClients: MutableList<Client> = mutableListOf()){
 
-  clients.forEach {
-    if(! excludeClients.contains(it)){
-      it.processNextMessage().getOrThrow()
+
+  updaterGroups.forEach { updaterGroup ->
+    if(updaterGroup != committerGroup) {
+      val updateMember = updaterGroup.update().getOrThrow()
+      DeliveryService.sendMessageToGroup(updateMember, updaterGroup.groupId).getOrThrow()
+
+      clients.forEach {
+        if (!excludeClients.contains(it)) {
+          it.processNextMessage().getOrThrow()
+        }
+      }
     }
   }
 
@@ -44,7 +57,7 @@ suspend fun main() {
   val clients = mutableListOf<Client>()
   val groups = mutableListOf<ActiveGroupClient<String>>()
 
-  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan")
+  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan", "Eve")
 
   for(cl in clientsList){
     val client = Client(cl)
@@ -125,93 +138,89 @@ suspend fun main() {
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////
 
-  val excludeClients = mutableListOf(clients[2])
-
-  var i = 1
-  var idxUpdate = 0
+  val i = 1
+  var idxGhosts = listOf<Int>()
   var idxCommit = 1
-  println(i.toString() + ": UPDATING " + clientsList[idxUpdate] + " KEYS, COMMITTING BY " + clientsList[idxCommit])
+  var idxUpdate = IntRange(0, clients.size-1).filter { !idxGhosts.contains(it) && it != idxCommit }
+  println(i.toString() + ": UPDATING " + clientsList.slice(idxUpdate) + " KEYS, COMMITTING BY " + clientsList[idxCommit])
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  updateKeys(groups[idxUpdate], groups[idxCommit], clients, excludeClients)
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-
-  for(j in 0..<clients.size) {
-    println(groups[j].state.ghostMembers)
-  }
-
-  i = 2
-  idxUpdate = 1
-  idxCommit = 3
-  println(i.toString() + ": UPDATING " + clientsList[idxUpdate] + " KEYS, COMMITTING BY " + clientsList[idxCommit])
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  updateKeys(groups[idxUpdate], groups[idxCommit], clients, excludeClients)
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-
-  for(j in 0..<clients.size) {
-    println(groups[j].state.ghostMembers)
-  }
-
-  i = 3
-  idxUpdate = 0
-  idxCommit = 1
-  println(i.toString() + ": UPDATING " + clientsList[idxUpdate] + " KEYS, COMMITTING BY " + clientsList[idxCommit])
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  updateKeys(groups[idxUpdate], groups[idxCommit], clients, excludeClients)
+  updateKeys(
+    groups.slice(idxUpdate),
+    groups[idxCommit],
+    clients,
+    clients.slice(idxGhosts).toMutableList()
+  )
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
   for(j in 0..<clients.size) {
     printGroup(groups[j], clientsList[j], clients.size)
   }
 
-  val listShares = mutableListOf<ShamirSecretSharing.SecretShare>()
-  for(j in IntRange(0, groups.size-1).filter{ it != 2 }) {
-    println(groups[j].state.ghostMembers)
-    println(groups[j].state.ghostMembersKeys)
-    println(groups[j].state.ghostMembersShares)
-    listShares.add(groups[j].state.ghostMembersShares[0])
+  idxGhosts = listOf(clients.size-1)
+  idxUpdate = IntRange(0, clients.size-1).filter { !idxGhosts.contains(it) && it != idxCommit }
+  for(j in 2..4) {
+    println(j.toString() + ": UPDATING " + clientsList.slice(idxUpdate) + " KEYS, COMMITTING BY " + clientsList[idxCommit])
+    println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    updateKeys(
+      groups.slice(idxUpdate),
+      groups[idxCommit],
+      clients,
+      clients.slice(idxGhosts).toMutableList()
+    )
+    println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+  }
+
+  for(j in 0..<clients.size) {
+    printGroup(groups[j], clientsList[j], clients.size)
+  }
+
+  for(j in 0..<clients.size) {
+    val st = groups[j].state
+    println("Ghosts Groups["+clientsList[j]+"]: ")
+    println("Members(" + st.ghostMembers.size + "): " + st.ghostMembers)
+    println("Keys(" + st.ghostMembersKeys.size+"): " + st.ghostMembersKeys)
+    println("SecretShares(" + st.ghostMembersShares.size+"): " + st.ghostMembersShares)
+    println("ShareHolderRanks(" + st.ghostMembersShareHolderRank.size+"): " + st.ghostMembersShareHolderRank)
     println("")
   }
+  println("")
 
+
+  // GHOST 1
+  val listShares = mutableListOf<ShamirSecretSharing.SecretShare>()
+  for(j in IntRange(0, groups.size-1).filter{ !idxGhosts.contains(it) }) {
+    if(groups[j].state.ghostMembersShareHolderRank[0] == 1) {
+      listShares.add(groups[j].state.ghostMembersShares[0])
+    }
+  }
   val secret = ShamirSecretSharing.retrieveSecret(listShares)
-  print(secret)
-
   val keyPair = groups[0].state.derive(secret)
-  print(keyPair.public)
+  println(keyPair.public)
 
-  for(j in IntRange(0, groups.size-1).filter{ it != 2 }) {
-    assert(keyPair.public == groups[j].state.ghostMembersKeys[0])
+  for(j in IntRange(0, groups.size-1).filter{ !idxGhosts.contains(it) }) {
+    println(groups[j].state.ghostMembersKeys[0])
+    assert(keyPair.public.bytes.contentEquals(groups[j].state.ghostMembersKeys[0].bytes))
   }
 
+  println("")
+
+  // GHOST 2
+//  val listShares2 = mutableListOf<ShamirSecretSharing.SecretShare>()
+//  for(j in IntRange(0, groups.size-1).filter{ !idxGhosts.contains(it) }) {
+//    listShares2.add(groups[j].state.ghostMembersShares[1])
+//  }
+//  val secret2 = ShamirSecretSharing.retrieveSecret(listShares2)
+//  val keyPair2 = groups[0].state.derive(secret2)
+//  println(keyPair2.public)
+//
+//  for(j in IntRange(0, groups.size-1).filter{ !idxGhosts.contains(it) }) {
+//    println(groups[j].state.ghostMembersKeys[1])
+//    assert(keyPair2.public.bytes.contentEquals(groups[j].state.ghostMembersKeys[1].bytes))
+//  }
 
 
 
-//  // Updating charlie's keys, committing by Alice
-//  println("UPDATING CHARLIE KEYS, COMMITTING BY ALICE")
-//  println("/////////////////////////////////////////////////////////////////////////")
-//  updateKeys(charlieGroup, aliceGroup, clients, excludeClients)
-//  printGroup(aliceGroup, "ALICE", 3)
-//  printGroup(bobGroup, "BOB", 3)
-//  printGroup(charlieGroup, "CHARLIE", 3)
-//  println("Commit done by Alice.")
-//  println(aliceGroup.state.members[0].encryptionKey)
-//  println(aliceGroup.state.tree.print())
-//  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-//  println()
-//
-//  // Updating Alice's keys, committing by Charlie
-//  println("UPDATING ALICE KEYS, COMMITTING BY CHARLIE")
-//  println("/////////////////////////////////////////////////////////////////////////")
-//  updateKeys(aliceGroup, charlieGroup, clients, excludeClients)
-//  printGroup(aliceGroup, "ALICE", 3)
-//  printGroup(bobGroup, "BOB", 3)
-//  printGroup(charlieGroup, "CHARLIE", 3)
-//  println("Commit done by Charlie.")
-//  println(aliceGroup.state.members[0].encryptionKey)
-//  println(charlieGroup.state.tree.print())
-//  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-//  println()
-//
-//
+
 //  //////////////////////////////////////////////////////////////////////
 //  //////////////////////////////////////////////////////////////////////
 //  // EXCHANGING MESSAGES

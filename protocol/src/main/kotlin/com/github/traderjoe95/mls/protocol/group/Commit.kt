@@ -59,12 +59,28 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Proposal
 import com.github.traderjoe95.mls.protocol.types.framing.content.ProposalOrRef
 import com.github.traderjoe95.mls.protocol.types.framing.content.ReInit
 import com.github.traderjoe95.mls.protocol.types.framing.content.Remove
+import com.github.traderjoe95.mls.protocol.types.framing.content.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.types.framing.content.Update
 import com.github.traderjoe95.mls.protocol.types.framing.enums.SenderType
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.UpdatePath
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
+import com.github.traderjoe95.mls.protocol.util.hex
 import com.github.traderjoe95.mls.protocol.types.RatchetTree as RatchetTreeExt
+
+
+fun GroupState.Active.printGhostUsers(newGhostMembers: List<LeafIndex>){
+  if(newGhostMembers.isNotEmpty()){
+    println("\nnew ghosts:")
+    println("current epoch:"+(groupContext.epoch+1u))
+    newGhostMembers.forEach {
+      val leaf = tree.leaves[it.value.toInt()]!!
+      println(leaf.encryptionKey.hex + ", " + leaf.epk + ", "  + leaf.equar)
+    }
+    println(ghostMembers)
+    println("end of ghosts.\n")
+  }
+}
 
 suspend fun <Identity : Any> GroupState.Active.prepareCommit(
   proposals: List<ProposalOrRef>,
@@ -83,7 +99,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
     // Determining new ghost members if any
     val (updatedTreeGhost, newGhostMembers, newGhostSecrets, newGhostKeys, _) = updateGhostMembers(proposalResult.updatedTree ?: tree)
     println("Preparing Commit.")
-    printGhostUsers()
+    printGhostUsers(newGhostMembers)
 
     val forcePathGhost = newGhostMembers.isNotEmpty()
 
@@ -101,6 +117,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
       }
 
     ghostMembersShares.addAll(ownGhostShares)
+    ownGhostShares.map { ghostMembersShareHolderRank.add(1) }
 
     val commitSecret = nullable { deriveSecret(pathSecrets.lastOrNull().bind(), "path") } ?: zeroesNh
 
@@ -199,7 +216,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     val updatedTreeGhost =
       processGhostMembers(preTree, commit.content.ghostUsers, commit.content.ghostKeys, commit.epoch).bind()
 
-    val (updatedTree, commitSecret, ghostSecretShares) =
+    val (updatedTree, commitSecret, ghostSecretShares, ghostShareHolderRanks) =
       updatePath.map { path ->
         path.leafNode.epk = commit.epoch + 1u
         updatedTreeGhost.applyCommitUpdatePath(
@@ -210,9 +227,10 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
           commit.content.ghostUsers,
           ghostMembers,
         )
-      }.getOrElse { Triple(updatedTreeGhost, zeroesNh, listOf()) }
+      }.getOrElse { Tuple4(updatedTreeGhost, zeroesNh, listOf(), listOf()) }
 
     ghostMembersShares.addAll(ghostSecretShares)
+    ghostMembersShareHolderRank.addAll(ghostShareHolderRanks)
 
     val updatedGroupContext =
       groupContext.evolve(
@@ -281,6 +299,8 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Tuple5<Ratc
         // Generating a new secret for each new ghost
         val secret = generateSecret(hashLen)
         newGhostSecrets.add(secret)
+
+//        println("SECRET SIZE = " + secret.bytes.size)
 
         // Generating a new encryption key for each new ghost
         // The public keys are returned in the commit message
@@ -372,7 +392,7 @@ private fun RatchetTree.applyCommitUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<LeafIndex> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
-): Triple<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>> =
+): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<Int>> =
   if (sender.type == SenderType.Member) {
     applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers, ghostMembers)
   } else {
@@ -546,6 +566,8 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
 
           return ProcessProposalsResult.ReInitCommit(proposal, zeroesNh)
         }
+
+        is ShareRecoveryMessage -> TODO()
       }
     }
 

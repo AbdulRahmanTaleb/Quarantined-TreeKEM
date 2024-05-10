@@ -4,7 +4,6 @@ import com.github.traderjoe95.mls.protocol.group.WelcomeMessages
 
 sealed interface ProcessHandshakeResult<out Identity : Any> {
   data object ProposalReceived : ProcessHandshakeResult<Nothing>
-
   data object CommitProcessed : ProcessHandshakeResult<Nothing>
 
   data class CommitProcessedWithNewMembers(val welcomeMessages: WelcomeMessages) : ProcessHandshakeResult<Nothing>
