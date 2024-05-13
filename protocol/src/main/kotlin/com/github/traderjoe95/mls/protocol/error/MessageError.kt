@@ -12,7 +12,8 @@ sealed interface CreateMessageError :
   CreateAddError,
   CreatePreSharedKeyError,
   CreateGroupContextExtensionsError,
-  CreateReInitError
+  CreateReInitError,
+  CreateQuarantineEndError
 
 sealed interface MessageSenderError : PrivateMessageSenderError, PublicMessageSenderError {
   data class InvalidSenderType(val senderType: SenderType, val reason: String) : MessageSenderError

@@ -6,7 +6,7 @@ sealed interface DecryptError : PrivateMessageRecipientError, WelcomeJoinError
 
 sealed interface HpkeDecryptError : RecipientTreeUpdateError, WelcomeJoinError
 
-sealed interface HpkeEncryptError : SenderTreeUpdateError, SenderCommitError
+sealed interface HpkeEncryptError : SenderTreeUpdateError, SenderCommitError, ProcessMessageError
 
 sealed interface ReconstructHpkePublicKeyError
 
@@ -24,7 +24,8 @@ sealed interface VerifySignatureError :
   JoinError,
   LeafNodeCheckError,
   MessageRecipientError,
-  KeyPackageValidationError {
+  KeyPackageValidationError,
+  QuarantineEndValidationError{
   data object BadSignature : VerifySignatureError
 
   data class SignaturePublicKeyKeyNotFound(val sender: Sender) : VerifySignatureError

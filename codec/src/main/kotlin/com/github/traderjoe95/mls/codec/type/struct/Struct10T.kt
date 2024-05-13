@@ -1,8 +1,8 @@
 package com.github.traderjoe95.mls.codec.type.struct
 
 import arrow.core.raise.Raise
-import arrow.core.some
 import com.github.traderjoe95.mls.codec.Struct1
+import com.github.traderjoe95.mls.codec.Struct10
 import com.github.traderjoe95.mls.codec.Struct2
 import com.github.traderjoe95.mls.codec.Struct3
 import com.github.traderjoe95.mls.codec.Struct4
@@ -13,16 +13,11 @@ import com.github.traderjoe95.mls.codec.Struct8
 import com.github.traderjoe95.mls.codec.Struct9
 import com.github.traderjoe95.mls.codec.error.DecoderError
 import com.github.traderjoe95.mls.codec.error.EncoderError
-import com.github.traderjoe95.mls.codec.error.SelectError
-import com.github.traderjoe95.mls.codec.type.DataType
-import com.github.traderjoe95.mls.codec.type.EnumT
-import com.github.traderjoe95.mls.codec.type.ProtocolEnum
 import com.github.traderjoe95.mls.codec.type.struct.member.Field
 import com.github.traderjoe95.mls.codec.type.struct.member.Member
-import com.github.traderjoe95.mls.codec.type.struct.member.SelectBuilder
 import com.github.traderjoe95.mls.codec.util.Slice
 
-class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
+class Struct10T<A, B, C, D, E, F, G, H, I, J> private constructor(
   name: String,
   val member1: Field<A>,
   val member2: Member<B>,
@@ -33,7 +28,8 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
   val member7: Member<G>,
   val member8: Member<H>,
   val member9: Member<I>,
-) : StructT<Struct9<A, B, C, D, E, F, G, H, I>>(
+  var member10: Member<J>
+) : StructT<Struct10<A, B, C, D, E, F, G, H, I, J>>(
     name,
     member1,
     member2,
@@ -44,9 +40,10 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
     member7,
     member8,
     member9,
+  member10,
   ) {
   context(Raise<EncoderError>)
-  override fun encode(value: Struct9<A, B, C, D, E, F, G, H, I>): ByteArray =
+  override fun encode(value: Struct10<A, B, C, D, E, F, G, H, I, J>): ByteArray =
     member1.encodeValue(value.field1, value, this) +
       member2.encodeValue(value.field2, value, this) +
       member3.encodeValue(value.field3, value, this) +
@@ -55,10 +52,11 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
       member6.encodeValue(value.field6, value, this) +
       member7.encodeValue(value.field7, value, this) +
       member8.encodeValue(value.field8, value, this) +
-      member9.encodeValue(value.field9, value, this)
+      member9.encodeValue(value.field9, value, this) +
+      member10.encodeValue(value.field10, value, this)
 
   context(Raise<DecoderError>)
-  override fun decode(bytes: Slice): Pair<Struct9<A, B, C, D, E, F, G, H, I>, Slice> =
+  override fun decode(bytes: Slice): Pair<Struct10<A, B, C, D, E, F, G, H, I, J>, Slice> =
     member1.decodeValue(bytes, null, this).let { (a, remainingA) ->
       member2.decodeValue(remainingA, Struct1(a), this).let { (b, remainingB) ->
         member3.decodeValue(remainingB, Struct2(a, b), this).let { (c, remainingC) ->
@@ -67,8 +65,10 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
               member6.decodeValue(remainingE, Struct5(a, b, c, d, e), this).let { (f, remainingF) ->
                 member7.decodeValue(remainingF, Struct6(a, b, c, d, e, f), this).let { (g, remainingG) ->
                   member8.decodeValue(remainingG, Struct7(a, b, c, d, e, f, g), this).let { (h, remainingH) ->
-                    member9.decodeValue(remainingH, Struct8(a, b, c, d, e, f, g, h), this).let { (i, remaining) ->
-                      Struct9(a, b, c, d, e, f, g, h, i) to remaining
+                    member9.decodeValue(remainingH, Struct8(a, b, c, d, e, f, g, h), this).let { (i, remainingI) ->
+                      member10.decodeValue(remainingI, Struct9(a, b, c, d, e, f, g, h, i), this).let { (j, remaining) ->
+                        Struct10(a, b, c, d, e, f, g, h, i, j) to remaining
+                      }
                     }
                   }
                 }
@@ -90,9 +90,10 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
     field7: G,
     field8: H,
     field9: I,
-  ): Struct9<A, B, C, D, E, F, G, H, I> = Struct9(field1, field2, field3, field4, field5, field6, field7, field8, field9)
+    field10: J,
+  ): Struct10<A, B, C, D, E, F, G, H, I, J> = Struct10(field1, field2, field3, field4, field5, field6, field7, field8, field9, field10)
 
-  class Builder<A, B, C, D, E, F, G, H, I>
+  class Builder<A, B, C, D, E, F, G, H, I, J>
     @PublishedApi
     internal constructor(
       @PublishedApi override val name: String,
@@ -105,48 +106,16 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
       @PublishedApi internal val member7: Member<G>,
       @PublishedApi internal val member8: Member<H>,
       @PublishedApi internal val member9: Member<I>,
-    ) : StructBuilder<Struct9<A, B, C, D, E, F, G, H, I>, Struct9T<A, B, C, D, E, F, G, H, I>>() {
+      @PublishedApi internal val member10: Member<J>,
+    ) : StructBuilder<Struct10<A, B, C, D, E, F, G, H, I, J>, Struct10T<A, B, C, D, E, F, G, H, I, J>>() {
       override val nextIndex: UInt = 8U
 
-    fun <J> field(
-      fieldName: String,
-      type: DataType<J>,
-    ): Struct10T.Builder<A, B, C, D, E, F, G, H, I, J> =
-      Struct10T.Builder(
-        name,
-        member1, member2, member3, member4, member5, member6, member7, member8, member9,
-        createField(fieldName, type),
-      )
-
-    fun <J> field(
-      fieldName: String,
-      type: DataType<J>,
-      constant: J,
-    ): Struct10T.Builder<A, B, C, D, E, F, G, H, I, J> =
-      Struct10T.Builder(
-        name,
-        member1, member2, member3, member4, member5, member6, member7, member8, member9,
-        createField(fieldName, type, constant.some()),
-      )
-
-    context(Raise<SelectError>)
-    inline fun <J, reified _E> select(
-      enumT: EnumT<_E>,
-      fieldName: String,
-      vararg nestedPath: String,
-      crossinline block: SelectBuilder<J, _E>.() -> SelectBuilder<J, _E>,
-    ): Struct10T.Builder<A, B, C, D, E, F, G, H, I, J> where _E : ProtocolEnum<_E> =
-      Struct10T.Builder(
-        name, member1, member2, member3, member4, member5, member6, member7, member8, member9,
-        createSelect(enumT, fieldName, *nestedPath, block = block),
-      )
-
       @PublishedApi
-      override fun buildStructT(): Struct9T<A, B, C, D, E, F, G, H, I> =
-        Struct9T(name, member1, member2, member3, member4, member5, member6, member7, member8, member9)
+      override fun buildStructT(): Struct10T<A, B, C, D, E, F, G, H, I, J> =
+        Struct10T(name, member1, member2, member3, member4, member5, member6, member7, member8, member9, member10)
     }
 
-  interface Shape<out A, out B, out C, out D, out E, out F, out G, out H, out I> {
+  interface Shape<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J> {
     operator fun component1(): A
 
     operator fun component2(): B
@@ -164,5 +133,7 @@ class Struct9T<A, B, C, D, E, F, G, H, I> private constructor(
     operator fun component8(): H
 
     operator fun component9(): I
+
+    operator fun component10(): J
   }
 }

@@ -10,6 +10,14 @@ sealed interface CreateUpdateError {
   data object AlreadyUpdatedThisEpoch : CreateUpdateError
 }
 
+sealed interface CreateQuarantineEndError {
+  data object AlreadyUpdatedThisEpoch : CreateQuarantineEndError
+}
+
+sealed interface CreateShareRecoveryMessageError : ProcessMessageError {
+  data object ShareRecoveryCreationError : CreateShareRecoveryMessageError
+}
+
 sealed interface CreatePreSharedKeyError
 
 sealed interface CreateGroupContextExtensionsError

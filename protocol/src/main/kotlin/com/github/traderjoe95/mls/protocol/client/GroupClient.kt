@@ -14,6 +14,7 @@ import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.error.BranchError
 import com.github.traderjoe95.mls.protocol.error.CreateAddError
 import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
+import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
@@ -51,7 +52,10 @@ import com.github.traderjoe95.mls.protocol.message.MlsMessage
 import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.encodeUnsafe
 import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFormat
 import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFormatAndContent
+import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.PrivateMessage
+import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.UsePrivateMessage
 import com.github.traderjoe95.mls.protocol.message.UsePublicMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
@@ -544,6 +548,30 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       }
     }
 
+  suspend fun processQuarantineEnd(quarantineEnd: QuarantineEnd): Either<ProcessMessageError, MlsShareRecoveryMessage?> =
+    either {
+
+      val (newState, shareRecoveryMessage) =
+        state.ensureActive {
+          process(quarantineEnd)
+        }.bind()
+
+      replaceCurrentState(newState)
+
+      shareRecoveryMessage
+    }
+
+  suspend fun processShareRecoveryMessage(shareRecoveryMessage: ShareRecoveryMessage): Either<ProcessMessageError, Unit> =
+    either {
+
+      val newState = state.ensureActive {
+        process(shareRecoveryMessage)
+      }.bind()
+
+      replaceCurrentState(newState)
+
+    }
+
   suspend fun addMember(keyPackage: KeyPackage): Either<CreateAddError, ByteArray> =
     either {
       state.messages
@@ -563,6 +591,12 @@ class ActiveGroupClient<Identity : Any> internal constructor(
         .update(state.updateLeafNode(cipherSuite.generateHpkeKeyPair()), handshakeMessageOptions)
         .bind()
         .encodeUnsafe()
+    }
+
+  suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray> =
+    either {
+      val newLeaf =  state.updateGhostLeafNode(cipherSuite.generateHpkeKeyPair())
+      state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey).bind().encodeUnsafe()
     }
 
   suspend fun removeMember(memberIdx: UInt): Either<CreateRemoveError, ByteArray> =

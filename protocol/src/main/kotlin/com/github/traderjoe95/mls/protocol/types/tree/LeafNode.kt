@@ -6,12 +6,15 @@ import arrow.core.Either
 import arrow.core.raise.either
 import com.github.traderjoe95.mls.codec.Encodable
 import com.github.traderjoe95.mls.codec.type.DataType
+import com.github.traderjoe95.mls.codec.type.derive
 import com.github.traderjoe95.mls.codec.type.struct.Struct2T
 import com.github.traderjoe95.mls.codec.type.struct.Struct8T
 import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.member.orElseNothing
 import com.github.traderjoe95.mls.codec.type.struct.member.then
 import com.github.traderjoe95.mls.codec.type.struct.struct
+import com.github.traderjoe95.mls.codec.type.uint32
+import com.github.traderjoe95.mls.codec.type.uint64
 import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
 import com.github.traderjoe95.mls.protocol.error.CreateSignatureError
 import com.github.traderjoe95.mls.protocol.error.VerifySignatureError
@@ -117,6 +120,17 @@ data class LeafNode<S : LeafNodeSource>(
     return true
   }
 
+  fun updateGhostKeysEquals(other: LeafNode<*>): Boolean{
+    if (encryptionKey eq other.encryptionKey) return false
+//
+    if (signaturePublicKey neq other.signaturePublicKey) return false
+    if (credential != other.credential) return false
+    if (capabilities != other.capabilities) return false
+    if (extensions != other.extensions) return false
+
+    return true
+  }
+
   override fun hashCode(): Int {
     var result = encryptionKey.hashCode
     result = 31 * result + signaturePublicKey.hashCode
@@ -149,6 +163,8 @@ data class LeafNode<S : LeafNodeSource>(
           }
           .field("extensions", LeafNodeExtension.T.extensionList())
           .field("signature", Signature.T)
+//          .field("epk", uint64.asULong)
+//          .field("equar", uint64.asULong)
       }.lift(::LeafNode)
 
     @Suppress("UNCHECKED_CAST", "kotlin:6531")

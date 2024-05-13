@@ -13,11 +13,13 @@ import com.github.traderjoe95.mls.protocol.error.LeafNodeCheckError
 import com.github.traderjoe95.mls.protocol.error.PreSharedKeyValidationError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError.BadExternalProposal
+import com.github.traderjoe95.mls.protocol.error.QuarantineEndValidationError
 import com.github.traderjoe95.mls.protocol.error.ReInitValidationError
 import com.github.traderjoe95.mls.protocol.error.RemoveValidationError
 import com.github.traderjoe95.mls.protocol.error.UnexpectedExtension
 import com.github.traderjoe95.mls.protocol.error.UpdateValidationError
 import com.github.traderjoe95.mls.protocol.message.KeyPackage
+import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
 import com.github.traderjoe95.mls.protocol.tree.RatchetTreeOps
@@ -84,6 +86,42 @@ class Validations(
       }
 
       keyPackage
+    }
+
+  fun validated(
+    quarantineEnd: QuarantineEnd,
+    currentTree: RatchetTreeOps = this.currentTree,
+  ): Either<QuarantineEndValidationError, QuarantineEnd> =
+    either {
+
+      ensure(quarantineEnd.cipherSuite == cipherSuite) {
+        QuarantineEndValidationError.IncompatibleCipherSuite(quarantineEnd.cipherSuite, cipherSuite)
+      }
+
+      ensure(currentTree.leafNodeOrNull(quarantineEnd.leafIndex) != null) {
+        QuarantineEndValidationError.LeafNotFound(quarantineEnd.leafIndex)
+      }
+
+      ensure(currentTree.leafNode(quarantineEnd.leafIndex).equar != 0U.toULong()) {
+        QuarantineEndValidationError.LeafIsNotGhost(quarantineEnd.leafIndex)
+      }
+
+      quarantineEnd.leafNode.validate(
+        currentTree,
+        groupContext,
+        quarantineEnd.leafIndex,
+        LeafNodeSource.Update,
+      )
+
+      val oldLeafNode = currentTree.leafNode(quarantineEnd.leafIndex)
+      val newLeafNode = quarantineEnd.leafNode
+      ensure(quarantineEnd.leafNode.updateGhostKeysEquals(oldLeafNode)) {
+        QuarantineEndValidationError.InvalidNewLeaf(newLeafNode, oldLeafNode)
+      }
+
+      quarantineEnd.verifySignature().bind()
+
+      quarantineEnd
     }
 
   suspend fun validated(proposal: AuthenticatedContent<Proposal>): Either<ProposalValidationError, AuthenticatedContent<Proposal>> =

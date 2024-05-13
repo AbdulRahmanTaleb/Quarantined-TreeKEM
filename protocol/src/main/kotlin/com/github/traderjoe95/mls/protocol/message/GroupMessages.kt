@@ -8,8 +8,10 @@ import com.github.traderjoe95.mls.protocol.error.CreateAddError
 import com.github.traderjoe95.mls.protocol.error.CreateGroupContextExtensionsError
 import com.github.traderjoe95.mls.protocol.error.CreateMessageError
 import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
+import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
+import com.github.traderjoe95.mls.protocol.error.CreateShareRecoveryMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateSignatureError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.PrivateMessageSenderError
@@ -28,6 +30,8 @@ import com.github.traderjoe95.mls.protocol.tree.RatchetTreeOps
 import com.github.traderjoe95.mls.protocol.tree.SecretTree
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.GroupId
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Mac
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
@@ -69,6 +73,22 @@ class GroupMessageFactory internal constructor(
 
   private val cipherSuite: CipherSuite
     get() = groupContext.cipherSuite
+
+  suspend fun quarantineEndMessage(
+    leafIndex: LeafIndex,
+    leafNode: UpdateLeafNode,
+    signaturePrivateKey: SignaturePrivateKey,
+  ): Either<CreateQuarantineEndError, MlsQuarantineEndMessage> = either {
+    MlsMessage(QuarantineEnd.create(groupContext.groupId, groupContext.cipherSuite, leafIndex, leafNode, signaturePrivateKey).bind())
+  }
+
+  suspend fun shareRecoveryMessage(
+    leafIndex: LeafIndex,
+    encryptionKey: HpkePublicKey,
+    ciphertext: HpkeCiphertext
+  ): Either<CreateShareRecoveryMessageError, MlsShareRecoveryMessage> = either {
+    MlsMessage(ShareRecoveryMessage.create(groupContext.groupId, leafIndex, encryptionKey, ciphertext))
+  }
 
   suspend fun applicationMessage(
     applicationData: ApplicationData,

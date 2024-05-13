@@ -98,6 +98,8 @@ class MlsMessage<out M : Message>
                   .case(WireFormat.MlsWelcome).then(Welcome.T, "welcome")
                   .case(WireFormat.MlsGroupInfo).then(GroupInfo.T, "group_info")
                   .case(WireFormat.MlsKeyPackage).then(KeyPackage.T, "key_package")
+                  .case(WireFormat.MlsQuarantineEnd).then(QuarantineEnd.T, "quarantine_end")
+                  .case(WireFormat.MlsShareRecoveryMessage).then(ShareRecoveryMessage.T, "share_recovery_message")
               }
           }.lift { v, _, msg -> MlsMessage(v, msg) }
         }

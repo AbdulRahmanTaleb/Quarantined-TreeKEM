@@ -123,14 +123,15 @@ suspend fun main() {
 
     groups.add(clients[i].processNextMessage().getOrThrow()!! as ActiveGroupClient<String>)
 
+    for(j in 0..i) {
+      printGroup(groups[j], clientsList[j], i+1)
+    }
+
     println("COMMIT DONE BY " + clientsList[i-1])
     println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     println()
   }
 
-  for(i in 0..<clients.size) {
-    printGroup(groups[i], clientsList[i], clients.size)
-  }
 
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////
@@ -203,6 +204,23 @@ suspend fun main() {
   }
 
   println("")
+
+  clients[clients.size-1].ghostReconnect(groups[clients.size-1].groupId)
+  clients.filterIndexed{ idx, _ -> !idxGhosts.contains(idx)}.forEach{
+    it.processNextMessage().getOrThrow()
+  }
+
+  for(k in 1..4){
+    println("")
+
+    clients.forEach {
+      it.processNextMessage().getOrThrow()
+    }
+  }
+
+  for(j in 0..<clients.size) {
+    printGroup(groups[j], clientsList[j], clients.size)
+  }
 
   // GHOST 2
 //  val listShares2 = mutableListOf<ShamirSecretSharing.SecretShare>()

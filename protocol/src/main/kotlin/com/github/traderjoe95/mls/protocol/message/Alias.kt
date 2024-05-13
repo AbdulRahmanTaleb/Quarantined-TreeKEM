@@ -18,3 +18,5 @@ typealias MlsHandshakeMessage = MlsMessage<HandshakeMessage>
 typealias MlsProposalMessage = MlsMessage<ProposalMessage>
 typealias MlsCommitMessage = MlsMessage<CommitMessage>
 typealias MlsApplicationMessage = MlsMessage<ApplicationMessage>
+typealias MlsQuarantineEndMessage = MlsMessage<QuarantineEnd>
+typealias MlsShareRecoveryMessage = MlsMessage<ShareRecoveryMessage>

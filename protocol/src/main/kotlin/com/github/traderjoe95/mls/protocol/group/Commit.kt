@@ -59,7 +59,6 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Proposal
 import com.github.traderjoe95.mls.protocol.types.framing.content.ProposalOrRef
 import com.github.traderjoe95.mls.protocol.types.framing.content.ReInit
 import com.github.traderjoe95.mls.protocol.types.framing.content.Remove
-import com.github.traderjoe95.mls.protocol.types.framing.content.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.types.framing.content.Update
 import com.github.traderjoe95.mls.protocol.types.framing.enums.SenderType
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
@@ -567,9 +566,26 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
           return ProcessProposalsResult.ReInitCommit(proposal, zeroesNh)
         }
 
-        is ShareRecoveryMessage -> TODO()
       }
     }
+
+  cachedQuarantineEnd.forEach {
+    it.leafNode.epk = groupContext.epoch + 1u
+    it.leafNode.equar = 0u
+    updatedTree = updatedTree.update(it.leafIndex, it.leafNode)
+    requiresUpdatePath = true
+
+    val idx = ghostMembers.indexOf(it.leafIndex)
+    ghostMembers.removeAt(idx)
+    ghostMembersShares.removeAt(idx)
+    ghostMembersKeys.removeAt(idx)
+    ghostMembersShareHolderRank.removeAt(idx)
+  }
+
+  if((cachedUpdate != null) && (cachedUpdate!!.ghost)){
+    updatedTree.update(leafIndex, cachedUpdate!!.leafNode, cachedUpdate!!.encryptionPrivateKey)
+    requiresUpdatePath = true
+  }
 
   return ProcessProposalsResult.CommitByMember(
     requiresUpdatePath,

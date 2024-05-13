@@ -1,5 +1,6 @@
 package com.github.traderjoe95.mls.codec
 
+import com.github.traderjoe95.mls.codec.type.struct.Struct10T
 import com.github.traderjoe95.mls.codec.type.struct.Struct1T
 import com.github.traderjoe95.mls.codec.type.struct.Struct2T
 import com.github.traderjoe95.mls.codec.type.struct.Struct3T
@@ -88,3 +89,17 @@ data class Struct9<out A, out B, out C, out D, out E, out F, out G, out H, out I
   val field9: I,
 ) : Struct(field1, field2, field3, field4, field5, field6, field7, field8, field9),
   Struct9T.Shape<A, B, C, D, E, F, G, H, I>
+
+data class Struct10<out A, out B, out C, out D, out E, out F, out G, out H, out I, out J>(
+  val field1: A,
+  val field2: B,
+  val field3: C,
+  val field4: D,
+  val field5: E,
+  val field6: F,
+  val field7: G,
+  val field8: H,
+  val field9: I,
+  val field10: J,
+) : Struct(field1, field2, field3, field4, field5, field6, field7, field8, field9, field10),
+  Struct10T.Shape<A, B, C, D, E, F, G, H, I, J>

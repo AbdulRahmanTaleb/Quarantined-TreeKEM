@@ -6,7 +6,6 @@ import arrow.core.raise.Raise
 import arrow.core.raise.either
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
-import com.github.traderjoe95.mls.protocol.error.CommitError
 import com.github.traderjoe95.mls.protocol.error.DecoderError
 import com.github.traderjoe95.mls.protocol.error.ExtensionSupportError
 import com.github.traderjoe95.mls.protocol.error.ExternalJoinError
@@ -119,12 +118,16 @@ suspend fun <Identity : Any> Welcome.joinGroup(
 
       var groupContext = groupInfo.groupContext
 
+//      publicTree.leaves[ownLeaf.value.toInt()]!!.epk = groupContext.epoch
+
       keyPackage.leafNode.checkSupport(groupContext.extensions, ownLeaf)
 
       tree =
         groupSecrets.pathSecret.map {
           with(cipherSuite) { tree.insertPathSecrets(ownLeaf, groupInfo.signer, it) }
         }.getOrElse { tree }
+
+
 
       for(i in 0..<tree.leaves.size){
         if(tree.leaves[i] != null){

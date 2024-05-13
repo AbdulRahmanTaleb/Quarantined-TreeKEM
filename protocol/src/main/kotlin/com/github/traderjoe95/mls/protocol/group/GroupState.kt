@@ -9,6 +9,7 @@ import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
+import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.GroupActive
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
@@ -18,11 +19,15 @@ import com.github.traderjoe95.mls.protocol.error.MessageRecipientError
 import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError
 import com.github.traderjoe95.mls.protocol.error.PskError
+import com.github.traderjoe95.mls.protocol.error.ShareRecoveryMessageError
 import com.github.traderjoe95.mls.protocol.message.AuthHandshakeContent
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
 import com.github.traderjoe95.mls.protocol.message.GroupMessageFactory
 import com.github.traderjoe95.mls.protocol.message.HandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsHandshakeMessage
+import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
+import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
 import com.github.traderjoe95.mls.protocol.psk.ResumptionPskId
@@ -98,12 +103,20 @@ sealed class GroupState(
 
   fun coerceSuspended(): Suspended = this as Suspended
 
+
   class Active internal constructor(
     groupContext: GroupContext,
     tree: RatchetTree,
     keySchedule: KeySchedule,
     val signaturePrivateKey: SignaturePrivateKey,
     private val cachedProposals: Map<String, CachedProposal> = mapOf(),
+    internal var cachedUpdate: CachedUpdate? = null,
+    internal val cachedQuarantineEnd: MutableList<CachedQuarantineEnd> = mutableListOf(),
+    val ghostMembers: MutableList<LeafIndex> = mutableListOf(),
+    val ghostMembersKeys: MutableList<HpkePublicKey> = mutableListOf(),
+    val ghostMembersShares: MutableList<ShamirSecretSharing.SecretShare> = mutableListOf(),
+    val ghostMembersShareHolderRank: MutableList<Int> = mutableListOf(),
+    val recoveredShares: List<ShamirSecretSharing.SecretShare> = mutableListOf(),
   ) : GroupState(groupContext, tree, keySchedule), SecretTree.Lookup, PskLookup {
     @get:JvmName("secretTree")
     val secretTree: SecretTree by lazy {
@@ -120,21 +133,14 @@ sealed class GroupState(
     @get:JvmName("validations")
     val validations: Validations by lazy { Validations(this) }
 
-    internal var cachedUpdate: CachedUpdate? = null
-
-    var ghostMembers: MutableList<LeafIndex> = mutableListOf()
-    var ghostMembersKeys: MutableList<HpkePublicKey> = mutableListOf()
-    var ghostMembersShares: MutableList<ShamirSecretSharing.SecretShare> = mutableListOf()
-    var ghostMembersShareHolderRank: MutableList<Int> = mutableListOf()
-
     fun derive(secret: ByteArray): HpkeKeyPair{
       return deriveKeyPair(secret.asSecret)
     }
 
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active {
-      val g = Active(
+    private suspend fun storeProposal(proposal: AuthenticatedContent<Proposal>): Active =
+       Active(
         groupContext,
         tree,
         keySchedule,
@@ -144,14 +150,56 @@ sealed class GroupState(
             validations.validated(proposal).bind(),
             cipherSuite,
           ).let { it.ref.hex to it },
+        cachedUpdate,
+        cachedQuarantineEnd,
+        ghostMembers,
+        ghostMembersKeys,
+        ghostMembersShares,
+        ghostMembersShareHolderRank,
+        recoveredShares,
       )
 
-      g.ghostMembers = ghostMembers
-      g.ghostMembersKeys = ghostMembersKeys
-      g.ghostMembersShares = ghostMembersShares
-      g.ghostMembersShareHolderRank = ghostMembersShareHolderRank
-      g.cachedUpdate = cachedUpdate
-      return g
+    context(Raise<ProposalValidationError>)
+    private suspend fun storeRecoveredShare(secretShare: ShamirSecretSharing.SecretShare): Active =
+      Active(
+        groupContext,
+        tree,
+        keySchedule,
+        signaturePrivateKey,
+        cachedProposals,
+        cachedUpdate,
+        cachedQuarantineEnd,
+        ghostMembers,
+        ghostMembersKeys,
+        ghostMembersShares,
+        ghostMembersShareHolderRank,
+        recoveredShares + secretShare,
+      )
+
+    private suspend fun storeQuarantineEndProposal(quarantineEnd: QuarantineEnd): Active {
+      if(quarantineEnd.leafIndex != leafIndex) {
+        cachedQuarantineEnd.add(
+          CachedQuarantineEnd(
+            quarantineEnd.leafIndex,
+            quarantineEnd.leafNode
+          )
+        )
+      }
+
+      return Active(
+        groupContext,
+        tree,
+        keySchedule,
+        signaturePrivateKey,
+        cachedProposals,
+        cachedUpdate,
+        cachedQuarantineEnd,
+        ghostMembers,
+        ghostMembersKeys,
+        ghostMembersShares,
+        ghostMembersShareHolderRank,
+        recoveredShares,
+      )
     }
 
     fun getStoredProposals(): List<CachedProposal> = cachedProposals.values.toList()
@@ -230,6 +278,57 @@ sealed class GroupState(
       }
     }
 
+    context(Raise<ProcessMessageError>)
+    suspend fun process(
+      quarantineEnd: QuarantineEnd,
+    ): Either<ProcessMessageError, Pair<GroupState, MlsShareRecoveryMessage?>> =
+      either {
+        ensure(quarantineEnd.groupId eq groupId) { MessageRecipientError.WrongGroup(quarantineEnd.groupId, groupId) }
+
+        val newState = storeQuarantineEndProposal(quarantineEnd)
+        validations.validated(quarantineEnd).bind()
+        if (ghostMembers.contains(quarantineEnd.leafIndex)) {
+          val idx = ghostMembers.indexOf(quarantineEnd.leafIndex)
+          if (ghostMembersShareHolderRank[idx] == 1) {
+            val ct = encryptWithLabel(
+              quarantineEnd.leafNode.encryptionKey,
+              "ShareRecoveryMessage",
+              ByteArray(0),
+              ghostMembersShares[idx].encode()
+            ).bind()
+            Pair(
+              newState,
+              messages.shareRecoveryMessage(quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
+            )
+          } else {
+            Pair(newState, null)
+          }
+        } else {
+          Pair(newState, null)
+        }
+      }
+
+    context(Raise<ProcessMessageError>)
+    suspend fun process(
+      shareRecoveryMessage: ShareRecoveryMessage
+    ): Either<ProcessMessageError, GroupState> = either {
+
+      ensure(shareRecoveryMessage.groupId eq groupId) { MessageRecipientError.WrongGroup(shareRecoveryMessage.groupId, groupId) }
+
+      ensure(cachedUpdate != null) { ShareRecoveryMessageError.MissingCachedUpdateForGhost }
+
+      val res = decryptWithLabel(
+        cachedUpdate!!.encryptionPrivateKey,
+        "ShareRecoveryMessage",
+        ByteArray(0),
+        shareRecoveryMessage.encryptedShare
+      ).bind()
+
+      val secretShare = ShamirSecretSharing.SecretShare.decode(res).second
+
+      storeRecoveredShare(secretShare)
+    }
+
     context(Raise<CreateUpdateError>)
     fun updateLeafNode(
       newEncryptionKeyPair: HpkeKeyPair,
@@ -259,20 +358,51 @@ sealed class GroupState(
       return newLeaf
     }
 
+    context(Raise<CreateQuarantineEndError>)
+    fun updateGhostLeafNode(
+      newEncryptionKeyPair: HpkeKeyPair,
+    ): UpdateLeafNode {
+      if (cachedUpdate != null) raise(CreateQuarantineEndError.AlreadyUpdatedThisEpoch)
+
+      val oldLeaf = tree.leafNode(leafIndex)
+      val newLeaf =
+        LeafNode.update(
+          cipherSuite,
+          SignatureKeyPair(signaturePrivateKey, oldLeaf.signaturePublicKey),
+          newEncryptionKeyPair.public,
+          oldLeaf.credential,
+          oldLeaf.capabilities,
+          oldLeaf.extensions,
+          leafIndex,
+          groupId,
+          epoch+1u,
+        ).bind()
+
+      cachedUpdate = CachedUpdate(newLeaf, newEncryptionKeyPair.private, null, true)
+
+      return newLeaf
+    }
+
     fun nextEpoch(
       groupContext: GroupContext,
       tree: RatchetTree,
       keySchedule: KeySchedule,
       newSignaturePrivateKey: SignaturePrivateKey = signaturePrivateKey,
     ): Active {
-      val g = Active(groupContext, tree, keySchedule, newSignaturePrivateKey)
-
-      g.ghostMembers = ghostMembers
-      g.ghostMembersKeys = ghostMembersKeys
-      g.ghostMembersShares = ghostMembersShares
-      g.ghostMembersShareHolderRank = ghostMembersShareHolderRank
-
-      return g
+      return Active(
+        groupContext,
+        tree,
+        keySchedule,
+        newSignaturePrivateKey,
+        mapOf(),
+        null,
+        mutableListOf(),
+        ghostMembers,
+        ghostMembersKeys,
+        ghostMembersShares,
+        ghostMembersShareHolderRank,
+        recoveredShares,
+        )
     }
 
     fun suspend(
@@ -303,6 +433,12 @@ sealed class GroupState(
     val leafNode: UpdateLeafNode,
     val encryptionPrivateKey: HpkePrivateKey,
     val signaturePrivateKey: SignaturePrivateKey?,
+    val ghost: Boolean = false,
+  )
+
+  internal data class CachedQuarantineEnd(
+    val leafIndex: LeafIndex,
+    val leafNode: UpdateLeafNode,
   )
 
   data class CachedProposal(

@@ -24,6 +24,8 @@ import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.MlsMessage
 import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFormat
 import com.github.traderjoe95.mls.protocol.message.PublicMessage
+import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskHolder
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskId
@@ -174,18 +176,36 @@ class MlsClient<Identity : Any>(
   suspend fun processMessage(message: MlsMessage<*>): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
       when (message.message) {
-        is KeyPackage -> {println("key package received")
-                        ProcessMessageResult.KeyPackageMessageReceived(message.message)}
+        is KeyPackage -> {
+          println("key package received")
+          ProcessMessageResult.KeyPackageMessageReceived(message.message)
+        }
 
-        is Welcome -> {println("welcome received")
-                      ProcessMessageResult.WelcomeMessageReceived(message.message)}
+        is Welcome -> {
+          println("welcome received")
+          ProcessMessageResult.WelcomeMessageReceived(message.message)
+        }
 
-        is GroupInfo -> {println("groupInfo received")
-                        ProcessMessageResult.GroupInfoMessageReceived(message.message)}
+        is GroupInfo -> {
+          println("groupInfo received")
+          ProcessMessageResult.GroupInfoMessageReceived(message.message)
+        }
 
-        is GroupMessage<*> -> {//println("groupMessage received")
-                              processGroupMessage(message.message).bind()}
+        is QuarantineEnd -> {
+          println("QuarantineEnd received")
+          processQuarantineEnd(message.message).bind()
+        }
+
+        is GroupMessage<*> -> {
+          processGroupMessage(message.message).bind()
+        }
+
+        is ShareRecoveryMessage -> {
+          println("ShareRecoveryMessage Received")
+          processShareRecoveryMessage(message.message).bind()
+        }
       }
+
     }
 
   suspend fun processGroupMessage(groupMessageBytes: ByteArray): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
@@ -195,7 +215,7 @@ class MlsClient<Identity : Any>(
     }
 
   @Suppress("UNCHECKED_CAST")
-  suspend fun processGroupMessage(groupMessage: GroupMessage<*>): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  private suspend fun processGroupMessage(groupMessage: GroupMessage<*>): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
       val groupId = groupMessage.groupId
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
@@ -226,6 +246,49 @@ class MlsClient<Identity : Any>(
 
         else ->
           error("unreachable")
+      }
+    }
+
+  private suspend fun processQuarantineEnd(quarantineEnd: QuarantineEnd): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+    either{
+      val groupId = quarantineEnd.groupId
+      val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
+
+      if(quarantineEnd.leafIndex == group.state.leafIndex){
+        println("Ignoring own QuarantineEnd Received")
+        ProcessMessageResult.QuarantineEndReceived(
+          quarantineEnd.groupId,
+          null
+        )
+      }
+      else{
+        if (group is ActiveGroupClient<Identity>) {
+          ProcessMessageResult.QuarantineEndReceived(
+            quarantineEnd.groupId,
+            group.processQuarantineEnd(quarantineEnd).bind()?.encoded,
+          )
+        } else {
+          raise(GroupSuspended(quarantineEnd.groupId))
+        }
+      }
+    }
+
+  private suspend fun processShareRecoveryMessage(shareRecoveryMessage: ShareRecoveryMessage): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+    either{
+      val groupId = shareRecoveryMessage.groupId
+      val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
+
+      if(shareRecoveryMessage.leafIndex != group.state.leafIndex){
+        println("Ignoring share recovery message")
+        ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
+      }
+
+      else{
+        if (group is ActiveGroupClient<Identity>) {
+          ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
+        } else {
+          raise(GroupSuspended(shareRecoveryMessage.groupId))
+        }
       }
     }
 

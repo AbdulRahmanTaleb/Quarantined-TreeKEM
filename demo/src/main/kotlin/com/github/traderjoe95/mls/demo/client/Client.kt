@@ -38,6 +38,8 @@ class Client(
   com.github.traderjoe95.mls.protocol.service.DeliveryService<String> by DeliveryService {
   private val messages: Channel<Pair<ULID, ByteArray>> = DeliveryService.registerUser(userName)
 
+  private val cachedGhostMessages: MutableList<Pair<ULID, ByteArray>> = mutableListOf()
+
   private val keyPackages: MutableMap<String, KeyPackage.Private> = mutableMapOf()
   private val signatureKeyPairs: MutableMap<CipherSuite, SignatureKeyPair> = mutableMapOf()
 
@@ -101,7 +103,9 @@ class Client(
 
         when (val res = mlsClient.processMessage(encoded).bind()) {
           is ProcessMessageResult.WelcomeMessageReceived -> {
-            val keyPackage = res.welcome.secrets.firstNotNullOf { getKeyPackage(it.newMember) }
+            val keyPackage = res.welcome.secrets.firstNotNullOf {
+              getKeyPackage(it.newMember)
+            }
 
             mlsClient.joinFromWelcome(res.welcome, keyPackage).bind().also {
               DeliveryService.registerForGroup(it.groupId, userName)
@@ -127,6 +131,17 @@ class Client(
 
           is ProcessMessageResult.ApplicationMessageReceived -> {
             println("[$userName] ${res.applicationData.framedContent.content.bytes.decodeToString()}")
+            mlsClient[res.groupId]
+          }
+
+          is ProcessMessageResult.QuarantineEndReceived -> {
+            if(res.shareRecoveryMessage != null){
+              DeliveryService.sendMessageToGroup(
+                res.shareRecoveryMessage!!,
+                res.groupId,
+                fromUser = userName
+              )
+            }
             mlsClient[res.groupId]
           }
 
@@ -165,9 +180,29 @@ class Client(
             println("Key package received, ignoring")
             null
           }
+
+          is ProcessMessageResult.ShareRecoveryMessageReceived -> {
+            null
+          }
         }
       }
     }
+
+  suspend fun ghostReconnect(groupId: GroupId) {
+    var message = messages.tryReceive().getOrNull()
+    while(message != null){
+      cachedGhostMessages.add(message)
+      message = messages.tryReceive().getOrNull()
+    }
+
+    val endQuarantineMessage = (mlsClient[groupId]!! as ActiveGroupClient<String>).endQuarantine().getOrThrow()
+
+    DeliveryService.sendMessageToGroup(
+      endQuarantineMessage,
+      groupId,
+      fromUser = userName,
+    )
+  }
 
   fun getKeyPackage(ref: KeyPackage.Ref): KeyPackage.Private? = keyPackages[ref.hex]
 

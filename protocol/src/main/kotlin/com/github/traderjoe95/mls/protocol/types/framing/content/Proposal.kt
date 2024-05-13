@@ -48,7 +48,6 @@ sealed class Proposal(
               .case(ProposalType.ReInit).then(ReInit.T)
               .case(ProposalType.ExternalInit).then(ExternalInit.T)
               .case(ProposalType.GroupContextExtensions).then(GroupContextExtensions.T)
-              .case(ProposalType.ShareRecoveryMessage).then(ShareRecoveryMessage.T)
           }
       }.lift({ _, p -> p }, { Struct2(it.type, it) })
     }
@@ -92,17 +91,6 @@ data class Update(
       struct("Update") {
         it.field("leaf_node", LeafNode.T)
       }.lift(::Update)
-  }
-}
-
-data class ShareRecoveryMessage(
-  val encryptedSecretShare: HpkeCiphertext
-) : Proposal(ProposalType.ShareRecoveryMessage), Struct1T.Shape<HpkeCiphertext> {
-  companion object {
-    val T: DataType<ShareRecoveryMessage> =
-      struct("ShareRecoveryMessage") {
-        it.field("encrypted_secret_share", HpkeCiphertext.T)
-      }.lift(::ShareRecoveryMessage)
   }
 }
 

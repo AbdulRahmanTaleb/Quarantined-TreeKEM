@@ -16,7 +16,7 @@ sealed interface TreeCheckError : JoinError {
     TreeCheckError
 }
 
-sealed interface LeafNodeCheckError : TreeCheckError, InvalidCommit, KeyPackageValidationError, UpdateValidationError {
+sealed interface LeafNodeCheckError : TreeCheckError, InvalidCommit, KeyPackageValidationError, UpdateValidationError, QuarantineEndValidationError {
   data class UnsupportedCapabilities(
     val leafIdx: LeafIndex,
     val requiredCapabilities: RequiredCapabilities,

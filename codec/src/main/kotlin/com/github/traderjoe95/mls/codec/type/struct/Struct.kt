@@ -5,6 +5,7 @@ package com.github.traderjoe95.mls.codec.type.struct
 import arrow.core.raise.Raise
 import com.github.traderjoe95.mls.codec.Struct
 import com.github.traderjoe95.mls.codec.Struct1
+import com.github.traderjoe95.mls.codec.Struct10
 import com.github.traderjoe95.mls.codec.Struct2
 import com.github.traderjoe95.mls.codec.Struct3
 import com.github.traderjoe95.mls.codec.Struct4
@@ -104,5 +105,22 @@ inline fun <A, B, C, D, E, F, G, H, I, V> Struct9T<A, B, C, D, E, F, G, H, I>.li
   StructT.Lifted(
     this,
     { (a, b, c, d, e, f, g, h, i) -> up(a, b, c, d, e, f, g, h, i) },
+    { down(it) },
+  )
+
+
+@Suppress("kotlin:S107")
+inline fun <A, B, C, D, E, F, G, H, I, J, reified V : Struct10T.Shape<A, B, C, D, E, F, G, H, I, J>> Struct10T<A, B, C, D, E, F, G, H, I, J>.lift(
+  crossinline up: (A, B, C, D, E, F, G, H, I, J) -> V,
+): DataType<V> = lift(up) { (a, b, c, d, e, f, g, h, i, j) -> create(a, b, c, d, e, f, g, h, i, j) }
+
+@Suppress("kotlin:S107")
+inline fun <A, B, C, D, E, F, G, H, I, J, V> Struct10T<A, B, C, D, E, F, G, H, I, J>.lift(
+  crossinline up: (A, B, C, D, E, F, G, H, I, J) -> V,
+  crossinline down: (V) -> Struct10<A, B, C, D, E, F, G, H, I, J>,
+): DataType<V> =
+  StructT.Lifted(
+    this,
+    { (a, b, c, d, e, f, g, h, i, j) -> up(a, b, c, d, e, f, g, h, i, j) },
     { down(it) },
   )
