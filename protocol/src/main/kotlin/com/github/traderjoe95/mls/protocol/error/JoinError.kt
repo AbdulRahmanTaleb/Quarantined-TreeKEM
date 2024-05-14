@@ -18,6 +18,12 @@ sealed interface WelcomeJoinError {
   data class MissingResumptionGroup(val pskId: ResumptionPskId) : WelcomeJoinError
 }
 
+sealed interface WelcomeBackGhostError : ProcessMessageError{
+
+  data object NoGroupSecretsForGhost : WelcomeBackGhostError
+
+}
+
 sealed interface ExternalJoinError {
   data object MissingExternalPub : ExternalJoinError
 

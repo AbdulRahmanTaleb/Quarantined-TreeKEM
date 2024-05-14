@@ -1,5 +1,6 @@
 package com.github.traderjoe95.mls.protocol.crypto
 
+import arrow.core.Tuple4
 import com.github.traderjoe95.mls.protocol.group.GroupContext
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
@@ -13,7 +14,7 @@ sealed class KeyScheduleEvolution {
     groupContext: GroupContext,
     pskSecret: Secret,
     forceInitSecret: Secret? = null,
-  ): Triple<KeySchedule, Secret, Secret> {
+  ): Tuple4<KeySchedule, Secret, Secret, Secret> {
     val initSecret = forceInitSecret ?: this.initSecret
 
     val joinerSecret =
@@ -26,12 +27,14 @@ sealed class KeyScheduleEvolution {
 
     val joinerExtracted = cipherSuite.extract(joinerSecret, pskSecret)
     val welcomeSecret = cipherSuite.deriveSecret(joinerExtracted, "welcome")
+    val welcomeBackSecret = cipherSuite.deriveSecret(joinerExtracted, "welcome_back")
     val epochSecret = cipherSuite.expandWithLabel(joinerExtracted, "epoch", groupContext.encoded)
 
-    return Triple(
+    return Tuple4(
       KeySchedule(cipherSuite, epochSecret),
       joinerSecret,
       welcomeSecret,
+      welcomeBackSecret,
     )
   }
 }
@@ -48,6 +51,7 @@ class KeySchedule internal constructor(
   val membershipKey: Secret = cipherSuite.deriveSecret(epochSecret, "membership")
   val resumptionPsk: Secret = cipherSuite.deriveSecret(epochSecret, "resumption")
   val epochAuthenticator: Secret = cipherSuite.deriveSecret(epochSecret, "authentication")
+
 
   override val initSecret: Secret = cipherSuite.deriveSecret(epochSecret, "init")
 

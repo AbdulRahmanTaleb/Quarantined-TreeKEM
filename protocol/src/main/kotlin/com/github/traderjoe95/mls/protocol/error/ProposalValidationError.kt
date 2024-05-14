@@ -27,6 +27,15 @@ sealed interface ShareRecoveryMessageError : ProcessMessageError {
 
   data object MissingCachedUpdateForGhost: ShareRecoveryMessageError
 }
+
+sealed interface WelcomeBackGhostMessageError : ProcessMessageError {
+
+  data object MissingCachedUpdateForGhost: WelcomeBackGhostMessageError
+
+  data object MissingRatchetTree: WelcomeBackGhostMessageError
+}
+
+
 sealed interface QuarantineEndValidationError : ProposalValidationError {
   data class IncompatibleCipherSuite(val keyPackage: CipherSuite, val group: CipherSuite) : QuarantineEndValidationError
 

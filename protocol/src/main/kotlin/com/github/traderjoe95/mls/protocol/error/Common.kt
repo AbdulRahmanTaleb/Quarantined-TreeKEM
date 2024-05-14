@@ -22,7 +22,7 @@ data class EncoderError(
 
 data class DecoderError(
   val decoderError: BaseDecoderError,
-) : VerifySignatureError, JoinError, MessageRecipientError, KeyPackageRetrievalError<Nothing>, CreateMessageError {
+) : VerifySignatureError, JoinError, MessageRecipientError, KeyPackageRetrievalError<Nothing>, CreateMessageError , WelcomeBackGhostError{
   companion object {
     context(Raise<DecoderError>)
     inline fun <T> wrap(block: Raise<BaseDecoderError>.() -> T): T = wrapErrors(::DecoderError, block)

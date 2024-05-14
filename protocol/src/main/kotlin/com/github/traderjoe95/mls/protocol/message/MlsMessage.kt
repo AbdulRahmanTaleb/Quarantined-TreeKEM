@@ -11,6 +11,7 @@ import com.github.traderjoe95.mls.codec.type.struct.struct
 import com.github.traderjoe95.mls.codec.util.throwAnyError
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.error.MessageRecipientError
+import com.github.traderjoe95.mls.protocol.types.GroupId
 import com.github.traderjoe95.mls.protocol.types.crypto.Ciphertext
 import com.github.traderjoe95.mls.protocol.types.framing.content.Content
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
@@ -49,8 +50,18 @@ class MlsMessage<out M : Message>
         encryptedGroupInfo: Ciphertext,
       ): MlsMessage<Welcome> = welcome(Welcome(cipherSuite, encryptedGroupSecrets, encryptedGroupInfo))
 
+      internal fun welcomeBackGhost(
+        cipherSuite: CipherSuite,
+        groupId: GroupId,
+        encryptedGroupSecrets: List<WelcomeBackEncryptedGroupSecrets>,
+        encryptedGroupInfo: Ciphertext,
+      ): MlsMessage<WelcomeBackGhost> = welcomeBackGhost(WelcomeBackGhost(cipherSuite, groupId, encryptedGroupSecrets, encryptedGroupInfo))
+
       @JvmStatic
       fun welcome(message: Welcome): MlsMessage<Welcome> = MlsMessage(MLS_1_0, message)
+
+      @JvmStatic
+      fun welcomeBackGhost(message: WelcomeBackGhost): MlsMessage<WelcomeBackGhost> = MlsMessage(MLS_1_0, message)
 
       @JvmStatic
       fun groupInfo(message: GroupInfo): MlsMessage<GroupInfo> = MlsMessage(MLS_1_0, message)
@@ -100,6 +111,7 @@ class MlsMessage<out M : Message>
                   .case(WireFormat.MlsKeyPackage).then(KeyPackage.T, "key_package")
                   .case(WireFormat.MlsQuarantineEnd).then(QuarantineEnd.T, "quarantine_end")
                   .case(WireFormat.MlsShareRecoveryMessage).then(ShareRecoveryMessage.T, "share_recovery_message")
+                  .case(WireFormat.MlsWelcomeBackGhost).then(WelcomeBackGhost.T, "welcome_back_ghost")
               }
           }.lift { v, _, msg -> MlsMessage(v, msg) }
         }

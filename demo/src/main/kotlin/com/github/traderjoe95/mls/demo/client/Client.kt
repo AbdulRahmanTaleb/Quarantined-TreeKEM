@@ -102,6 +102,13 @@ class Client(
         println("[$userName] Message received: $messageId")
 
         when (val res = mlsClient.processMessage(encoded).bind()) {
+
+          is ProcessMessageResult.GroupMessageIgnored -> {
+            println("[$userName] $res")
+            cachedGhostMessages.add(Pair(messageId, encoded))
+            mlsClient[res.groupId]
+          }
+
           is ProcessMessageResult.WelcomeMessageReceived -> {
             val keyPackage = res.welcome.secrets.firstNotNullOf {
               getKeyPackage(it.newMember)
@@ -153,13 +160,22 @@ class Client(
               }
 
               is ProcessHandshakeResult.CommitProcessedWithNewMembers -> {
-                println("[$userName] CommitProcessed, adding new members")
+                println("[$userName] CommitProcessed, adding new members / sending messages to ghosts")
 
                 handshakeResult.welcomeMessages.forEach { (welcome, to) ->
                   DeliveryService.sendMessageToIdentities(
                     welcome.encoded,
                     authenticateCredentials(
                       to.map { it.leafNode.signaturePublicKey to it.leafNode.credential },
+                    ).bindAll(),
+                  )
+                }
+
+                handshakeResult.welcomeBackGhostMessages.forEach { (welcomeBack, to) ->
+                  DeliveryService.sendMessageToIdentities(
+                    welcomeBack.encoded,
+                    authenticateCredentials(
+                      to.map { it.signaturePublicKey to it.credential },
                     ).bindAll(),
                   )
                 }
@@ -172,7 +188,6 @@ class Client(
                 handshakeResult.suspendedClient
               }
 
-//              ProcessHandshakeResult.QuarantineEndReceived -> TODO()
             }
           }
 
@@ -183,6 +198,15 @@ class Client(
 
           is ProcessMessageResult.ShareRecoveryMessageReceived -> {
             null
+          }
+
+          is ProcessMessageResult.WelcomeBackGhostMessageIgnored -> {
+            println("[$userName] $res")
+            mlsClient[res.groupId]
+          }
+          is ProcessMessageResult.WelcomeBackGhostMessageProcessed -> {
+            println("[$userName] $res")
+            mlsClient[res.groupId]
           }
         }
       }

@@ -28,6 +28,8 @@ import com.github.traderjoe95.mls.protocol.message.MessageOptions
 import com.github.traderjoe95.mls.protocol.message.MlsMessage
 import com.github.traderjoe95.mls.protocol.message.UsePublicMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
+import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
+import com.github.traderjoe95.mls.protocol.message.WelcomeBackGroupSecrets
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
 import com.github.traderjoe95.mls.protocol.psk.ResolvedPsk.Companion.updatePskSecret
@@ -120,9 +122,10 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
 
     val commitSecret = nullable { deriveSecret(pathSecrets.lastOrNull().bind(), "path") } ?: zeroesNh
 
+
     val partialCommit =
       messages.createAuthenticatedContent(
-        Commit(proposals, updatePath.toOption(), newGhostMembers, newGhostKeys),
+        Commit(proposals, updatePath.toOption(), newGhostMembers, newGhostKeys, emptyList(), emptyList()),
         messageOptions,
         authenticatedData,
       )
@@ -136,7 +139,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
         newExtensions = (proposalResult as? ProcessProposalsResult.CommitByMember)?.extensions,
       )
 
-    val (newKeySchedule, joinerSecret, welcomeSecret) =
+    val (newKeySchedule, joinerSecret, welcomeSecret, welcomeBackSecret) =
       keySchedule.nextEpoch(
         commitSecret,
         updatedGroupContext,
@@ -170,6 +173,15 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
         signaturePrivateKey,
       ).bind()
 
+
+    val ghostReconnectKeys = cachedQuarantineEnd.map{
+      it.leafNode
+    }
+//    val encryptedGroupInfoForGhostReconnect = cachedQuarantineEnd.map{
+//      encryptWithLabel(it.leafNode.encryptionKey, "GroupInfoGhostReconnect", byteArrayOf() ,groupInfo.encodeUnsafe()).bind()
+//    }
+
+
     PrepareCommitResult(
       updatedGroupState,
       messages.protectCommit(partialCommit, confirmationTag, messageOptions),
@@ -187,6 +199,22 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
                 proposalResult.pskIds,
               ),
               newMembers.map { it.second },
+            ),
+          )
+        } ?: listOf(),
+
+      ghostReconnectKeys.takeIf { it.isNotEmpty() }
+        ?.let{ newMembers ->
+          listOf(
+            PrepareCommitResult.WelcomeBackGhostMessage(
+              newMembers.createWelcomeBack(
+                groupInfo,
+                pathSecrets.last(),
+                welcomeBackSecret,
+                joinerSecret,
+                proposalResult.pskIds,
+              ),
+              newMembers.map { it },
             ),
           )
         } ?: listOf(),
@@ -240,7 +268,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
         newExtensions = (proposalResult as? ProcessProposalsResult.CommitByMember)?.extensions,
       )
 
-    val (newKeySchedule, _, _) =
+    val (newKeySchedule, _, _, _) =
       keySchedule.nextEpoch(
         commitSecret,
         updatedGroupContext,
@@ -425,6 +453,33 @@ private fun List<Pair<LeafIndex, KeyPackage>>.createWelcome(
 
   return MlsMessage.welcome(
     groupContext.cipherSuite,
+    encryptedGroupSecrets,
+    encryptedGroupInfo,
+  )
+}
+
+context(GroupState.Active, Raise<SenderCommitError>)
+private fun List<LeafNode<*>>.createWelcomeBack(
+  groupInfo: GroupInfo,
+  pathSecret: Secret,
+  welcomeBackSecret: Secret,
+  joinerSecret: Secret,
+  pskIds: List<PreSharedKeyId>,
+): MlsMessage<WelcomeBackGhost> {
+  val welcomeBackNonce = expandWithLabel(welcomeBackSecret, "nonce", byteArrayOf(), nonceLen).asNonce
+  val welcomeBackKey = expandWithLabel(welcomeBackSecret, "key", byteArrayOf(), keyLen)
+
+  val encryptedGroupInfo = encryptAead(welcomeBackKey, welcomeBackNonce, Aad.empty, groupInfo.encodeUnsafe())
+
+  val encryptedGroupSecrets =
+    map { leaf ->
+      WelcomeBackGroupSecrets(joinerSecret, pathSecret, pskIds)
+        .encrypt(cipherSuite, leaf.encryptionKey, encryptedGroupInfo)
+    }.bindAll()
+
+  return MlsMessage.welcomeBackGhost(
+    groupContext.cipherSuite,
+    groupId,
     encryptedGroupSecrets,
     encryptedGroupInfo,
   )

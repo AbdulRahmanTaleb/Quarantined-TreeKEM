@@ -1,6 +1,7 @@
 package com.github.traderjoe95.mls.protocol.group
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.ensure
@@ -15,26 +16,39 @@ import com.github.traderjoe95.mls.protocol.error.GroupActive
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
 import com.github.traderjoe95.mls.protocol.error.GroupSuspended
 import com.github.traderjoe95.mls.protocol.error.InvalidCommit
+import com.github.traderjoe95.mls.protocol.error.JoinError
 import com.github.traderjoe95.mls.protocol.error.MessageRecipientError
 import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError
 import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.ShareRecoveryMessageError
+import com.github.traderjoe95.mls.protocol.error.WelcomeBackGhostMessageError
+import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
+import com.github.traderjoe95.mls.protocol.group.resumption.isProtocolResumption
+import com.github.traderjoe95.mls.protocol.group.resumption.validateResumption
 import com.github.traderjoe95.mls.protocol.message.AuthHandshakeContent
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
 import com.github.traderjoe95.mls.protocol.message.GroupMessageFactory
 import com.github.traderjoe95.mls.protocol.message.HandshakeMessage
+import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.MlsHandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
+import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
+import com.github.traderjoe95.mls.protocol.psk.ResolvedPsk
 import com.github.traderjoe95.mls.protocol.psk.ResumptionPskId
 import com.github.traderjoe95.mls.protocol.service.AuthenticationService
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
+import com.github.traderjoe95.mls.protocol.tree.PrivateRatchetTree
 import com.github.traderjoe95.mls.protocol.tree.RatchetTree
+import com.github.traderjoe95.mls.protocol.tree.RatchetTree.Companion.join
 import com.github.traderjoe95.mls.protocol.tree.SecretTree
+import com.github.traderjoe95.mls.protocol.tree.check
+import com.github.traderjoe95.mls.protocol.tree.findEquivalentLeaf
+import com.github.traderjoe95.mls.protocol.tree.insertPathSecrets
 import com.github.traderjoe95.mls.protocol.types.Credential
 import com.github.traderjoe95.mls.protocol.types.Extension
 import com.github.traderjoe95.mls.protocol.types.ExternalPub
@@ -81,7 +95,7 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
-  val INACTIVITY_DELAY: ULong = 3U
+  val INACTIVITY_DELAY: ULong = 2U
   val QUARANTEEN_DELAY: ULong = 100U
 
 
@@ -327,6 +341,69 @@ sealed class GroupState(
       val secretShare = ShamirSecretSharing.SecretShare.decode(res).second
 
       storeRecoveredShare(secretShare)
+    }
+
+    context(Raise<ProcessMessageError>)
+    suspend fun process(
+      welcomeBackGhost: WelcomeBackGhost,
+      psks: PskLookup = PskLookup.EMPTY
+    ): Either<ProcessMessageError, GroupState> = either {
+
+      ensure(welcomeBackGhost.groupId eq groupId) { MessageRecipientError.WrongGroup(welcomeBackGhost.groupId, groupId) }
+
+      ensure(cachedUpdate != null) { WelcomeBackGhostMessageError.MissingCachedUpdateForGhost }
+
+      val keyPair = reconstructPublicKey(cachedUpdate!!.encryptionPrivateKey).bind()
+
+      val groupSecrets = welcomeBackGhost.decryptWelcomeBackGroupSecrets(keyPair).bind()
+
+      val resolvedPsks = PskLookup.resolvePsks(psks, groupSecrets.preSharedKeyIds).bind()
+      val pskSecret = ResolvedPsk.calculatePskSecret(cipherSuite, resolvedPsks)
+
+      val groupInfo = welcomeBackGhost.decryptWelcomeBackGroupInfo(groupSecrets.joinerSecret, pskSecret).bind()
+
+      val publicTree =
+        groupInfo.extension<RatchetTreeExt>()?.tree ?: raise(WelcomeBackGhostMessageError.MissingRatchetTree)
+
+      groupInfo.verifySignature(publicTree).bind()
+      publicTree.check(groupInfo.groupContext).bind()
+
+      val secretTree = PrivateRatchetTree(cipherSuite, leafIndex, mapOf(Pair(publicTree.root,groupSecrets.pathSecret)))
+
+      val newTree = RatchetTree(cipherSuite, publicTree, secretTree)
+
+      var groupContext = groupInfo.groupContext
+
+      for(i in 0..<tree.leaves.size){
+        if(tree.leaves[i] != null){
+          tree.leaves[i]!!.epk = groupContext.epoch
+        }
+      }
+
+      val keySchedule =
+        KeySchedule.join(
+          cipherSuite,
+          groupSecrets.joinerSecret,
+          pskSecret,
+          groupContext,
+        )
+
+      cipherSuite.verifyMac(
+        keySchedule.confirmationKey,
+        groupContext.confirmedTranscriptHash,
+        groupInfo.confirmationTag,
+      )
+      groupContext =
+        groupContext.withInterimTranscriptHash(
+          newInterimTranscriptHash(
+            cipherSuite,
+            groupContext.confirmedTranscriptHash,
+            groupInfo.confirmationTag,
+          ),
+        )
+
+
+      GroupState.Active(groupContext, newTree, keySchedule, signaturePrivateKey)
     }
 
     context(Raise<CreateUpdateError>)

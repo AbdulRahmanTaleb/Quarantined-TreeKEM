@@ -16,6 +16,7 @@ enum class WireFormat(ord: UInt, override val isValid: Boolean = true) : Protoco
   MlsKeyPackage(0x0005U),
   MlsQuarantineEnd(0x0006U),
   MlsShareRecoveryMessage(0x0007U),
+  MlsWelcomeBackGhost(0x0008U),
   ;
 
   override val ord: UIntRange = ord..ord

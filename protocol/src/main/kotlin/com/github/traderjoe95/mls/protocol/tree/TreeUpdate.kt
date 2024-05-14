@@ -142,11 +142,16 @@ internal fun createUpdatePath(
     val provisionalGroupCtx = groupContext.provisional(updatedTree)
     val excludedNodeIndices = excludeNewLeaves.map { it.nodeIndex }.toSet()
 
+    println(filteredDirectPath)
+
     var shareIdx = 1
     val updatePathNodes =
       filteredDirectPath.zip(pathSecrets.drop(1)).mapIndexed { index, (nodeAndRes, pathSecret) ->
         val (nodeIdx, resolution) = nodeAndRes
         val encryptFor = resolution - excludedNodeIndices
+
+//        println(encryptFor)
+//        println(updatedTree.leafNode(encryptFor[0]).encryptionKey)
 
         UpdatePathNode(
           updatedTree.parentNode(nodeIdx).encryptionKey,

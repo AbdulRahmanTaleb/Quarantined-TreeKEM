@@ -60,4 +60,16 @@ sealed interface ProcessMessageResult<out Identity : Any> {
     val groupId: GroupId,
     val result: ProcessHandshakeResult<Identity>,
   ) : ProcessMessageResult<Identity>
+
+  data class WelcomeBackGhostMessageIgnored<out Identity : Any>(
+    val groupId: GroupId,
+  ) : ProcessMessageResult<Identity>
+
+  data class WelcomeBackGhostMessageProcessed<out Identity : Any>(
+    val groupId: GroupId,
+  ) : ProcessMessageResult<Identity>
+
+  data class GroupMessageIgnored(
+    val groupId: GroupId,
+  ) : ProcessMessageResult<Nothing>
 }

@@ -15,6 +15,7 @@ import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.PublicMessageError
 import com.github.traderjoe95.mls.protocol.error.UnknownGroup
 import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
+import com.github.traderjoe95.mls.protocol.group.PrepareCommitResult
 import com.github.traderjoe95.mls.protocol.group.resumption.isProtocolResumption
 import com.github.traderjoe95.mls.protocol.message.ApplicationMessage
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
@@ -27,6 +28,7 @@ import com.github.traderjoe95.mls.protocol.message.PublicMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
+import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskHolder
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskId
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
@@ -204,6 +206,10 @@ class MlsClient<Identity : Any>(
           println("ShareRecoveryMessage Received")
           processShareRecoveryMessage(message.message).bind()
         }
+
+        is WelcomeBackGhost -> {
+          processWelcomeBackGhostMessage(message.message).bind()
+        }
       }
 
     }
@@ -220,32 +226,40 @@ class MlsClient<Identity : Any>(
       val groupId = groupMessage.groupId
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
 
-      when (groupMessage.contentType) {
-        is ContentType.Handshake ->
-          if (group is ActiveGroupClient<Identity>) {
-            // println("handshake message received")
-            ProcessMessageResult.HandshakeMessageReceived(
-              groupId,
-              group.processHandshake(groupMessage as HandshakeMessage).bind(),
-            )
-          } else {
-            raise(GroupSuspended(groupMessage.groupId))
+      if(group.isGhost){
+        ProcessMessageResult.GroupMessageIgnored(groupId)
+      }
+      else {
+        when (groupMessage.contentType) {
+          is ContentType.Handshake -> {
+
+            if (group is ActiveGroupClient<Identity>) {
+              // println("handshake message received")
+              ProcessMessageResult.HandshakeMessageReceived(
+                groupId,
+                group.processHandshake(groupMessage as HandshakeMessage).bind(),
+              )
+            } else {
+              raise(GroupSuspended(groupMessage.groupId))
+            }
           }
 
-        is ContentType.Application ->
-          if (groupMessage is PublicMessage) {
-            println("public app message received")
-            raise(PublicMessageError.ApplicationMessageMustNotBePublic)
-          } else {
-            println("private app message received")
-            ProcessMessageResult.ApplicationMessageReceived(
-              groupId,
-              group.open(groupMessage as ApplicationMessage).bind(),
-            )
+          is ContentType.Application -> {
+            if (groupMessage is PublicMessage) {
+              println("public app message received")
+              raise(PublicMessageError.ApplicationMessageMustNotBePublic)
+            } else {
+              println("private app message received")
+              ProcessMessageResult.ApplicationMessageReceived(
+                groupId,
+                group.open(groupMessage as ApplicationMessage).bind(),
+              )
+            }
           }
 
-        else ->
-          error("unreachable")
+          else ->
+            error("unreachable")
+        }
       }
     }
 
@@ -285,9 +299,29 @@ class MlsClient<Identity : Any>(
 
       else{
         if (group is ActiveGroupClient<Identity>) {
+          group.processShareRecoveryMessage(shareRecoveryMessage)
+          println("Processed share recovery message")
           ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
         } else {
           raise(GroupSuspended(shareRecoveryMessage.groupId))
+        }
+      }
+    }
+
+  private suspend fun processWelcomeBackGhostMessage(welcomeBackGhost: WelcomeBackGhost): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+    either{
+      val groupId = welcomeBackGhost.groupId
+      val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
+
+      if(!group.isGhost){
+        ProcessMessageResult.WelcomeBackGhostMessageIgnored(groupId)
+      }
+      else{
+        if (group is ActiveGroupClient<Identity>) {
+          group.processWelcomeBackGhostMessage(welcomeBackGhost)
+          ProcessMessageResult.WelcomeBackGhostMessageProcessed(groupId)
+        } else {
+          raise(GroupSuspended(welcomeBackGhost.groupId))
         }
       }
     }

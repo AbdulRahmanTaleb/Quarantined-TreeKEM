@@ -101,6 +101,7 @@ object DeliveryService : DeliveryService<String> {
     to: List<String>,
   ): Map<String, Either<SendToUserError<String>, ULID>> {
     return to.associateWith { toUser ->
+
       val messageId = ULID.new()
 
       either {

@@ -27,22 +27,21 @@ fun printGroup(group: ActiveGroupClient<String>, name: String, nbMembers: Int){
   println()
 }
 
-suspend fun updateKeys(updaterGroups: List<ActiveGroupClient<String>>, committerGroup: ActiveGroupClient<String>, clients: MutableList<Client>, excludeClients: MutableList<Client> = mutableListOf()){
-
+suspend fun updateKeys(updaterGroups: List<ActiveGroupClient<String>>, clients: MutableList<Client>, excludeClients: MutableList<Client> = mutableListOf()){
 
   updaterGroups.forEach { updaterGroup ->
-    if(updaterGroup != committerGroup) {
-      val updateMember = updaterGroup.update().getOrThrow()
-      DeliveryService.sendMessageToGroup(updateMember, updaterGroup.groupId).getOrThrow()
+    val updateMember = updaterGroup.update().getOrThrow()
+    DeliveryService.sendMessageToGroup(updateMember, updaterGroup.groupId).getOrThrow()
 
-      clients.forEach {
-        if (!excludeClients.contains(it)) {
-          it.processNextMessage().getOrThrow()
-        }
+    clients.forEach {
+      if (!excludeClients.contains(it)) {
+        it.processNextMessage().getOrThrow()
       }
     }
   }
+}
 
+suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: MutableList<Client>, excludeClients: MutableList<Client> = mutableListOf()){
   val commitMsg = committerGroup.commit().getOrThrow()
   DeliveryService.sendMessageToGroup(commitMsg, committerGroup.groupId).getOrThrow()
 
@@ -57,7 +56,7 @@ suspend fun main() {
   val clients = mutableListOf<Client>()
   val groups = mutableListOf<ActiveGroupClient<String>>()
 
-  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan", "Eve")
+  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan")
 
   for(cl in clientsList){
     val client = Client(cl)
@@ -147,6 +146,10 @@ suspend fun main() {
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   updateKeys(
     groups.slice(idxUpdate),
+    clients,
+    clients.slice(idxGhosts).toMutableList()
+  )
+  commit(
     groups[idxCommit],
     clients,
     clients.slice(idxGhosts).toMutableList()
@@ -159,11 +162,15 @@ suspend fun main() {
 
   idxGhosts = listOf(clients.size-1)
   idxUpdate = IntRange(0, clients.size-1).filter { !idxGhosts.contains(it) && it != idxCommit }
-  for(j in 2..4) {
+  for(j in 2..3) {
     println(j.toString() + ": UPDATING " + clientsList.slice(idxUpdate) + " KEYS, COMMITTING BY " + clientsList[idxCommit])
     println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     updateKeys(
       groups.slice(idxUpdate),
+      clients,
+      clients.slice(idxGhosts).toMutableList()
+    )
+    commit(
       groups[idxCommit],
       clients,
       clients.slice(idxGhosts).toMutableList()
@@ -175,6 +182,14 @@ suspend fun main() {
     printGroup(groups[j], clientsList[j], clients.size)
   }
 
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // CHECKING GHOST STATUS
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+
+  println("CHECKING GHOST STATUS")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   for(j in 0..<clients.size) {
     val st = groups[j].state
     println("Ghosts Groups["+clientsList[j]+"]: ")
@@ -184,8 +199,6 @@ suspend fun main() {
     println("ShareHolderRanks(" + st.ghostMembersShareHolderRank.size+"): " + st.ghostMembersShareHolderRank)
     println("")
   }
-  println("")
-
 
   // GHOST 1
   val listShares = mutableListOf<ShamirSecretSharing.SecretShare>()
@@ -203,20 +216,74 @@ suspend fun main() {
     assert(keyPair.public.bytes.contentEquals(groups[j].state.ghostMembersKeys[0].bytes))
   }
 
-  println("")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
+
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+  // GHOST RECONNECTING
+  //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////
+
+  println("GHOST RECONNECTING")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+  println("\n---------------------------- Sending Quarantine End")
   clients[clients.size-1].ghostReconnect(groups[clients.size-1].groupId)
   clients.filterIndexed{ idx, _ -> !idxGhosts.contains(idx)}.forEach{
     it.processNextMessage().getOrThrow()
   }
 
-  for(k in 1..4){
+  println("\n---------------------------- Receiving Share Recovery Message")
+  for(k in 0..clients.size-1){
     println("")
 
     clients.forEach {
       it.processNextMessage().getOrThrow()
     }
   }
+
+//  for(j in 0..<clients.size) {
+//    printGroup(groups[j], clientsList[j], clients.size)
+//  }
+
+  println("\n---------------------------- Committing by " + clientsList[idxCommit])
+  commit(
+    groups[idxCommit],
+    clients,
+    //clients.slice(idxGhosts).toMutableList()
+  )
+
+  clients[clients.size-1].processNextMessage().getOrThrow()
+
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+  clients[0].sendMessage(groups[0].groupId, "test Alice")
+  for(k in 1..<clients.size){
+    clients[k].processNextMessage().getOrThrow()
+  }
+
+
+  for(j in 0..<clients.size) {
+    printGroup(groups[j], clientsList[j], clients.size)
+  }
+
+  idxGhosts = listOf<Int>()
+  idxCommit = 1
+  idxUpdate = IntRange(0, clients.size-1).filter { !idxGhosts.contains(it) && it != idxCommit }
+  println("UPDATING " + clientsList.slice(idxUpdate) + " KEYS, COMMITTING BY " + clientsList[idxCommit])
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  updateKeys(
+    groups.slice(idxUpdate),
+    clients,
+    clients.slice(idxGhosts).toMutableList()
+  )
+  commit(
+    groups[idxCommit],
+    clients,
+    clients.slice(idxGhosts).toMutableList()
+  )
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
   for(j in 0..<clients.size) {
     printGroup(groups[j], clientsList[j], clients.size)

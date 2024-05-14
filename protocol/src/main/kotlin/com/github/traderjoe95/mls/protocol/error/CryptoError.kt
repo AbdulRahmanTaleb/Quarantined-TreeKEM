@@ -2,13 +2,13 @@ package com.github.traderjoe95.mls.protocol.error
 
 import com.github.traderjoe95.mls.protocol.types.framing.Sender
 
-sealed interface DecryptError : PrivateMessageRecipientError, WelcomeJoinError
+sealed interface DecryptError : PrivateMessageRecipientError, WelcomeJoinError, WelcomeBackGhostError
 
-sealed interface HpkeDecryptError : RecipientTreeUpdateError, WelcomeJoinError
+sealed interface HpkeDecryptError : RecipientTreeUpdateError, WelcomeJoinError, WelcomeBackGhostError
 
 sealed interface HpkeEncryptError : SenderTreeUpdateError, SenderCommitError, ProcessMessageError
 
-sealed interface ReconstructHpkePublicKeyError
+sealed interface ReconstructHpkePublicKeyError: ProcessMessageError
 
 sealed interface SendExportError : ExternalJoinError
 

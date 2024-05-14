@@ -7,7 +7,7 @@ import com.github.traderjoe95.mls.protocol.types.tree.leaf.Capabilities
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
 import java.time.Instant
 
-sealed interface TreeCheckError : JoinError {
+sealed interface TreeCheckError : JoinError, ProcessMessageError {
   data class BadTreeHash(val expected: ByteArray, val actual: ByteArray) : TreeCheckError
 
   data class NotParentHashValid(val nodeIdx: NodeIndex) : TreeCheckError

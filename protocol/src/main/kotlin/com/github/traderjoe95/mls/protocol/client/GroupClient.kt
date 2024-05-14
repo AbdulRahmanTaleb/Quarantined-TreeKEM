@@ -35,6 +35,7 @@ import com.github.traderjoe95.mls.protocol.error.ReInitError
 import com.github.traderjoe95.mls.protocol.error.SenderCommitError
 import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
 import com.github.traderjoe95.mls.protocol.group.GroupState
+import com.github.traderjoe95.mls.protocol.group.WelcomeBackGhostMessages
 import com.github.traderjoe95.mls.protocol.group.WelcomeMessages
 import com.github.traderjoe95.mls.protocol.group.joinGroup
 import com.github.traderjoe95.mls.protocol.group.joinGroupExternal
@@ -59,6 +60,7 @@ import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.UsePrivateMessage
 import com.github.traderjoe95.mls.protocol.message.UsePublicMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
+import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.padding.randomized.CovertPadding
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskHolder
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskId
@@ -100,6 +102,8 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
     get() = state.members
   val epochAuthenticator: Secret
     get() = state.keySchedule.epochAuthenticator
+
+  var isGhost: Boolean = false
 
   val state: State
     get() = stateHistory.first().coerceState()
@@ -535,10 +539,12 @@ class ActiveGroupClient<Identity : Any> internal constructor(
             when (newState) {
               is GroupState.Active -> {
                 advanceCurrentState(newState)
-                cached?.welcomeMessages
-                  ?.takeIf { it.isNotEmpty() }
-                  ?.let(::CommitProcessedWithNewMembers)
-                  ?: ProcessHandshakeResult.CommitProcessed
+                if((cached != null) && (cached.welcomeMessages.isNotEmpty() || cached.welcomeBackMessages.isNotEmpty())){
+                  CommitProcessedWithNewMembers(cached.welcomeMessages, cached.welcomeBackMessages)
+                }
+                else{
+                  ProcessHandshakeResult.CommitProcessed
+                }
               }
 
               is GroupState.Suspended ->
@@ -572,6 +578,17 @@ class ActiveGroupClient<Identity : Any> internal constructor(
 
     }
 
+  suspend fun processWelcomeBackGhostMessage(welcomeBackGhost: WelcomeBackGhost): Either<ProcessMessageError, Unit> =
+    either {
+
+      val newState = state.ensureActive {
+        process(welcomeBackGhost, psks)
+      }.bind()
+
+      advanceCurrentState(newState)
+      isGhost = false
+    }
+
   suspend fun addMember(keyPackage: KeyPackage): Either<CreateAddError, ByteArray> =
     either {
       state.messages
@@ -593,10 +610,14 @@ class ActiveGroupClient<Identity : Any> internal constructor(
         .encodeUnsafe()
     }
 
-  suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray> =
-    either {
-      val newLeaf =  state.updateGhostLeafNode(cipherSuite.generateHpkeKeyPair())
-      state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey).bind().encodeUnsafe()
+  suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray>
+    {
+      isGhost = true
+      return either {
+        val newLeaf = state.updateGhostLeafNode(cipherSuite.generateHpkeKeyPair())
+        state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey)
+          .bind().encodeUnsafe()
+      }
     }
 
   suspend fun removeMember(memberIdx: UInt): Either<CreateRemoveError, ByteArray> =
@@ -650,12 +671,12 @@ class ActiveGroupClient<Identity : Any> internal constructor(
           .filter { proposalFilter(it.proposal) }
           .map { it.ref }
 
-      val (newState, commitMsg, welcomeMsgs) =
+      val (newState, commitMsg, welcomeMsgs, welcomeBackMsgs) =
         state.prepareCommit(proposalRefs + additionalProposals, authService, handshakeMessageOptions, psks = psks)
           .bind()
 
       commitMsg.encodeUnsafe().also {
-        commitCache[makeCommitRef(commitMsg.message).hex] = CachedCommit(newState, welcomeMsgs)
+        commitCache[makeCommitRef(commitMsg.message).hex] = CachedCommit(newState, welcomeMsgs, welcomeBackMsgs)
       }
     }
 
@@ -691,7 +712,7 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       messageOptions = handshakeMessageOptions,
     ).map { (suspendedGroup, commitMsg) ->
       commitMsg.encodeUnsafe().also {
-        commitCache[makeCommitRef(commitMsg.message).hex] = CachedCommit(suspendedGroup, listOf())
+        commitCache[makeCommitRef(commitMsg.message).hex] = CachedCommit(suspendedGroup, listOf(), listOf())
       }
     }
 
@@ -753,6 +774,7 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   private data class CachedCommit(
     val newState: GroupState,
     val welcomeMessages: WelcomeMessages,
+    val welcomeBackMessages: WelcomeBackGhostMessages,
   )
 }
 
