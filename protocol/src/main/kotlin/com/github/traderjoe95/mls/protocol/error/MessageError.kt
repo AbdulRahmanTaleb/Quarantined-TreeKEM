@@ -41,3 +41,15 @@ sealed interface ProcessMessageError {
   data class HandshakeMessageForWrongEpoch(val groupId: GroupId, val epoch: ULong, val currentEpoch: ULong) :
     ProcessMessageError
 }
+
+
+sealed interface GhostRecoveryProcessError {
+  data object NotEnoughSharesForKeyRecoveryError : GhostRecoveryProcessError
+
+  data object WrongGhostEpoch : GhostRecoveryProcessError
+
+  data object UnexpectedEpochAfterMessageRecovery : GhostRecoveryProcessError
+
+  data object IncoherentStates : GhostRecoveryProcessError
+
+}

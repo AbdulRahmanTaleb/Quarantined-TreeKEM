@@ -171,47 +171,52 @@ class MlsClient<Identity : Any>(
 
   fun decodeMessage(messageBytes: ByteArray): Either<DecoderError, MlsMessage<*>> = GroupClient.decodeMessage(messageBytes)
 
-  suspend fun processMessage(messageBytes: ByteArray): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  suspend fun processMessage(messageBytes: ByteArray, isGhost: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     decodeMessage(messageBytes)
-      .flatMap { processMessage(it) }
+      .flatMap { processMessage(it, isGhost) }
 
-  suspend fun processMessage(message: MlsMessage<*>): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  private suspend fun processMessage(message: MlsMessage<*>, isGhost: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
-      when (message.message) {
-        is KeyPackage -> {
-          println("key package received")
-          ProcessMessageResult.KeyPackageMessageReceived(message.message)
-        }
+      if(isGhost && (message.message !is ShareRecoveryMessage) && (message.message !is WelcomeBackGhost)){
+        ProcessMessageResult.MessageToCachForLater
+      }
+      else {
+        when (message.message) {
+          is KeyPackage -> {
+            println("key package received")
+            ProcessMessageResult.KeyPackageMessageReceived(message.message)
+          }
 
-        is Welcome -> {
-          println("welcome received")
-          ProcessMessageResult.WelcomeMessageReceived(message.message)
-        }
+          is Welcome -> {
+            println("welcome received")
+            ProcessMessageResult.WelcomeMessageReceived(message.message)
+          }
 
-        is GroupInfo -> {
-          println("groupInfo received")
-          ProcessMessageResult.GroupInfoMessageReceived(message.message)
-        }
+          is GroupInfo -> {
+            println("groupInfo received")
+            ProcessMessageResult.GroupInfoMessageReceived(message.message)
+          }
 
-        is QuarantineEnd -> {
-          println("QuarantineEnd received")
-          processQuarantineEnd(message.message).bind()
-        }
+          is QuarantineEnd -> {
+            println("QuarantineEnd received")
+            processQuarantineEnd(message.message).bind()
+          }
 
-        is GroupMessage<*> -> {
-          processGroupMessage(message.message).bind()
-        }
+          is GroupMessage<*> -> {
+            processGroupMessage(message.message).bind()
+          }
 
-        is ShareRecoveryMessage -> {
-          println("ShareRecoveryMessage Received")
-          processShareRecoveryMessage(message.message).bind()
-        }
+          is ShareRecoveryMessage -> {
+            println("ShareRecoveryMessage Received")
+            processShareRecoveryMessage(message.message).bind()
+          }
 
-        is WelcomeBackGhost -> {
-          processWelcomeBackGhostMessage(message.message).bind()
+          is WelcomeBackGhost -> {
+            println("welcomebackghost")
+            processWelcomeBackGhostMessage(message.message).bind()
+          }
         }
       }
-
     }
 
   suspend fun processGroupMessage(groupMessageBytes: ByteArray): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
@@ -226,40 +231,35 @@ class MlsClient<Identity : Any>(
       val groupId = groupMessage.groupId
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
 
-      if(group.isGhost){
-        ProcessMessageResult.GroupMessageIgnored(groupId)
-      }
-      else {
-        when (groupMessage.contentType) {
-          is ContentType.Handshake -> {
+      when (groupMessage.contentType) {
+        is ContentType.Handshake -> {
 
-            if (group is ActiveGroupClient<Identity>) {
-              // println("handshake message received")
-              ProcessMessageResult.HandshakeMessageReceived(
-                groupId,
-                group.processHandshake(groupMessage as HandshakeMessage).bind(),
-              )
-            } else {
-              raise(GroupSuspended(groupMessage.groupId))
-            }
+          if (group is ActiveGroupClient<Identity>) {
+//               println("handshake message received")
+            ProcessMessageResult.HandshakeMessageReceived(
+              groupId,
+              group.processHandshake(groupMessage as HandshakeMessage).bind(),
+            )
+          } else {
+            raise(GroupSuspended(groupMessage.groupId))
           }
-
-          is ContentType.Application -> {
-            if (groupMessage is PublicMessage) {
-              println("public app message received")
-              raise(PublicMessageError.ApplicationMessageMustNotBePublic)
-            } else {
-              println("private app message received")
-              ProcessMessageResult.ApplicationMessageReceived(
-                groupId,
-                group.open(groupMessage as ApplicationMessage).bind(),
-              )
-            }
-          }
-
-          else ->
-            error("unreachable")
         }
+
+        is ContentType.Application -> {
+          if (groupMessage is PublicMessage) {
+//              println("public app message received")
+            raise(PublicMessageError.ApplicationMessageMustNotBePublic)
+          } else {
+//              println("private app message received")
+            ProcessMessageResult.ApplicationMessageReceived(
+              groupId,
+              group.open(groupMessage as ApplicationMessage).bind(),
+            )
+          }
+        }
+
+        else ->
+          error("unreachable")
       }
     }
 
@@ -314,12 +314,12 @@ class MlsClient<Identity : Any>(
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
 
       if(!group.isGhost){
-        ProcessMessageResult.WelcomeBackGhostMessageIgnored(groupId)
+        ProcessMessageResult.WelcomeBackGhostMessageIgnored
       }
       else{
         if (group is ActiveGroupClient<Identity>) {
           group.processWelcomeBackGhostMessage(welcomeBackGhost)
-          ProcessMessageResult.WelcomeBackGhostMessageProcessed(groupId)
+          ProcessMessageResult.WelcomeBackGhostMessageProcessed
         } else {
           raise(GroupSuspended(welcomeBackGhost.groupId))
         }

@@ -12,6 +12,7 @@ import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
+import com.github.traderjoe95.mls.protocol.error.GhostRecoveryProcessError
 import com.github.traderjoe95.mls.protocol.error.GroupActive
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
 import com.github.traderjoe95.mls.protocol.error.GroupSuspended
@@ -49,7 +50,9 @@ import com.github.traderjoe95.mls.protocol.tree.SecretTree
 import com.github.traderjoe95.mls.protocol.tree.check
 import com.github.traderjoe95.mls.protocol.tree.findEquivalentLeaf
 import com.github.traderjoe95.mls.protocol.tree.insertPathSecrets
+import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.Credential
+import com.github.traderjoe95.mls.protocol.types.CredentialType
 import com.github.traderjoe95.mls.protocol.types.Extension
 import com.github.traderjoe95.mls.protocol.types.ExternalPub
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtensions
@@ -129,8 +132,9 @@ sealed class GroupState(
     val ghostMembers: MutableList<LeafIndex> = mutableListOf(),
     val ghostMembersKeys: MutableList<HpkePublicKey> = mutableListOf(),
     val ghostMembersShares: MutableList<ShamirSecretSharing.SecretShare> = mutableListOf(),
-    val ghostMembersShareHolderRank: MutableList<Int> = mutableListOf(),
-    val recoveredShares: List<ShamirSecretSharing.SecretShare> = mutableListOf(),
+    val ghostMembersShareHolderRank: MutableList<UInt> = mutableListOf(),
+    val recoveredShares: List<ShamirSecretSharing.SecretShare> = listOf(),
+    val recoveredSharesHolderRank: UInt = 0u,
   ) : GroupState(groupContext, tree, keySchedule), SecretTree.Lookup, PskLookup {
     @get:JvmName("secretTree")
     val secretTree: SecretTree by lazy {
@@ -171,10 +175,11 @@ sealed class GroupState(
         ghostMembersShares,
         ghostMembersShareHolderRank,
         recoveredShares,
+         recoveredSharesHolderRank,
       )
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeRecoveredShare(secretShare: ShamirSecretSharing.SecretShare): Active =
+    private suspend fun storeRecoveredShare(secretShare: ShamirSecretSharing.SecretShare, shareHolderRank: UInt): Active =
       Active(
         groupContext,
         tree,
@@ -188,7 +193,25 @@ sealed class GroupState(
         ghostMembersShares,
         ghostMembersShareHolderRank,
         recoveredShares + secretShare,
+        if (shareHolderRank > recoveredSharesHolderRank) shareHolderRank else recoveredSharesHolderRank ,
       )
+
+    context(Raise<GhostRecoveryProcessError>)
+    suspend fun recoverKeyPair(): Either<GhostRecoveryProcessError, HpkeKeyPair> = either {
+      if(recoveredShares.isEmpty()){
+        raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
+      }
+      val t = recoveredShares[0].t
+      val indices = mutableSetOf<Int>()
+      recoveredShares.forEach {
+        indices.add(it.rank)
+      }
+      if(indices.size != t){
+        raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
+      }
+      val secret = ShamirSecretSharing.retrieveSecret(recoveredShares)
+      derive(secret)
+    }
 
     private suspend fun storeQuarantineEndProposal(quarantineEnd: QuarantineEnd): Active {
       if(quarantineEnd.leafIndex != leafIndex) {
@@ -213,6 +236,7 @@ sealed class GroupState(
         ghostMembersShares,
         ghostMembersShareHolderRank,
         recoveredShares,
+        recoveredSharesHolderRank,
       )
     }
 
@@ -260,9 +284,12 @@ sealed class GroupState(
       authenticationService: AuthenticationService<Identity>,
       psks: PskLookup = PskLookup.EMPTY,
       cachedState: GroupState? = null,
+      ghostKeyPair: HpkeKeyPair? = null,
+      newGhostLeafNode: LeafNode<*>? = null,
+      newGhostPrivateEncryptionKey: HpkePrivateKey? = null,
     ): Either<ProcessMessageError, GroupState> =
       either {
-        process(message.unprotect(this@Active).bind(), authenticationService, psks, cachedState)
+        process(message.unprotect(this@Active).bind(), authenticationService, psks, cachedState, ghostKeyPair, newGhostLeafNode, newGhostPrivateEncryptionKey)
       }
 
     context(Raise<ProcessMessageError>)
@@ -272,11 +299,15 @@ sealed class GroupState(
       authenticationService: AuthenticationService<Identity>,
       psks: PskLookup = PskLookup.EMPTY,
       cachedState: GroupState? = null,
+      ghostKeyPair: HpkeKeyPair? = null,
+      newGhostLeafNode: LeafNode<*>? = null,
+      newGhostPrivateEncryptionKey: HpkePrivateKey? = null,
     ): GroupState {
       ensure(message.groupId eq groupId) { MessageRecipientError.WrongGroup(message.groupId, groupId) }
       ensure(message.epoch == epoch) {
         ProcessMessageError.HandshakeMessageForWrongEpoch(groupId, message.epoch, epoch)
       }
+
 
       return when (message.framedContent.content) {
         is Proposal ->
@@ -284,10 +315,10 @@ sealed class GroupState(
 
         is Commit ->
           if (message.sender.type == Member && message.sender.index == leafIndex) {
-            // println("processing own commit !!")
+//             println("processing own commit !!")
             cachedState ?: raise(ProcessMessageError.MustUseCachedStateForOwnCommit)
           } else {
-            processCommit(message as AuthenticatedContent<Commit>, authenticationService, psks).bind()
+            processCommit(message as AuthenticatedContent<Commit>, authenticationService, psks, ghostKeyPair, newGhostLeafNode, newGhostPrivateEncryptionKey).bind()
           }
       }
     }
@@ -303,7 +334,7 @@ sealed class GroupState(
         validations.validated(quarantineEnd).bind()
         if (ghostMembers.contains(quarantineEnd.leafIndex)) {
           val idx = ghostMembers.indexOf(quarantineEnd.leafIndex)
-          if (ghostMembersShareHolderRank[idx] == 1) {
+          if (ghostMembersShareHolderRank[idx] == 1u) {
             val ct = encryptWithLabel(
               quarantineEnd.leafNode.encryptionKey,
               "ShareRecoveryMessage",
@@ -312,7 +343,7 @@ sealed class GroupState(
             ).bind()
             Pair(
               newState,
-              messages.shareRecoveryMessage(quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
+              messages.shareRecoveryMessage(ghostMembersShareHolderRank[idx] ,quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
             )
           } else {
             Pair(newState, null)
@@ -340,7 +371,7 @@ sealed class GroupState(
 
       val secretShare = ShamirSecretSharing.SecretShare.decode(res).second
 
-      storeRecoveredShare(secretShare)
+      storeRecoveredShare(secretShare, shareRecoveryMessage.shareHolderRank)
     }
 
     context(Raise<ProcessMessageError>)
@@ -352,6 +383,7 @@ sealed class GroupState(
       ensure(welcomeBackGhost.groupId eq groupId) { MessageRecipientError.WrongGroup(welcomeBackGhost.groupId, groupId) }
 
       ensure(cachedUpdate != null) { WelcomeBackGhostMessageError.MissingCachedUpdateForGhost }
+
 
       val keyPair = reconstructPublicKey(cachedUpdate!!.encryptionPrivateKey).bind()
 
@@ -366,11 +398,12 @@ sealed class GroupState(
         groupInfo.extension<RatchetTreeExt>()?.tree ?: raise(WelcomeBackGhostMessageError.MissingRatchetTree)
 
       groupInfo.verifySignature(publicTree).bind()
+
       publicTree.check(groupInfo.groupContext).bind()
 
       val secretTree = PrivateRatchetTree(cipherSuite, leafIndex, mapOf(Pair(publicTree.root,groupSecrets.pathSecret)))
 
-      val newTree = RatchetTree(cipherSuite, publicTree, secretTree)
+      val newTree = RatchetTree(cipherSuite, publicTree, secretTree).update(leafIndex, cachedUpdate!!.leafNode, cachedUpdate!!.encryptionPrivateKey)
 
       var groupContext = groupInfo.groupContext
 
@@ -402,8 +435,7 @@ sealed class GroupState(
           ),
         )
 
-
-      GroupState.Active(groupContext, newTree, keySchedule, signaturePrivateKey)
+      GroupState.Active(groupContext, newTree, keySchedule, signaturePrivateKey, recoveredShares = recoveredShares)
     }
 
     context(Raise<CreateUpdateError>)
@@ -479,6 +511,7 @@ sealed class GroupState(
         ghostMembersShares,
         ghostMembersShareHolderRank,
         recoveredShares,
+        recoveredSharesHolderRank,
         )
     }
 

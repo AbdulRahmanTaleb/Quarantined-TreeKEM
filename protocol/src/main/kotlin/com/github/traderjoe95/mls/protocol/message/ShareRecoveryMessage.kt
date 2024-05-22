@@ -12,6 +12,8 @@ import com.github.traderjoe95.mls.codec.type.struct.Struct4T
 import com.github.traderjoe95.mls.codec.type.struct.Struct5T
 import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.struct
+import com.github.traderjoe95.mls.codec.type.uint32
+import com.github.traderjoe95.mls.codec.type.uint64
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.error.CreateSignatureError
 import com.github.traderjoe95.mls.protocol.error.KeyPackageMismatchError
@@ -52,9 +54,10 @@ import kotlin.time.Duration
 data class ShareRecoveryMessage(
   val groupId: GroupId,
   val leafIndex: LeafIndex,
+  val shareHolderRank: UInt,
   val encryptionKey: HpkePublicKey,
   val encryptedShare: HpkeCiphertext,
-) : Message, Struct4T.Shape<GroupId, LeafIndex, HpkePublicKey, HpkeCiphertext> {
+) : Message, Struct5T.Shape<GroupId, LeafIndex, UInt, HpkePublicKey, HpkeCiphertext> {
   override val wireFormat: WireFormat = WireFormat.MlsShareRecoveryMessage
 
   override val encoded: ByteArray by lazy { encodeUnsafe() }
@@ -65,6 +68,7 @@ data class ShareRecoveryMessage(
       struct("ShareRecoveryMessage") {
         it.field("group_id", GroupId.T)
           .field("leaf_index", LeafIndex.T)
+          .field("share_holder_rank", uint32.asUInt)
           .field("encryption_key", HpkePublicKey.T)
           .field("encrypted_share", HpkeCiphertext.T)
       }.lift(::ShareRecoveryMessage)
@@ -72,12 +76,14 @@ data class ShareRecoveryMessage(
     fun create(
       groupId: GroupId,
       leafIndex: LeafIndex,
+      shareHolderRank: UInt,
       encryptionKey: HpkePublicKey,
       encryptedShare: HpkeCiphertext
     ): ShareRecoveryMessage =
         ShareRecoveryMessage(
           groupId,
           leafIndex,
+          shareHolderRank,
           encryptionKey,
           encryptedShare,
           )

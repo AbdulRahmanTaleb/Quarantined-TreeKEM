@@ -44,6 +44,7 @@ class Client(
   private val signatureKeyPairs: MutableMap<CipherSuite, SignatureKeyPair> = mutableMapOf()
 
   private val mlsClient: MlsClient<String> = MlsClient(this)
+  private var isGhost = false
 
   fun generateKeyPackages(
     amount: UInt,
@@ -96,123 +97,145 @@ class Client(
     )
   }
 
+  suspend fun processCachedGhostMessages(): Either<Any, Unit> =
+    either {
+      println("Processing cached messages")
+      cachedGhostMessages.forEach{(messageId, encoded) ->
+        processMessage(messageId, encoded)
+      }
+      println("Finished processing cached messages")
+    }
+
   suspend fun processNextMessage(): Either<Any, GroupClient<String, *>?> =
     either {
       messages.tryReceive().getOrNull()?.let { (messageId, encoded) ->
-        println("[$userName] Message received: $messageId")
+        processMessage(messageId, encoded)
+      }
+    }
 
-        when (val res = mlsClient.processMessage(encoded).bind()) {
 
-          is ProcessMessageResult.GroupMessageIgnored -> {
-            println("[$userName] $res")
-            cachedGhostMessages.add(Pair(messageId, encoded))
-            mlsClient[res.groupId]
+  suspend fun processMessage(messageId: ULID, encoded: ByteArray): GroupClient<String, *>? {
+      println("[$userName] Message received: $messageId")
+
+      when (val res = mlsClient.processMessage(encoded, isGhost).getOrThrow()) {
+
+        is ProcessMessageResult.WelcomeMessageReceived -> {
+          val keyPackage = res.welcome.secrets.firstNotNullOf {
+            getKeyPackage(it.newMember)
           }
 
-          is ProcessMessageResult.WelcomeMessageReceived -> {
-            val keyPackage = res.welcome.secrets.firstNotNullOf {
-              getKeyPackage(it.newMember)
+          return mlsClient.joinFromWelcome(res.welcome, keyPackage).getOrThrow().also {
+            DeliveryService.registerForGroup(it.groupId, userName)
+          }
+        }
+
+        is ProcessMessageResult.GroupInfoMessageReceived -> {
+          return mlsClient.joinFromGroupInfo(
+            res.groupInfo,
+            signatureKeyPairs.computeIfAbsent(Config.cipherSuite, CipherSuite::generateSignatureKeyPair),
+            credential,
+            leafNodeExtensions =
+              listOf(
+                ApplicationId(applicationId.toBytes()),
+              ),
+          ).map { (group, commit) ->
+            DeliveryService.sendMessageToGroup(commit, group.groupId)
+            DeliveryService.registerForGroup(group.groupId, userName)
+
+            group
+          }.getOrThrow()
+        }
+
+        is ProcessMessageResult.ApplicationMessageReceived -> {
+          println("[$userName] Conversation message received:\n--------- ${res.applicationData.framedContent.content.bytes.decodeToString()}")
+          return mlsClient[res.groupId]
+        }
+
+        is ProcessMessageResult.QuarantineEndReceived -> {
+          if(res.shareRecoveryMessage != null){
+            DeliveryService.sendMessageToGroup(
+              res.shareRecoveryMessage!!,
+              res.groupId,
+              fromUser = userName
+            )
+          }
+          return mlsClient[res.groupId]
+        }
+
+        is ProcessMessageResult.HandshakeMessageReceived -> {
+          when (val handshakeResult = res.result) {
+            is ProcessHandshakeResult.ProposalReceived, is ProcessHandshakeResult.CommitProcessed -> {
+              println("[$userName] ${res.result}")
+              return mlsClient[res.groupId]
             }
 
-            mlsClient.joinFromWelcome(res.welcome, keyPackage).bind().also {
-              DeliveryService.registerForGroup(it.groupId, userName)
-            }
-          }
-
-          is ProcessMessageResult.GroupInfoMessageReceived -> {
-            mlsClient.joinFromGroupInfo(
-              res.groupInfo,
-              signatureKeyPairs.computeIfAbsent(Config.cipherSuite, CipherSuite::generateSignatureKeyPair),
-              credential,
-              leafNodeExtensions =
-                listOf(
-                  ApplicationId(applicationId.toBytes()),
-                ),
-            ).map { (group, commit) ->
-              DeliveryService.sendMessageToGroup(commit, group.groupId)
-              DeliveryService.registerForGroup(group.groupId, userName)
-
-              group
-            }.bind()
-          }
-
-          is ProcessMessageResult.ApplicationMessageReceived -> {
-            println("[$userName] ${res.applicationData.framedContent.content.bytes.decodeToString()}")
-            mlsClient[res.groupId]
-          }
-
-          is ProcessMessageResult.QuarantineEndReceived -> {
-            if(res.shareRecoveryMessage != null){
-              DeliveryService.sendMessageToGroup(
-                res.shareRecoveryMessage!!,
-                res.groupId,
-                fromUser = userName
-              )
-            }
-            mlsClient[res.groupId]
-          }
-
-          is ProcessMessageResult.HandshakeMessageReceived -> {
-            when (val handshakeResult = res.result) {
-              is ProcessHandshakeResult.ProposalReceived, is ProcessHandshakeResult.CommitProcessed -> {
-                println("[$userName] ${res.result}")
-                mlsClient[res.groupId]
+            is ProcessHandshakeResult.CommitProcessedWithNewMembers -> {
+              println("[$userName] CommitProcessed")
+              if(handshakeResult.welcomeMessages.isNotEmpty()){
+                println("adding new members - sending Welcome messages")
               }
 
-              is ProcessHandshakeResult.CommitProcessedWithNewMembers -> {
-                println("[$userName] CommitProcessed, adding new members / sending messages to ghosts")
-
-                handshakeResult.welcomeMessages.forEach { (welcome, to) ->
-                  DeliveryService.sendMessageToIdentities(
-                    welcome.encoded,
-                    authenticateCredentials(
-                      to.map { it.leafNode.signaturePublicKey to it.leafNode.credential },
-                    ).bindAll(),
-                  )
-                }
-
-                handshakeResult.welcomeBackGhostMessages.forEach { (welcomeBack, to) ->
-                  DeliveryService.sendMessageToIdentities(
-                    welcomeBack.encoded,
-                    authenticateCredentials(
-                      to.map { it.signaturePublicKey to it.credential },
-                    ).bindAll(),
-                  )
-                }
-
-                mlsClient[res.groupId]
+              handshakeResult.welcomeMessages.forEach { (welcome, to) ->
+                DeliveryService.sendMessageToIdentities(
+                  welcome.encoded,
+                  authenticateCredentials(
+                    to.map { it.leafNode.signaturePublicKey to it.leafNode.credential },
+                  ).map{ it.getOrThrow() },
+                )
               }
 
-              is ProcessHandshakeResult.ReInitProcessed -> {
-                println("[$userName] ReInit processed, returning suspended group")
-                handshakeResult.suspendedClient
+              if(handshakeResult.welcomeBackGhostMessages.isNotEmpty()){
+                println("reviving ghosts - sending WelcomeBackGhost messages")
+              }
+              handshakeResult.welcomeBackGhostMessages.forEach { (welcomeBack, to) ->
+                DeliveryService.sendMessageToIdentities(
+                  welcomeBack.encoded,
+                  authenticateCredentials(
+                    to.map { it.signaturePublicKey to it.credential },
+                  ).map{ it.getOrThrow() },
+                )
               }
 
+              return mlsClient[res.groupId]
             }
-          }
 
-          is ProcessMessageResult.KeyPackageMessageReceived -> {
-            println("Key package received, ignoring")
-            null
-          }
+            is ProcessHandshakeResult.ReInitProcessed -> {
+              println("[$userName] ReInit processed, returning suspended group")
+              return handshakeResult.suspendedClient
+            }
 
-          is ProcessMessageResult.ShareRecoveryMessageReceived -> {
-            null
           }
+        }
 
-          is ProcessMessageResult.WelcomeBackGhostMessageIgnored -> {
-            println("[$userName] $res")
-            mlsClient[res.groupId]
-          }
-          is ProcessMessageResult.WelcomeBackGhostMessageProcessed -> {
-            println("[$userName] $res")
-            mlsClient[res.groupId]
-          }
+        is ProcessMessageResult.KeyPackageMessageReceived -> {
+          println("Key package received, ignoring")
+          return null
+        }
+
+        is ProcessMessageResult.ShareRecoveryMessageReceived -> {
+          return null
+        }
+
+        is ProcessMessageResult.WelcomeBackGhostMessageIgnored -> {
+          println("[$userName] $res")
+          return null
+        }
+        is ProcessMessageResult.WelcomeBackGhostMessageProcessed -> {
+          println("[$userName] $res")
+          isGhost = false
+          return null
+        }
+
+        ProcessMessageResult.MessageToCachForLater -> {
+          println("Temporarily caching message because user is a ghost reconnecting")
+          cachedGhostMessages.add(Pair(messageId, encoded))
+          return null
         }
       }
     }
 
   suspend fun ghostReconnect(groupId: GroupId) {
+    isGhost = true
     var message = messages.tryReceive().getOrNull()
     while(message != null){
       cachedGhostMessages.add(message)

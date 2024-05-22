@@ -2,6 +2,7 @@ package com.github.traderjoe95.mls.protocol.tree
 
 import arrow.core.Either
 import arrow.core.Tuple4
+import arrow.core.firstOrNone
 import arrow.core.prependTo
 import arrow.core.raise.Raise
 import com.github.traderjoe95.mls.codec.util.uSize
@@ -62,13 +63,8 @@ internal fun createUpdatePath(
 
     val ghostSecretShares = mutableListOf<List<ShamirSecretSharing.SecretShare>>()
     if (newGhostSecrets.isNotEmpty()) {
-
-//      println(originalTree.print())
-//      println(filteredDirectPath)
-
       var nbShares = filteredDirectPath.size + 1
       filteredDirectPath.mapIndexed { idx, (_, res) ->
-//        println(res)
         res.map {
           if((!it.isLeaf) || (originalTree.leaves[it.leafIndex.value.toInt()]!!.source != LeafNodeSource.Ghost)){
             onlyGhostsInRes[idx] = false
@@ -82,11 +78,7 @@ internal fun createUpdatePath(
       newGhostSecrets.forEach {
         ghostSecretShares.add(ShamirSecretSharing.generateShares(it.bytes, nbShares, nbShares))
       }
-
-//      println("NB SHARES = " + nbShares)
     }
-
-//    println(onlyGhostsInRes)
 
     val ownGhostSecretShares = ghostSecretShares.map{ it[0] }
 
@@ -142,7 +134,7 @@ internal fun createUpdatePath(
     val provisionalGroupCtx = groupContext.provisional(updatedTree)
     val excludedNodeIndices = excludeNewLeaves.map { it.nodeIndex }.toSet()
 
-    println(filteredDirectPath)
+//    println(filteredDirectPath)
 
     var shareIdx = 1
     val updatePathNodes =
@@ -150,7 +142,7 @@ internal fun createUpdatePath(
         val (nodeIdx, resolution) = nodeAndRes
         val encryptFor = resolution - excludedNodeIndices
 
-//        println(encryptFor)
+        println(encryptFor)
 //        println(updatedTree.leafNode(encryptFor[0]).encryptionKey)
 
         UpdatePathNode(
@@ -206,7 +198,7 @@ internal fun applyUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<LeafIndex> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
-): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<Int>> {
+): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<UInt>> {
   var updatedTree = originalTree.mergeUpdatePath(fromLeafIndex, updatePath)
 
   val provisionalGroupCtx = groupContext.provisional(updatedTree)
@@ -232,7 +224,7 @@ internal fun RatchetTree.applyUpdatePathExternalJoin(
   groupContext: GroupContext,
   updatePath: UpdatePath,
   excludeNewLeaves: Set<LeafIndex>,
-): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<Int>> =
+): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<UInt>> =
   insert(updatePath.leafNode).let { (tree, newLeaf) ->
     applyUpdatePath(tree, groupContext, newLeaf, updatePath, excludeNewLeaves)
   }
@@ -260,6 +252,7 @@ internal fun RatchetTree.mergeUpdatePath(
       val computedParentHash = updatedWithoutLeaf.parentHash(cipherSuite, filteredDirectPath.first().first, fromLeafIdx)
 
       if (updatePath.leafNode.parentHash neqNullable computedParentHash) {
+        println("HERE")
         raise(WrongParentHash(computedParentHash.bytes, updatePath.leafNode.parentHash!!.bytes))
       }
 
@@ -276,7 +269,7 @@ internal fun RatchetTree.extractCommonPathSecret(
   excludeNewLeaves: Set<NodeIndex>,
   newGhostUsers: List<LeafIndex> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
-): Tuple4<NodeIndex, Secret, List<ShamirSecretSharing.SecretShare>, List<Int>> {
+): Tuple4<NodeIndex, Secret, List<ShamirSecretSharing.SecretShare>, List<UInt>> {
   val filteredDirectPath = filteredDirectPath(fromLeafIdx)
 
   return filteredDirectPath.zip(updatePath.nodes)
@@ -298,14 +291,14 @@ internal fun RatchetTree.extractCommonPathSecret(
             ).bind().asSecret
           }
 
-      var ghostShareHolderRank = mutableListOf<Int>()
+      val ghostShareHolderRank = mutableListOf<UInt>()
       var ghostSecretShares = mutableListOf<ShamirSecretSharing.SecretShare>()
       if(newGhostUsers.isNotEmpty()){
         val excludeGhosts = ghostMembers.map{ it.nodeIndex }
         val secrets = (resolution - excludeNewLeaves - excludeGhosts.toSet())
           .zip(updateNode.encryptedGhostSecrets)
-          .firstNotNullOf { (node, ciphertext) -> getKeyPair(node)?.let(ciphertext::to) }
-          .let { (ciphertext, keyPair) ->
+          .firstNotNullOfOrNull { (node, ciphertext) -> getKeyPair(node)?.let(ciphertext::to) }
+          ?.let { (ciphertext, keyPair) ->
             cipherSuite.decryptWithLabel(
               keyPair,
               "UpdatePathNode",
@@ -313,10 +306,13 @@ internal fun RatchetTree.extractCommonPathSecret(
               ciphertext,
             ).bind()
           }
-        ghostSecretShares = ShamirSecretSharing.SecretShare.decodeListOfShares(secrets, newGhostUsers.size)
 
-        val shareHolderRank = (resolution - excludeNewLeaves - excludeGhosts.toSet()).indexOfFirst { getKeyPair(it) != null }
-        ghostSecretShares.map{ ghostShareHolderRank.add(shareHolderRank+1) }
+        if(secrets != null){
+          ghostSecretShares = ShamirSecretSharing.SecretShare.decodeListOfShares(secrets, newGhostUsers.size)
+
+          val shareHolderRank = (resolution - excludeNewLeaves - excludeGhosts.toSet()).indexOfFirst { getKeyPair(it) != null }
+          ghostSecretShares.map{ ghostShareHolderRank.add(shareHolderRank.toUInt() +1u) }
+        }
       }
 
       Tuple4(nodeIdx, pathSecret, ghostSecretShares, ghostShareHolderRank)

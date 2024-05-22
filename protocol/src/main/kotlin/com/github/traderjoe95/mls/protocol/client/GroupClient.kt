@@ -23,6 +23,7 @@ import com.github.traderjoe95.mls.protocol.error.EpochError
 import com.github.traderjoe95.mls.protocol.error.EpochError.EpochNotAvailable
 import com.github.traderjoe95.mls.protocol.error.EpochError.FutureEpoch
 import com.github.traderjoe95.mls.protocol.error.ExternalJoinError
+import com.github.traderjoe95.mls.protocol.error.GhostRecoveryProcessError
 import com.github.traderjoe95.mls.protocol.error.GroupCreationError
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
 import com.github.traderjoe95.mls.protocol.error.HistoryAccessError
@@ -75,6 +76,7 @@ import com.github.traderjoe95.mls.protocol.tree.nonBlankLeafIndices
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.GroupId
 import com.github.traderjoe95.mls.protocol.types.crypto.HashReference
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.framing.content.ApplicationData
 import com.github.traderjoe95.mls.protocol.types.framing.content.AuthenticatedContent
@@ -104,6 +106,9 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
     get() = state.keySchedule.epochAuthenticator
 
   var isGhost: Boolean = false
+  var ghostEpoch: ULong = 0u
+  var ghostKeyPair: HpkeKeyPair? = null
+  val temporaryCachedStates = mutableListOf<GroupState>()
 
   val state: State
     get() = stateHistory.first().coerceState()
@@ -526,7 +531,15 @@ class ActiveGroupClient<Identity : Any> internal constructor(
 
         val newState =
           state.ensureActive {
-            process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState)
+            if((temporaryCachedStates.size > 0) && (temporaryCachedStates[0].epoch == handshakeMessage.epoch + 1u)){
+//              println("detected")
+              val ghostLeaf = temporaryCachedStates[0].tree.leafNode(leafIndex)
+              val privateKey = temporaryCachedStates[0].tree.private.getPrivateKey(leafIndex)
+//              println("private = " +privateKey)
+              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPair, ghostLeaf, privateKey)
+            }else{
+              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPair)
+            }
           }.bind()
 
         when (newState.epoch) {
@@ -613,12 +626,52 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray>
     {
       isGhost = true
+      ghostEpoch = state.epoch
       return either {
         val newLeaf = state.updateGhostLeafNode(cipherSuite.generateHpkeKeyPair())
         state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey)
           .bind().encodeUnsafe()
       }
     }
+
+  suspend fun startGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
+    either {
+//      println("stateHistory size = " + stateHistory.size)
+      ghostKeyPair = state.recoverKeyPair().bind()
+      val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
+//      println("epoch = " + ghostEpoch + " , " + stateHistory[ghostStateIdx].tree.private.getPrivateKey(state.leafIndex))
+
+      for(i in 0..<ghostStateIdx){
+        temporaryCachedStates.add(0, stateHistory[0])
+        stateHistory.removeAt(0)
+      }
+      if(stateHistory[0].epoch != ghostEpoch){
+        raise(GhostRecoveryProcessError.WrongGhostEpoch)
+      }
+//      println("cachedStates size = " + temporaryCachedStates.size)
+    }
+
+  suspend fun endGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
+    either {
+
+      if(temporaryCachedStates[0].epoch != state.epoch){
+        raise(GhostRecoveryProcessError.UnexpectedEpochAfterMessageRecovery)
+      }
+
+//      if(temporaryCachedStates[0].tree.public.leaves != state.tree.public.leaves){
+//        raise(GhostRecoveryProcessError.IncoherentStates)
+//      }
+
+      temporaryCachedStates.removeAt(0)
+      temporaryCachedStates.forEach {
+        stateHistory.add(it)
+      }
+      temporaryCachedStates.clear()
+      ghostEpoch = 0u
+      ghostKeyPair = null
+    }
+
+
 
   suspend fun removeMember(memberIdx: UInt): Either<CreateRemoveError, ByteArray> =
     either {

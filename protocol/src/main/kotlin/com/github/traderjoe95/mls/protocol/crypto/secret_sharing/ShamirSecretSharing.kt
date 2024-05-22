@@ -16,6 +16,7 @@ import com.github.traderjoe95.mls.codec.util.fromBytes
 import com.github.traderjoe95.mls.codec.util.get
 import com.github.traderjoe95.mls.codec.util.toBytes
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.group.GroupContext
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.GroupId
@@ -183,5 +184,5 @@ class ShamirSecretSharing() {
     }
   }
 
-
 }
+

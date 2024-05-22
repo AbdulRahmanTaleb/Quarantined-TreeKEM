@@ -8,6 +8,7 @@ import com.github.traderjoe95.mls.protocol.types.RequiredCapabilities
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
 import java.time.Instant
+import kotlin.math.sign
 
 context(Raise<LeafNodeCheckError>)
 fun LeafNode<*>.validate(
@@ -16,8 +17,11 @@ fun LeafNode<*>.validate(
   leafIdx: LeafIndex,
   expectedSource: LeafNodeSource? = null,
 ) {
+
   // Verify leaf node signature
-  verifySignature(groupContext.cipherSuite, groupContext.groupId, leafIdx).bind()
+  if(source != LeafNodeSource.Ghost){
+    verifySignature(groupContext.cipherSuite, groupContext.groupId, leafIdx).bind()
+  }
 
   // Check that leaf node is compatible with group requirements
   groupContext.extension<RequiredCapabilities>()?.let { requiredCapabilities ->

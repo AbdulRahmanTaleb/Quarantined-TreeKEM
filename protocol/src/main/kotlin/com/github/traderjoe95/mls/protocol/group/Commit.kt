@@ -45,6 +45,8 @@ import com.github.traderjoe95.mls.protocol.types.Extension
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtension
 import com.github.traderjoe95.mls.protocol.types.ProposalType
 import com.github.traderjoe95.mls.protocol.types.crypto.Aad
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePrivateKey
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.crypto.Signature
@@ -118,7 +120,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
       }
 
     ghostMembersShares.addAll(ownGhostShares)
-    ownGhostShares.map { ghostMembersShareHolderRank.add(1) }
+    ownGhostShares.map { ghostMembersShareHolderRank.add(1u) }
 
     val commitSecret = nullable { deriveSecret(pathSecrets.lastOrNull().bind(), "path") } ?: zeroesNh
 
@@ -177,10 +179,6 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
     val ghostReconnectKeys = cachedQuarantineEnd.map{
       it.leafNode
     }
-//    val encryptedGroupInfoForGhostReconnect = cachedQuarantineEnd.map{
-//      encryptWithLabel(it.leafNode.encryptionKey, "GroupInfoGhostReconnect", byteArrayOf() ,groupInfo.encodeUnsafe()).bind()
-//    }
-
 
     PrepareCommitResult(
       updatedGroupState,
@@ -225,10 +223,13 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
   authenticatedCommit: AuthenticatedContent<Commit>,
   authenticationService: AuthenticationService<Identity>,
   psks: PskLookup = this,
+  ghostKeyPair: HpkeKeyPair? = null,
+  newGhostLeafNode: LeafNode<*>? = null,
+  newGhostPrivateEncryptionKey: HpkePrivateKey? = null,
 ): Either<RecipientCommitError, GroupState> =
   either {
     val commit = authenticatedCommit.framedContent
-    val proposalResult = commit.content.validateAndApply(commit.sender, psks, authenticationService)
+    val proposalResult = commit.content.validateAndApply(commit.sender, psks, authenticationService, newGhostLeafNode, newGhostPrivateEncryptionKey)
     val updatePath = commit.content.updatePath
 
 //    println("Processing Commit.")
@@ -241,7 +242,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     }
 
     val updatedTreeGhost =
-      processGhostMembers(preTree, commit.content.ghostUsers, commit.content.ghostKeys, commit.epoch).bind()
+      processGhostMembers(preTree, commit.content.ghostUsers, commit.content.ghostKeys, commit.epoch, ghostKeyPair).bind()
 
     val (updatedTree, commitSecret, ghostSecretShares, ghostShareHolderRanks) =
       updatePath.map { path ->
@@ -327,8 +328,6 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Tuple5<Ratc
         val secret = generateSecret(hashLen)
         newGhostSecrets.add(secret)
 
-//        println("SECRET SIZE = " + secret.bytes.size)
-
         // Generating a new encryption key for each new ghost
         // The public keys are returned in the commit message
         val newKeys = deriveKeyPair(secret)
@@ -349,7 +348,12 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Tuple5<Ratc
   return Tuple5(newTree, newGhostMembers, newGhostSecrets, newGhostKeys, deleteMembers)
 }
 
-private fun GroupState.Active.processGhostMembers(tree: RatchetTree, newGhostUsers: List<LeafIndex>, newGhostKeys: List<HpkePublicKey>, commitEpoch: ULong) : Either<CommitError,RatchetTree>  = either{
+private fun GroupState.Active.processGhostMembers(
+  tree: RatchetTree,
+  newGhostUsers: List<LeafIndex>,
+  newGhostKeys: List<HpkePublicKey>,
+  commitEpoch: ULong,
+  ghostKeyPair: HpkeKeyPair? = null,) : Either<CommitError,RatchetTree>  = either{
 
   var newTree = tree
 
@@ -364,7 +368,13 @@ private fun GroupState.Active.processGhostMembers(tree: RatchetTree, newGhostUse
     ghostMembers.add(ghostLeafIndex)
     ghostMembersKeys.add(key)
 
-    newTree = newTree.update(ghostLeafIndex, newGhostLeafNode)
+    newTree = if(ghostLeafIndex.eq(newTree.leafIndex)){
+//      println("I am a new ghost")
+      newTree.update(ghostLeafIndex, newGhostLeafNode, ghostKeyPair!!.private)
+    }
+    else{
+      newTree.update(ghostLeafIndex, newGhostLeafNode)
+    }
   }
 
   newTree
@@ -375,6 +385,8 @@ private suspend fun <Identity : Any> Commit.validateAndApply(
   sender: Sender,
   psks: PskLookup,
   authenticationService: AuthenticationService<Identity>,
+  newGhostLeafNode: LeafNode<*>? = null,
+  newGhostPrivateEncryptionKey: HpkePrivateKey? = null,
 ): ProcessProposalsResult =
   processProposals(
     proposals,
@@ -388,6 +400,8 @@ private suspend fun <Identity : Any> Commit.validateAndApply(
     inReInit = false,
     inBranch = false,
     psks,
+    newGhostLeafNode,
+    newGhostPrivateEncryptionKey
   ).also { result ->
     if (result.updatePathRequired && updatePath.isNone()) raise(InvalidCommit.MissingUpdatePath)
 
@@ -419,7 +433,7 @@ private fun RatchetTree.applyCommitUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<LeafIndex> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
-): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<Int>> =
+): Tuple4<RatchetTree, Secret, List<ShamirSecretSharing.SecretShare>, List<UInt>> =
   if (sender.type == SenderType.Member) {
     applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers, ghostMembers)
   } else {
@@ -494,6 +508,8 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
   inReInit: Boolean = false,
   inBranch: Boolean = false,
   psks: PskLookup,
+  newGhostLeafNode: LeafNode<*>? = null,
+  newGhostPrivateEncryptionKey: HpkePrivateKey? = null,
 ): ProcessProposalsResult {
   val resolved: ResolvedProposals = mutableMapOf()
 
@@ -624,6 +640,7 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
       }
     }
 
+
   cachedQuarantineEnd.forEach {
     it.leafNode.epk = groupContext.epoch + 1u
     it.leafNode.equar = 0u
@@ -637,9 +654,15 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
     ghostMembersShareHolderRank.removeAt(idx)
   }
 
-  if((cachedUpdate != null) && (cachedUpdate!!.ghost)){
-    updatedTree.update(leafIndex, cachedUpdate!!.leafNode, cachedUpdate!!.encryptionPrivateKey)
+  if(newGhostLeafNode != null && newGhostPrivateEncryptionKey != null){
+    newGhostLeafNode.epk = groupContext.epoch + 1u
+    newGhostLeafNode.equar = 0u
+    updatedTree = updatedTree.update(leafIndex, newGhostLeafNode, newGhostPrivateEncryptionKey)
     requiresUpdatePath = true
+
+    val idx = ghostMembers.indexOf(leafIndex)
+    ghostMembers.removeAt(idx)
+    ghostMembersKeys.removeAt(idx)
   }
 
   return ProcessProposalsResult.CommitByMember(
