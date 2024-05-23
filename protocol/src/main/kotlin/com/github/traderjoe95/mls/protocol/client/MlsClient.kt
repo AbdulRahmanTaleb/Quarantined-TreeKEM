@@ -27,6 +27,7 @@ import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFo
 import com.github.traderjoe95.mls.protocol.message.PublicMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
+import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.Welcome
 import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.psk.ExternalPskHolder
@@ -215,14 +216,13 @@ class MlsClient<Identity : Any>(
             println("welcomebackghost")
             processWelcomeBackGhostMessage(message.message).bind()
           }
+
+          is ShareResend -> {
+            println("ShareResend received")
+            processShareResend(message.message).bind()
+          }
         }
       }
-    }
-
-  suspend fun processGroupMessage(groupMessageBytes: ByteArray): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
-    either {
-      val msg = decodeMessage(groupMessageBytes).bind().ensureFormat<GroupMessage<*>>()
-      processGroupMessage(msg.message).bind()
     }
 
   @Suppress("UNCHECKED_CAST")
@@ -283,6 +283,30 @@ class MlsClient<Identity : Any>(
           )
         } else {
           raise(GroupSuspended(quarantineEnd.groupId))
+        }
+      }
+    }
+
+  private suspend fun processShareResend(shareResend: ShareResend): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+    either{
+      val groupId = shareResend.groupId
+      val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
+
+      if(shareResend.leafIndex == group.state.leafIndex){
+        println("Ignoring own ShareResend Received")
+        ProcessMessageResult.ShareResendReceived(
+          shareResend.groupId,
+          null
+        )
+      }
+      else{
+        if (group is ActiveGroupClient<Identity>) {
+          ProcessMessageResult.ShareResendReceived(
+            shareResend.groupId,
+            group.processShareResend(shareResend).bind()?.encoded,
+          )
+        } else {
+          raise(GroupSuspended(shareResend.groupId))
         }
       }
     }

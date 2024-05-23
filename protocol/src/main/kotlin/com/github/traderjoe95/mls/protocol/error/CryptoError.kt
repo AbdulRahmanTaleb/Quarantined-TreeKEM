@@ -25,7 +25,8 @@ sealed interface VerifySignatureError :
   LeafNodeCheckError,
   MessageRecipientError,
   KeyPackageValidationError,
-  QuarantineEndValidationError{
+  QuarantineEndValidationError,
+ShareResendValidationError{
   data object BadSignature : VerifySignatureError
 
   data class SignaturePublicKeyKeyNotFound(val sender: Sender) : VerifySignatureError

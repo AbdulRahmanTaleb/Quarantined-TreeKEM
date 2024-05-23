@@ -18,6 +18,10 @@ sealed interface CreateShareRecoveryMessageError : ProcessMessageError {
   data object ShareRecoveryCreationError : CreateShareRecoveryMessageError
 }
 
+sealed interface CreateShareResendMessageError {
+  data object ShareResendCreationError : CreateShareResendMessageError
+}
+
 sealed interface CreatePreSharedKeyError
 
 sealed interface CreateGroupContextExtensionsError

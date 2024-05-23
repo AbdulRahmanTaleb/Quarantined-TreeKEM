@@ -231,6 +231,17 @@ class Client(
           cachedGhostMessages.add(Pair(messageId, encoded))
           return null
         }
+
+        is ProcessMessageResult.ShareResendReceived -> {
+          if(res.shareRecoveryMessage != null){
+            DeliveryService.sendMessageToGroup(
+              res.shareRecoveryMessage!!,
+              res.groupId,
+              fromUser = userName
+            )
+          }
+          return mlsClient[res.groupId]
+        }
       }
     }
 
@@ -246,6 +257,20 @@ class Client(
 
     DeliveryService.sendMessageToGroup(
       endQuarantineMessage,
+      groupId,
+      fromUser = userName,
+    )
+  }
+
+  suspend fun retrievedEnoughShares(groupId: GroupId): Boolean {
+    return (mlsClient[groupId]!! as ActiveGroupClient<String>).retrievedEnoughShares()
+  }
+
+  suspend fun sendShareResend(groupId: GroupId) {
+
+    val shareResendMessage = (mlsClient[groupId]!! as ActiveGroupClient<String>).shareResend().getOrThrow()
+    DeliveryService.sendMessageToGroup(
+      shareResendMessage,
       groupId,
       fromUser = userName,
     )

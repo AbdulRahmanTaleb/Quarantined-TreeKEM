@@ -51,6 +51,32 @@ sealed interface ProcessMessageResult<out Identity : Any> {
     }
   }
 
+  data class ShareResendReceived(
+    val groupId: GroupId,
+    val shareRecoveryMessage: ByteArray?
+  ): ProcessMessageResult<Nothing> {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as ShareResendReceived
+
+      if (groupId != other.groupId) return false
+      if (shareRecoveryMessage != null) {
+        if (other.shareRecoveryMessage == null) return false
+        if (!shareRecoveryMessage.contentEquals(other.shareRecoveryMessage)) return false
+      } else if (other.shareRecoveryMessage != null) return false
+
+      return true
+    }
+
+    override fun hashCode(): Int {
+      var result = groupId.hashCode()
+      result = 31 * result + (shareRecoveryMessage?.contentHashCode() ?: 0)
+      return result
+    }
+  }
+
   data class ApplicationMessageReceived(
     val groupId: GroupId,
     val applicationData: AuthenticatedContent<ApplicationData>,

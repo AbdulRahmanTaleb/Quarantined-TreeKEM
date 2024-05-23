@@ -23,6 +23,7 @@ import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError
 import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.ShareRecoveryMessageError
+import com.github.traderjoe95.mls.protocol.error.ShareResendError
 import com.github.traderjoe95.mls.protocol.error.WelcomeBackGhostMessageError
 import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
 import com.github.traderjoe95.mls.protocol.group.resumption.isProtocolResumption
@@ -36,6 +37,7 @@ import com.github.traderjoe95.mls.protocol.message.MlsHandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
+import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.psk.PreSharedKeyId
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
@@ -213,6 +215,24 @@ sealed class GroupState(
       derive(secret)
     }
 
+    suspend fun canRecoverKeyPair(): Boolean  {
+      if(recoveredShares.isEmpty()){
+        return false
+      }
+      val t = recoveredShares[0].t
+      val indices = mutableSetOf<Int>()
+      recoveredShares.forEach {
+        indices.add(it.rank)
+      }
+      if(indices.size != t){
+        return false
+      }
+
+      return true
+    }
+
+    fun nextShareHolderRankForShareResend(): UInt  = recoveredSharesHolderRank+1u
+
     private suspend fun storeQuarantineEndProposal(quarantineEnd: QuarantineEnd): Active {
       if(quarantineEnd.leafIndex != leafIndex) {
         cachedQuarantineEnd.add(
@@ -350,6 +370,35 @@ sealed class GroupState(
           }
         } else {
           Pair(newState, null)
+        }
+      }
+
+    context(Raise<ProcessMessageError>)
+    suspend fun process(
+      shareResend: ShareResend,
+    ): Either<ProcessMessageError, MlsShareRecoveryMessage?> =
+      either {
+        ensure(shareResend.groupId eq groupId) { MessageRecipientError.WrongGroup(shareResend.groupId, groupId) }
+
+        val cached = cachedQuarantineEnd.firstOrNull{ it.leafIndex == shareResend.leafIndex }
+        ensure(cached != null) { ShareResendError.InvalidLeafIndexNotFoundInCachedQuarantineEnd }
+
+        validations.validated(shareResend).bind()
+        if (ghostMembers.contains(shareResend.leafIndex)) {
+          val idx = ghostMembers.indexOf(shareResend.leafIndex)
+          if (ghostMembersShareHolderRank[idx] == shareResend.requiredShareHolderRank) {
+            val ct = encryptWithLabel(
+              cached.leafNode.encryptionKey,
+              "ShareRecoveryMessage",
+              ByteArray(0),
+              ghostMembersShares[idx].encode()
+            ).bind()
+              messages.shareRecoveryMessage(ghostMembersShareHolderRank[idx] ,shareResend.leafIndex ,cached.leafNode.encryptionKey, ct).bind()
+          } else {
+            null
+          }
+        } else {
+          null
         }
       }
 

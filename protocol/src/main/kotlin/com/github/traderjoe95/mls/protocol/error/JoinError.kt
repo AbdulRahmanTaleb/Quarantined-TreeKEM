@@ -24,6 +24,12 @@ sealed interface WelcomeBackGhostError : ProcessMessageError{
 
 }
 
+sealed interface ShareResendError : ProcessMessageError{
+
+  data object InvalidLeafIndexNotFoundInCachedQuarantineEnd : ShareResendError
+
+}
+
 sealed interface ExternalJoinError {
   data object MissingExternalPub : ExternalJoinError
 

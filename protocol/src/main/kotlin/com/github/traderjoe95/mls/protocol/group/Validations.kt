@@ -16,10 +16,12 @@ import com.github.traderjoe95.mls.protocol.error.ProposalValidationError.BadExte
 import com.github.traderjoe95.mls.protocol.error.QuarantineEndValidationError
 import com.github.traderjoe95.mls.protocol.error.ReInitValidationError
 import com.github.traderjoe95.mls.protocol.error.RemoveValidationError
+import com.github.traderjoe95.mls.protocol.error.ShareResendValidationError
 import com.github.traderjoe95.mls.protocol.error.UnexpectedExtension
 import com.github.traderjoe95.mls.protocol.error.UpdateValidationError
 import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
 import com.github.traderjoe95.mls.protocol.tree.RatchetTreeOps
@@ -122,6 +124,25 @@ class Validations(
       quarantineEnd.verifySignature().bind()
 
       quarantineEnd
+    }
+
+  fun validated(
+    shareResend: ShareResend,
+    currentTree: RatchetTreeOps = this.currentTree,
+  ): Either<ShareResendValidationError, ShareResend> =
+    either {
+
+      ensure(shareResend.cipherSuite == cipherSuite) {
+        ShareResendValidationError.IncompatibleCipherSuite(shareResend.cipherSuite, cipherSuite)
+      }
+
+      ensure(currentTree.leafNodeOrNull(shareResend.leafIndex) != null) {
+        ShareResendValidationError.LeafNotFound(shareResend.leafIndex)
+      }
+
+      shareResend.verifySignature(currentTree.leafNode(shareResend.leafIndex).signaturePublicKey).bind()
+
+      shareResend
     }
 
   suspend fun validated(proposal: AuthenticatedContent<Proposal>): Either<ProposalValidationError, AuthenticatedContent<Proposal>> =

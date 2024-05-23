@@ -17,6 +17,7 @@ import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
 import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
+import com.github.traderjoe95.mls.protocol.error.CreateShareResendMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.DecoderError
 import com.github.traderjoe95.mls.protocol.error.EpochError
@@ -58,6 +59,7 @@ import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.PrivateMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
+import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.UsePrivateMessage
 import com.github.traderjoe95.mls.protocol.message.UsePublicMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
@@ -580,12 +582,24 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       shareRecoveryMessage
     }
 
+  suspend fun processShareResend(shareResend: ShareResend): Either<ProcessMessageError, MlsShareRecoveryMessage?> =
+    either {
+
+      val shareRecoveryMessage =
+        state.ensureActive {
+          process(shareResend)
+        }.bind()
+
+      shareRecoveryMessage
+    }
+
   suspend fun processShareRecoveryMessage(shareRecoveryMessage: ShareRecoveryMessage): Either<ProcessMessageError, Unit> =
     either {
 
       val newState = state.ensureActive {
         process(shareRecoveryMessage)
       }.bind()
+
 
       replaceCurrentState(newState)
 
@@ -633,6 +647,16 @@ class ActiveGroupClient<Identity : Any> internal constructor(
           .bind().encodeUnsafe()
       }
     }
+
+  suspend fun retrievedEnoughShares(): Boolean {
+    return state.canRecoverKeyPair()
+  }
+
+  suspend fun shareResend():  Either<CreateShareResendMessageError, ByteArray> =
+  either {
+    state.messages.shareResend(state.nextShareHolderRankForShareResend(), state.leafIndex, state.signaturePrivateKey)
+      .bind().encodeUnsafe()
+  }
 
   suspend fun startGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {

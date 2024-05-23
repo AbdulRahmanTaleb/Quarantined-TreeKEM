@@ -111,11 +111,20 @@ suspend fun main() {
     it.processNextMessage().getOrThrow()
   }
 
-  // In this scenario, all users have exactly shareholder rank = 1, so there is a total
-  // of clients.size-1 ShareRecoveryMessage sent (3 in this case), the ghost user
-  // needs these 3 shares to recover its ghost key
   println("\n---------------------------- Receiving Share Recovery Message")
   for(k in 0..clients.size-2){
+    clients.filterIndexed{idx, _ -> idx != idxGhost2}.forEach {
+      it.processNextMessage().getOrThrow()
+    }
+  }
+
+  if(!clients[idxGhost1].retrievedEnoughShares(groups[idxGhost1].groupId)){
+    println("\n---------------------------- Receiving ADDITIONAL Share Recovery Message")
+    clients[idxGhost1].sendShareResend(groups[idxGhost1].groupId)
+    clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
+      it.processNextMessage().getOrThrow()
+    }
+    println("\n---------------------------- Receiving ADDITIONAL Share Recovery Message")
     clients.filterIndexed{idx, _ -> idx != idxGhost2}.forEach {
       it.processNextMessage().getOrThrow()
     }

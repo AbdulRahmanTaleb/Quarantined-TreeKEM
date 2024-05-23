@@ -12,6 +12,7 @@ import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
 import com.github.traderjoe95.mls.protocol.error.CreateShareRecoveryMessageError
+import com.github.traderjoe95.mls.protocol.error.CreateShareResendMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateSignatureError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.PrivateMessageSenderError
@@ -89,6 +90,14 @@ class GroupMessageFactory internal constructor(
     ciphertext: HpkeCiphertext
   ): Either<CreateShareRecoveryMessageError, MlsShareRecoveryMessage> = either {
     MlsMessage(ShareRecoveryMessage.create(groupContext.groupId, leafIndex, shareHolderRank, encryptionKey, ciphertext))
+  }
+
+  suspend fun shareResend(
+    shareHolderRank: UInt,
+    leafIndex: LeafIndex,
+    signaturePrivateKey: SignaturePrivateKey,
+  ): Either<CreateShareResendMessageError, MlsShareResendMessage> = either {
+    MlsMessage(ShareResend.create(groupContext.groupId, groupContext.cipherSuite, leafIndex, shareHolderRank, signaturePrivateKey).bind())
   }
 
   suspend fun applicationMessage(
