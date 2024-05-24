@@ -20,6 +20,8 @@ import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.member.then
 import com.github.traderjoe95.mls.codec.type.struct.struct
 import com.github.traderjoe95.mls.codec.util.throwAnyError
+import com.github.traderjoe95.mls.protocol.group.GhostMember
+import com.github.traderjoe95.mls.protocol.group.GhostMemberCommit
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
@@ -30,16 +32,15 @@ import com.github.traderjoe95.mls.protocol.util.zipWithIndex
 data class Commit(
   val proposals: List<ProposalOrRef>,
   val updatePath: Option<UpdatePath>,
-  val ghostUsers: List<LeafIndex>,
-  val ghostKeys: List<HpkePublicKey>,
+  val ghostUsers: List<GhostMemberCommit>,
   val ghostReconnectKeys: List<HpkePublicKey>,
   val encryptedGroupInfoForGhostReconnect: List<HpkeCiphertext>,
-) : Content.Handshake<Commit>, Struct6T.Shape<List<ProposalOrRef>, Option<UpdatePath>, List<LeafIndex>, List<HpkePublicKey>, List<HpkePublicKey>, List<HpkeCiphertext>> {
+) : Content.Handshake<Commit>, Struct5T.Shape<List<ProposalOrRef>, Option<UpdatePath>, List<GhostMemberCommit>, List<HpkePublicKey>, List<HpkeCiphertext>> {
 
-  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath, ghostUsers: List<LeafIndex>, ghostKeys: List<HpkePublicKey>, ghostReconnectKeys: List<HpkePublicKey>, encryptedGroupInfoForGhostReconnect: List<HpkeCiphertext>) : this(proposals, updatePath.some(), ghostUsers, ghostKeys, ghostReconnectKeys ,encryptedGroupInfoForGhostReconnect)
-  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath) : this(proposals, updatePath.some(), emptyList(), emptyList(), emptyList(), emptyList())
+  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath, ghostUsers: List<GhostMemberCommit>, ghostReconnectKeys: List<HpkePublicKey>, encryptedGroupInfoForGhostReconnect: List<HpkeCiphertext>) : this(proposals, updatePath.some(), ghostUsers, ghostReconnectKeys ,encryptedGroupInfoForGhostReconnect)
+  constructor(proposals: List<ProposalOrRef>, updatePath: UpdatePath) : this(proposals, updatePath.some(), emptyList(), emptyList(), emptyList())
 
-  constructor(proposals: List<ProposalOrRef>) : this(proposals, None, emptyList(), emptyList(), emptyList(), emptyList())
+  constructor(proposals: List<ProposalOrRef>) : this(proposals, None, emptyList(), emptyList(), emptyList())
 
   override val contentType: ContentType.Commit = ContentType.Commit
 
@@ -49,14 +50,13 @@ data class Commit(
       struct("Commit") {
         it.field("proposals", ProposalOrRef.T[V])
           .field("update_path", optional[UpdatePath.T])
-          .field("ghost_users", LeafIndex.T[V])
-          .field("ghost_keys", HpkePublicKey.T[V])
+          .field("ghost_users", GhostMemberCommit.T[V])
           .field("ghost_reconnect_keys", HpkePublicKey.T[V])
           .field("encrypted_group_info_for_ghost_reconnect", HpkeCiphertext.T[V])
       }.lift(::Commit)
 
     val empty: Commit
-      get() = Commit(listOf(), None, listOf(), listOf(), listOf(), listOf())
+      get() = Commit(listOf(), None, listOf(), listOf(), listOf())
   }
 
   override fun equals(other: Any?): Boolean {
@@ -70,10 +70,7 @@ data class Commit(
     if (updatePath != other.updatePath) return false
 
     if (ghostUsers.size != other.ghostUsers.size) return false
-    if (ghostUsers.zipWithIndex().any { (leafIdx, idx) -> leafIdx neq other.ghostUsers[idx] }) return false
-
-    if (ghostKeys.size != other.ghostKeys.size) return false
-    if (ghostKeys.zipWithIndex().any { (key, idx) -> !key.eq(other.ghostKeys[idx]) }) return false
+    if (ghostUsers.zipWithIndex().any { (leafIdx, idx) -> !leafIdx.equals(other.ghostUsers[idx].leafIndex) }) return false
 
     if (ghostReconnectKeys.size != other.ghostReconnectKeys.size) return false
     if (ghostReconnectKeys.zipWithIndex().any { (key, idx) -> !key.eq(other.ghostReconnectKeys[idx]) }) return false
@@ -90,7 +87,6 @@ data class Commit(
     result = 31 * result + updatePath.hashCode()
     result = 31 * result + contentType.hashCode()
     result = ghostUsers.fold(result) { hc, li -> hc * 31 + li.hashCode()}
-    result = ghostKeys.fold(result) { hc, li -> hc * 31 + li.hashCode()}
     result = ghostReconnectKeys.fold(result) { hc, li -> hc * 31 + li.hashCode()}
     result = encryptedGroupInfoForGhostReconnect.fold(result) { hc, li -> hc * 31 + li.hashCode()}
 

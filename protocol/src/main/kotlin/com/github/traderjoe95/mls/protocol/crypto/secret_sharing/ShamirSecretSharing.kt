@@ -48,7 +48,7 @@ class ShamirSecretSharing() {
       for (i in 1..m) {
         val x = generateFieldElem(rnd)
         val y = evaluatePolynomial(coefficients, x)
-        shares += SecretShare(i, t, x, y)
+        shares += SecretShare(i.toUInt(), t.toUInt(), x.toByteArray(), y.toByteArray())
       }
 
       val newS = BigInteger(1, retrieveSecret(shares))
@@ -62,15 +62,15 @@ class ShamirSecretSharing() {
 
       for (j in 0..<shares.size) {
 
-        var tmp = shares[j].y
+        var tmp = BigInteger(1, shares[j].y)
 
-        val xj = shares[j].x
+        val xj = BigInteger(1, shares[j].x)
 
         for (i in 0..<shares.size) {
 
           if (i != j) {
 
-            val xi = shares[i].x
+            val xi = BigInteger(1, shares[i].x)
 
             var inter = xi.subtract(xj).modInverse(p)
 
@@ -111,53 +111,28 @@ class ShamirSecretSharing() {
   }
 
   data class SecretShare(
-    val rank: Int,
-    val t: Int,
-    val x: BigInteger,
-    val y: BigInteger,
-  ) {
-    fun encode(): ByteArray {
-      var bytes = rank.toBytes(4U)
-      bytes += t.toBytes(4U)
-      val xBytes = x.toByteArray()
-      val yBytes = y.toByteArray()
-
-      bytes += xBytes.size.toBytes(4U) + xBytes
-      bytes += yBytes.size.toBytes(4U) + yBytes
-
-      return bytes
+    val rank: UInt,
+    val t: UInt,
+    val x: ByteArray,
+    val y: ByteArray,
+  ) : Struct4T.Shape<UInt, UInt, ByteArray, ByteArray> {
+    companion object : Encodable<SecretShare> {
+      @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
+      override val T: DataType<SecretShare> =
+        struct("SecretShare") {
+          it.field("rank", uint32.asUInt)
+            .field("t", uint32.asUInt)
+            .field("x", opaque[V])
+            .field("y", opaque[V])
+        }.lift(::SecretShare)
     }
 
-    companion object {
-
-      fun decode(bytes: ByteArray): Pair<Int, SecretShare> {
-        val rank = Int.fromBytes(bytes[UIntRange(0u, 3u)])
-        val t = Int.fromBytes(bytes[UIntRange(4u, 7u)])
-        val xSize = Int.fromBytes(bytes[UIntRange(8u, 11u)])
-        val x = bytes[UIntRange(12u, 12u + xSize.toUInt() - 1u)]
-        val ySizeOffset = 12u + xSize.toUInt()
-        val ySize = Int.fromBytes(bytes[UIntRange(ySizeOffset, ySizeOffset + 3u)])
-        val yOffset = ySizeOffset + 4u
-        val y = bytes[UIntRange(yOffset, yOffset + ySize.toUInt() - 1u)]
-
-        val size = 4 + 4 + 4 + xSize + 4 + ySize
-
-        return Pair(size, SecretShare(rank, t, BigInteger(1,x), BigInteger(1,y)))
-      }
-
-      fun decodeListOfShares(bytes: ByteArray, nbShares: Int): MutableList<SecretShare> {
-        val listShares = mutableListOf<SecretShare>()
-
-        var offset = 0
-        for(i in 0..<nbShares){
-
-          val (size, share) = decode(bytes[UIntRange(offset.toUInt(), (bytes.size-1).toUInt())])
-          offset += size
-          listShares.add(share)
-        }
-
-        return listShares
-      }
+    override fun hashCode(): Int {
+      var result = rank.hashCode()
+      result = 31 * result + x.hashCode()
+      result = 31 * result + y.hashCode()
+      result = 31 * result + t.hashCode()
+      return result
     }
 
     override fun equals(other: Any?): Boolean {
@@ -167,20 +142,11 @@ class ShamirSecretSharing() {
       other as SecretShare
 
       if (rank != other.rank) return false
-      if (!x == other.x) return false
-      if (!y == other.y) return false
-      if(t != other.t) return false
-
+      if (t != other.t) return false
+      if (!x.contentEquals(other.x)) return false
+      if (!y.contentEquals(other.y)) return false
 
       return true
-    }
-
-    override fun hashCode(): Int {
-      var result = rank.hashCode()
-      result = 31 * result + x.hashCode()
-      result = 31 * result + y.hashCode()
-      result = 31 * result + t.hashCode()
-      return result
     }
   }
 

@@ -64,9 +64,9 @@ suspend fun main() {
 
   printGroups(groups, clients, clientsList)
 
-  groups.forEach {
-    println(it.state.ghostMembersShareHolderRank)
-  }
+//  groups.forEach {
+//    println(it.state.ghostMembersShareHolderRank)
+//  }
 
   val idxGhosts = listOf(idxGhost1, idxGhost2)
   // Now making Ghost2 a ghost user too
@@ -89,9 +89,9 @@ suspend fun main() {
   //////////////////////////////////////////////////////////////////////
   basicConversation(clients, groups, clients.slice(idxGhosts), id = "1")
 
-  groups.forEach {
-    println(it.state.ghostMembersShareHolderRank)
-  }
+//  groups.forEach {
+//    println(it.state.ghostMembersShareHolderRank)
+//  }
 
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////
