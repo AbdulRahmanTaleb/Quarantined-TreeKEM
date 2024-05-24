@@ -53,4 +53,6 @@ sealed interface GhostRecoveryProcessError {
 
   data object IncoherentStates : GhostRecoveryProcessError
 
+  data object NotImplementedYetForMultipleQuarantineKeys : GhostRecoveryProcessError
+
 }

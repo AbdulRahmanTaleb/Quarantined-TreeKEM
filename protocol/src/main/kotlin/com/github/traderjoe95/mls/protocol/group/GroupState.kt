@@ -1,7 +1,6 @@
 package com.github.traderjoe95.mls.protocol.group
 
 import arrow.core.Either
-import arrow.core.getOrElse
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.ensure
@@ -10,7 +9,6 @@ import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.ICipherSuite
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
-import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing.SecretShare.Companion.encodeUnsafe
 import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.GhostRecoveryProcessError
@@ -18,7 +16,6 @@ import com.github.traderjoe95.mls.protocol.error.GroupActive
 import com.github.traderjoe95.mls.protocol.error.GroupInfoError
 import com.github.traderjoe95.mls.protocol.error.GroupSuspended
 import com.github.traderjoe95.mls.protocol.error.InvalidCommit
-import com.github.traderjoe95.mls.protocol.error.JoinError
 import com.github.traderjoe95.mls.protocol.error.MessageRecipientError
 import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.ProposalValidationError
@@ -26,14 +23,11 @@ import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.ShareRecoveryMessageError
 import com.github.traderjoe95.mls.protocol.error.ShareResendError
 import com.github.traderjoe95.mls.protocol.error.WelcomeBackGhostMessageError
-import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
-import com.github.traderjoe95.mls.protocol.group.resumption.isProtocolResumption
-import com.github.traderjoe95.mls.protocol.group.resumption.validateResumption
+import com.github.traderjoe95.mls.protocol.group.GhostShareHolderList.Companion.encodeUnsafe
 import com.github.traderjoe95.mls.protocol.message.AuthHandshakeContent
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
 import com.github.traderjoe95.mls.protocol.message.GroupMessageFactory
 import com.github.traderjoe95.mls.protocol.message.HandshakeMessage
-import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.MlsHandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
@@ -48,14 +42,9 @@ import com.github.traderjoe95.mls.protocol.service.AuthenticationService
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
 import com.github.traderjoe95.mls.protocol.tree.PrivateRatchetTree
 import com.github.traderjoe95.mls.protocol.tree.RatchetTree
-import com.github.traderjoe95.mls.protocol.tree.RatchetTree.Companion.join
 import com.github.traderjoe95.mls.protocol.tree.SecretTree
 import com.github.traderjoe95.mls.protocol.tree.check
-import com.github.traderjoe95.mls.protocol.tree.findEquivalentLeaf
-import com.github.traderjoe95.mls.protocol.tree.insertPathSecrets
-import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.Credential
-import com.github.traderjoe95.mls.protocol.types.CredentialType
 import com.github.traderjoe95.mls.protocol.types.Extension
 import com.github.traderjoe95.mls.protocol.types.ExternalPub
 import com.github.traderjoe95.mls.protocol.types.GroupContextExtensions
@@ -101,7 +90,7 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
-  val INACTIVITY_DELAY: ULong = 20U
+  val INACTIVITY_DELAY: ULong = 2U
   val QUARANTEEN_DELAY: ULong = 100U
 
 
@@ -133,8 +122,7 @@ sealed class GroupState(
     internal var cachedUpdate: CachedUpdate? = null,
     internal val cachedQuarantineEnd: MutableList<CachedQuarantineEnd> = mutableListOf(),
     val groupGhostInfo: GroupGhostInfo = GroupGhostInfo(),
-    val recoveredShares: List<ShamirSecretSharing.SecretShare> = listOf(),
-    val recoveredSharesHolderRank: UInt = 0u,
+    val recoveredShares: List<GhostShareHolder> = listOf(),
   ) : GroupState(groupContext, tree, keySchedule), SecretTree.Lookup, PskLookup {
     @get:JvmName("secretTree")
     val secretTree: SecretTree by lazy {
@@ -172,11 +160,10 @@ sealed class GroupState(
         cachedQuarantineEnd,
          groupGhostInfo,
         recoveredShares,
-         recoveredSharesHolderRank,
       )
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeRecoveredShare(secretShare: ShamirSecretSharing.SecretShare, shareHolderRank: UInt): Active =
+    private suspend fun storeRecoveredShare(secretShares: GhostShareHolderList): Active =
       Active(
         groupContext,
         tree,
@@ -186,44 +173,72 @@ sealed class GroupState(
         cachedUpdate,
         cachedQuarantineEnd,
         groupGhostInfo,
-        recoveredShares + secretShare,
-        if (shareHolderRank > recoveredSharesHolderRank) shareHolderRank else recoveredSharesHolderRank ,
+        recoveredShares + secretShares.ghostShareHolders,
       )
 
     context(Raise<GhostRecoveryProcessError>)
     suspend fun recoverKeyPair(): Either<GhostRecoveryProcessError, HpkeKeyPair> = either {
-      if(recoveredShares.isEmpty()){
+      val shares = mutableListOf<Pair<HpkePublicKey, MutableList<GhostShareHolder>>>()
+      recoveredShares.forEach{ghostShareHolder ->
+        shares.firstOrNull {
+          it.first.eq(ghostShareHolder.ghostEncryptionKey)
+        }.also {
+          if(it == null){
+            shares.add(Pair(ghostShareHolder.ghostEncryptionKey, mutableListOf(ghostShareHolder)))
+          } else{
+            it.second.add(ghostShareHolder)
+          }
+        }
+      }
+      if(shares.isEmpty()){
         raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
       }
-      val t = recoveredShares[0].t
+      if(shares.size > 1){
+        raise(GhostRecoveryProcessError.NotImplementedYetForMultipleQuarantineKeys)
+      }
+
+      val t = shares[0].second[0].ghostShare.t
       val indices = mutableSetOf<UInt>()
-      recoveredShares.forEach {
-        indices.add(it.rank)
+      shares[0].second.forEach {
+        indices.add(it.ghostShare.rank)
       }
       if(indices.size.toUInt() != t){
         raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
       }
-      val secret = ShamirSecretSharing.retrieveSecret(recoveredShares)
+      val secret = ShamirSecretSharing.retrieveSecret(shares[0].second.map{ it.ghostShare })
       derive(secret)
     }
 
-    suspend fun canRecoverKeyPair(): Boolean  {
-      if(recoveredShares.isEmpty()){
+    suspend fun canRecoverKeyPairs(): Boolean  {
+      val shares = mutableListOf<Pair<HpkePublicKey, MutableList<GhostShareHolder>>>()
+      recoveredShares.forEach{ghostShareHolder ->
+        shares.firstOrNull {
+          it.first.eq(ghostShareHolder.ghostEncryptionKey)
+        }.also {
+          if(it == null){
+            shares.add(Pair(ghostShareHolder.ghostEncryptionKey, mutableListOf(ghostShareHolder)))
+          } else{
+            it.second.add(ghostShareHolder)
+          }
+        }
+      }
+      if(shares.isEmpty()){
         return false
       }
-      val t = recoveredShares[0].t
-      val indices = mutableSetOf<UInt>()
-      recoveredShares.forEach {
-        indices.add(it.rank)
+      shares.forEach {
+        val t = it.second[0].ghostShare.t
+        val indices = mutableSetOf<UInt>()
+        for (shareHolder in it.second) {
+          indices.add(shareHolder.ghostShare.rank)
+        }
+        if(indices.size.toUInt() != t){
+          return false
+        }
       }
-      if(indices.size.toUInt() != t){
-        return false
-      }
-
       return true
     }
 
-    fun nextShareHolderRankForShareResend(): UInt  = recoveredSharesHolderRank+1u
+    fun nextShareHolderRankForShareResend(): UInt  = recoveredShares.fold(0u) { max, share -> if(share.ghostShareHolderRank > max) share.ghostShareHolderRank else max } + 1u
 
     private suspend fun storeQuarantineEndProposal(quarantineEnd: QuarantineEnd): Active {
       if(quarantineEnd.leafIndex != leafIndex) {
@@ -245,7 +260,6 @@ sealed class GroupState(
         cachedQuarantineEnd,
         groupGhostInfo,
         recoveredShares,
-        recoveredSharesHolderRank,
       )
     }
 
@@ -343,16 +357,16 @@ sealed class GroupState(
         validations.validated(quarantineEnd).bind()
         if (groupGhostInfo.containsGhost(quarantineEnd.leafIndex)) {
           if (groupGhostInfo.hasKeyShares(quarantineEnd.leafIndex, 1u)) {
-            val ghostShareHolder = groupGhostInfo.getKeyShares(quarantineEnd.leafIndex, 1u)[0]
+            val ghostShareHolderList = groupGhostInfo.getKeyShares(quarantineEnd.leafIndex, 1u)
             val ct = encryptWithLabel(
               quarantineEnd.leafNode.encryptionKey,
               "ShareRecoveryMessage",
               ByteArray(0),
-              ghostShareHolder.ghostShare.encodeUnsafe()
+              ghostShareHolderList.encodeUnsafe()
             ).bind()
             Pair(
               newState,
-              messages.shareRecoveryMessage(ghostShareHolder.ghostShareHolderRank ,quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
+              messages.shareRecoveryMessage(quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
             )
           } else {
             Pair(newState, null)
@@ -374,14 +388,14 @@ sealed class GroupState(
 
         validations.validated(shareResend).bind()
         if (groupGhostInfo.hasKeyShares(shareResend.leafIndex, shareResend.requiredShareHolderRank)) {
-          val ghostShareHolder = groupGhostInfo.getKeyShares(shareResend.leafIndex, shareResend.requiredShareHolderRank)[0]
+          val ghostShareHolderList = groupGhostInfo.getKeyShares(shareResend.leafIndex, shareResend.requiredShareHolderRank)
           val ct = encryptWithLabel(
             cached.leafNode.encryptionKey,
             "ShareRecoveryMessage",
             ByteArray(0),
-            ghostShareHolder.ghostShare.encodeUnsafe()
+            ghostShareHolderList.encodeUnsafe()
           ).bind()
-            messages.shareRecoveryMessage(ghostShareHolder.ghostShareHolderRank ,shareResend.leafIndex ,cached.leafNode.encryptionKey, ct).bind()
+            messages.shareRecoveryMessage(shareResend.leafIndex ,cached.leafNode.encryptionKey, ct).bind()
         } else {
           null
         }
@@ -403,9 +417,9 @@ sealed class GroupState(
         shareRecoveryMessage.encryptedShare
       ).bind()
 
-      val secretShare = ShamirSecretSharing.SecretShare.decodeUnsafe(res)
+      val shares = GhostShareHolderList.decodeUnsafe(res)
 
-      storeRecoveredShare(secretShare, shareRecoveryMessage.shareHolderRank)
+      storeRecoveredShare(shares)
     }
 
     context(Raise<ProcessMessageError>)
@@ -542,7 +556,6 @@ sealed class GroupState(
         mutableListOf(),
         groupGhostInfo,
         recoveredShares,
-        recoveredSharesHolderRank,
         )
     }
 

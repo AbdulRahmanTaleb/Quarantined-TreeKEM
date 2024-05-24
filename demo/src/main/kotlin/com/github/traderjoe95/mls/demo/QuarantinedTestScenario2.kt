@@ -119,7 +119,7 @@ suspend fun main() {
   }
 
   if(!clients[idxGhost1].retrievedEnoughShares(groups[idxGhost1].groupId)){
-    println("\n---------------------------- Receiving ADDITIONAL Share Recovery Message")
+    println("\n---------------------------- Sending ADDITIONAL Share Resend Message")
     clients[idxGhost1].sendShareResend(groups[idxGhost1].groupId)
     clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
       it.processNextMessage().getOrThrow()
@@ -142,7 +142,6 @@ suspend fun main() {
     listOf(clients[idxGhost2])
   )
 
-  println("here")
   // The ghost user processes the WelcomeBackGhost Message
   clients[idxGhost1].processNextMessage().getOrThrow()
 

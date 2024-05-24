@@ -649,7 +649,7 @@ class ActiveGroupClient<Identity : Any> internal constructor(
     }
 
   suspend fun retrievedEnoughShares(): Boolean {
-    return state.canRecoverKeyPair()
+    return state.canRecoverKeyPairs()
   }
 
   suspend fun shareResend():  Either<CreateShareResendMessageError, ByteArray> =
@@ -661,9 +661,13 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun startGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {
 //      println("stateHistory size = " + stateHistory.size)
-      ghostKeyPair = state.recoverKeyPair().bind()
       val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
 //      println("epoch = " + ghostEpoch + " , " + stateHistory[ghostStateIdx].tree.private.getPrivateKey(state.leafIndex))
+
+      println(state.recoveredShares.map{ it.epoch})
+      println(state.recoveredShares.map{it.ghostShare.rank})
+      println(ghostEpoch)
+      ghostKeyPair = state.recoverKeyPair().bind()
 
       for(i in 0..<ghostStateIdx){
         temporaryCachedStates.add(0, stateHistory[0])

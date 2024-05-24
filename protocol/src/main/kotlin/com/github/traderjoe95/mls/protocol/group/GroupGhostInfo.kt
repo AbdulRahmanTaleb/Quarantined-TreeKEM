@@ -148,45 +148,6 @@ data class GroupGhostInfo(
     }
   }
 
-
-  context(Raise<GroupGhostInfoError>)
-  private fun addNewGhostKeyShare(leafIndex: LeafIndex,
-                          epoch: ULong,
-                          encryptionKey: HpkePublicKey,
-                          share: ShamirSecretSharing.SecretShare,
-                          rank: UInt){
-    currentGhostMembers.firstOrNull{
-      it.leafIndex == leafIndex
-    }.also{ghostMember ->
-      if(ghostMember == null){
-        raise(GroupGhostInfoError.GhostNotFound(leafIndex))
-      }
-
-      ghostMember.ghostEncryptionKeys.firstOrNull { (epochG, keyG) ->
-        epochG == epoch || keyG.eq(encryptionKey)
-      }.also{ keyAndEpoch ->
-        if(keyAndEpoch == null){
-          raise(GroupGhostInfoError.KeyNotFoundForEpoch(epoch))
-        }
-        ghostMembersShares.firstOrNull { ghostShareHolder ->
-          ghostShareHolder.epoch == epoch || ghostShareHolder.ghostEncryptionKey.eq(encryptionKey)
-        }.also{
-          if(it != null){
-            raise(GroupGhostInfoError.GhostShareAlreadySavedForThisKey(encryptionKey))
-          }
-          ghostMembersShares.add(
-            GhostShareHolder.create(
-              encryptionKey,
-              leafIndex,
-              epoch,
-              share,
-              rank
-            ))
-        }
-      }
-    }
-  }
-
   context(Raise<GroupGhostInfoError>)
   fun hasKeyShares(leafIndex: LeafIndex,
                    rank: UInt): Boolean {
@@ -199,10 +160,16 @@ data class GroupGhostInfo(
 
   context(Raise<GroupGhostInfoError>)
   fun getKeyShares(leafIndex: LeafIndex,
-                   rank: UInt): List<GhostShareHolder> {
-    return ghostMembersShares.filter {
+                   rank: UInt): GhostShareHolderList {
+    val res = GhostShareHolderList(ghostMembersShares.filter {
+      it.leafIndex == leafIndex && it.ghostShareHolderRank == rank
+    })
+
+    ghostMembersShares.removeAll{
       it.leafIndex == leafIndex && it.ghostShareHolderRank == rank
     }
+
+    return res
   }
 
 }

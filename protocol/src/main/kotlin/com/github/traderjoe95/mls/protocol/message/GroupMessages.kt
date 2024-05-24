@@ -84,12 +84,11 @@ class GroupMessageFactory internal constructor(
   }
 
   suspend fun shareRecoveryMessage(
-    shareHolderRank: UInt,
     leafIndex: LeafIndex,
     encryptionKey: HpkePublicKey,
     ciphertext: HpkeCiphertext
   ): Either<CreateShareRecoveryMessageError, MlsShareRecoveryMessage> = either {
-    MlsMessage(ShareRecoveryMessage.create(groupContext.groupId, leafIndex, shareHolderRank, encryptionKey, ciphertext))
+    MlsMessage(ShareRecoveryMessage.create(groupContext.groupId, leafIndex, encryptionKey, ciphertext))
   }
 
   suspend fun shareResend(
