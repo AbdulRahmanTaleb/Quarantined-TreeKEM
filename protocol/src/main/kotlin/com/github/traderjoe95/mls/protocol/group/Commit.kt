@@ -626,12 +626,15 @@ private suspend fun <Identity : Any> GroupState.Active.processProposals(
         is Add -> {
           validations.validated(proposal, updatedTree).bind()
 
-          proposal.keyPackage.leafNode.epk = groupContext.epoch + 1u
+//          proposal.keyPackage.leafNode.epk = groupContext.epoch + 1u
 
           with(authenticationService) { updatedTree.findEquivalentLeaf(proposal.keyPackage.leafNode) }
             ?.also { raise(InvalidCommit.AlreadyMember(proposal.keyPackage, it)) }
 
-          val (treeWithNewMember, newMemberLeaf) = updatedTree.insert(proposal.keyPackage.leafNode)
+          val newLeaf = LeafNode.copy(proposal.keyPackage.leafNode)
+          newLeaf.epk = groupContext.epoch + 1u
+
+          val (treeWithNewMember, newMemberLeaf) = updatedTree.insert(newLeaf)
 
           updatedTree = treeWithNewMember
           welcomeTo.add(newMemberLeaf to proposal.keyPackage)

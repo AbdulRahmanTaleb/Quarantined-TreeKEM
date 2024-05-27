@@ -44,7 +44,7 @@ suspend fun main() {
   )
 
   val idxGhosts = listOf(clients.size-1)
-  for(i in 0..2) {
+  for(i in 0..4) {
     updateKeys(
       groups,
       clients,

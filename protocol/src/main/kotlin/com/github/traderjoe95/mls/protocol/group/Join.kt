@@ -48,6 +48,7 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Remove
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion
 import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
 import com.github.traderjoe95.mls.protocol.types.tree.KeyPackageLeafNode
+import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.RatchetTree as RatchetTreeExt
 
 fun newGroup(
@@ -113,7 +114,10 @@ suspend fun <Identity : Any> Welcome.joinGroup(
       groupInfo.verifySignature(publicTree).bind()
       publicTree.check(groupInfo.groupContext).bind()
 
-      val ownLeaf = publicTree.findEquivalentLeaf(keyPackage) ?: raise(WelcomeJoinError.OwnLeafNotFound)
+      val newLeafFromKeyPackage = LeafNode.copy(keyPackage.leafNode)
+      newLeafFromKeyPackage.epk = groupInfo.groupContext.epoch
+
+      val ownLeaf = publicTree.findEquivalentLeaf(newLeafFromKeyPackage) ?: raise(WelcomeJoinError.OwnLeafNotFound)
       var tree = publicTree.join(cipherSuite, ownLeaf, keyPackage.encPrivateKey)
 
       var groupContext = groupInfo.groupContext
@@ -127,13 +131,6 @@ suspend fun <Identity : Any> Welcome.joinGroup(
           with(cipherSuite) { tree.insertPathSecrets(ownLeaf, groupInfo.signer, it) }
         }.getOrElse { tree }
 
-
-
-      for(i in 0..<tree.leaves.size){
-        if(tree.leaves[i] != null){
-          tree.leaves[i]!!.epk = groupContext.epoch
-        }
-      }
 
       val keySchedule =
         KeySchedule.join(

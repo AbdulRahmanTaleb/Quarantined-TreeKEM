@@ -90,7 +90,7 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
-  val INACTIVITY_DELAY: ULong = 2U
+  val INACTIVITY_DELAY: ULong = 5U
   val UPDATE_QUARANTINE_KEYS_DELAY = 1u
   val DELETE_FROM_QUARANTINE_DELAY: ULong = 100U
 
@@ -248,7 +248,7 @@ sealed class GroupState(
         if(indices.size.toUInt() != t){
           return false
         }
-        println(indices)
+//        println(indices)
       }
       return true
     }
@@ -466,15 +466,17 @@ sealed class GroupState(
 
       val secretTree = PrivateRatchetTree(cipherSuite, leafIndex, mapOf(Pair(publicTree.root,groupSecrets.pathSecret)))
 
+      cachedUpdate!!.leafNode.epk = groupInfo.groupContext.epoch
+
       val newTree = RatchetTree(cipherSuite, publicTree, secretTree).update(leafIndex, cachedUpdate!!.leafNode, cachedUpdate!!.encryptionPrivateKey)
 
       var groupContext = groupInfo.groupContext
 
-      for(i in 0..<tree.leaves.size){
-        if(tree.leaves[i] != null){
-          tree.leaves[i]!!.epk = groupContext.epoch
-        }
-      }
+//      for(i in 0..<tree.leaves.size){
+//        if(tree.leaves[i] != null){
+//          tree.leaves[i]!!.epk = groupContext.epoch
+//        }
+//      }
 
       val keySchedule =
         KeySchedule.join(

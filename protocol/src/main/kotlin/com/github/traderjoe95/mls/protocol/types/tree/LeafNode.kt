@@ -7,6 +7,7 @@ import arrow.core.raise.either
 import com.github.traderjoe95.mls.codec.Encodable
 import com.github.traderjoe95.mls.codec.type.DataType
 import com.github.traderjoe95.mls.codec.type.derive
+import com.github.traderjoe95.mls.codec.type.struct.Struct10T
 import com.github.traderjoe95.mls.codec.type.struct.Struct2T
 import com.github.traderjoe95.mls.codec.type.struct.Struct8T
 import com.github.traderjoe95.mls.codec.type.struct.lift
@@ -53,11 +54,11 @@ data class LeafNode<S : LeafNodeSource>(
   val info: LeafNodeInfo?,
   override val extensions: LeafNodeExtensions,
   val signature: Signature,
-  var epk: ULong = 0U,
-  var equar: ULong = 0U,
+  var epk: ULong = 0u,
+  var equar: ULong = 0u,
 ) : HasExtensions<LeafNodeExtension<*>>(),
   Node,
-  Struct8T.Shape<HpkePublicKey, SignaturePublicKey, Credential, Capabilities, S, LeafNodeInfo?, LeafNodeExtensions, Signature> {
+  Struct10T.Shape<HpkePublicKey, SignaturePublicKey, Credential, Capabilities, S, LeafNodeInfo?, LeafNodeExtensions, Signature, ULong, ULong> {
   override val parentHash: ParentHash?
     get() = info as? ParentHash
 
@@ -114,8 +115,8 @@ data class LeafNode<S : LeafNodeSource>(
     if (signature neq other.signature) return false
     if (parentHash neqNullable other.parentHash) return false
     if (lifetime != other.lifetime) return false
-    // if(epk != other.epk) return false
-    // if(equar != other.equar) return false
+     if(epk != other.epk) return false
+     if(equar != other.equar) return false
 
     return true
   }
@@ -163,8 +164,8 @@ data class LeafNode<S : LeafNodeSource>(
           }
           .field("extensions", LeafNodeExtension.T.extensionList())
           .field("signature", Signature.T)
-//          .field("epk", uint64.asULong)
-//          .field("equar", uint64.asULong)
+          .field("epk", uint64.asULong)
+          .field("equar", uint64.asULong)
       }.lift(::LeafNode)
 
     @Suppress("UNCHECKED_CAST", "kotlin:6531")
@@ -182,7 +183,25 @@ data class LeafNode<S : LeafNodeSource>(
           }
           .field("extensions", LeafNodeExtension.T.extensionList())
           .field("signature", Signature.T)
+          .field("epk", uint64.asULong)
+          .field("equar", uint64.asULong)
       }.lift(::LeafNode)
+
+    fun copy(
+      leaf: LeafNode<*>
+    ): LeafNode<*> =
+      LeafNode(
+        leaf.encryptionKey,
+        leaf.signaturePublicKey,
+        leaf.credential,
+        leaf.capabilities,
+        leaf.source,
+        leaf.info,
+        leaf.extensions,
+        leaf.signature,
+        leaf.epk,
+        leaf.equar
+      )
 
     fun keyPackage(
       cipherSuite: ICipherSuite,

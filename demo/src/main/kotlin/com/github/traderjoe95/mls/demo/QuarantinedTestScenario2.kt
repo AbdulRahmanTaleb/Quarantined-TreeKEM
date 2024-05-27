@@ -50,7 +50,7 @@ suspend fun main() {
   val idxGhost2 = clients.size-3
 
   // Updating keys for all users except Ghost1 so that it can become ghost first
-  for(i in 0..1) {
+  for(i in 0..4) {
     updateKeys(
       groups,
       clients,
@@ -70,7 +70,7 @@ suspend fun main() {
 
   val idxGhosts = listOf(idxGhost1, idxGhost2)
   // Now making Ghost2 a ghost user too
-  for(i in 0..1) {
+  for(i in 0..4) {
     updateKeys(
       groups,
       clients,

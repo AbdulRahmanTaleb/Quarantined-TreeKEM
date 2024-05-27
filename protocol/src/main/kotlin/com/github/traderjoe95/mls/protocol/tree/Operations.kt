@@ -16,6 +16,7 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 import com.github.traderjoe95.mls.protocol.types.framing.content.Commit
 import com.github.traderjoe95.mls.protocol.types.framing.content.FramedContent
 import com.github.traderjoe95.mls.protocol.types.framing.enums.SenderType
+import com.github.traderjoe95.mls.protocol.types.tree.KeyPackageLeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.hash.ParentHashInput
 import com.github.traderjoe95.mls.protocol.types.tree.hash.ParentHashInput.Companion.encodeUnsafe
@@ -80,13 +81,17 @@ private fun RatchetTreeOps.removeLeaves(leaves: Set<LeafIndex>): RatchetTreeOps 
     is PublicRatchetTree -> removeLeaves(leaves)
   }
 
-context(Raise<IsSameClientError>)
-fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage.Private): LeafIndex? =
-  findEquivalentLeaf(keyPackage.public)
+//context(Raise<IsSameClientError>)
+//fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage.Private): LeafIndex? =
+//  findEquivalentLeaf(keyPackage.public)
+//
+//context(Raise<IsSameClientError>)
+//fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage): LeafIndex? =
+//  findLeaf { this == keyPackage.leafNode }?.second
 
 context(Raise<IsSameClientError>)
-fun RatchetTreeOps.findEquivalentLeaf(keyPackage: KeyPackage): LeafIndex? =
-  findLeaf { this == keyPackage.leafNode }?.second
+fun RatchetTreeOps.findEquivalentLeaf(leaf: LeafNode<*>): LeafIndex? =
+  findLeaf { this == leaf }?.second
 
 context(AuthenticationService<Identity>, Raise<IsSameClientError>)
 suspend fun <Identity : Any> RatchetTreeOps.findEquivalentLeaf(leafNode: LeafNode<*>): LeafIndex? =
