@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple4
-import arrow.core.Tuple5
 import arrow.core.getOrElse
 import arrow.core.raise.Raise
 import arrow.core.raise.either
@@ -12,7 +11,6 @@ import arrow.core.raise.nullable
 import arrow.core.toOption
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite.Companion.zeroesNh
 import com.github.traderjoe95.mls.protocol.crypto.KeySchedule
-import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.error.CommitError
 import com.github.traderjoe95.mls.protocol.error.GroupGhostInfoError
 import com.github.traderjoe95.mls.protocol.error.InvalidCommit
@@ -48,11 +46,9 @@ import com.github.traderjoe95.mls.protocol.types.ProposalType
 import com.github.traderjoe95.mls.protocol.types.crypto.Aad
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkeKeyPair
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePrivateKey
-import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
 import com.github.traderjoe95.mls.protocol.types.crypto.Signature
 import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePrivateKey
-import com.github.traderjoe95.mls.protocol.types.crypto.SignaturePublicKey
 import com.github.traderjoe95.mls.protocol.types.framing.Sender
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 import com.github.traderjoe95.mls.protocol.types.framing.content.AuthenticatedContent
@@ -233,7 +229,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     val proposalResult = commit.content.validateAndApply(commit.sender, psks, authenticationService, newGhostLeafNode, newGhostPrivateEncryptionKey)
     val updatePath = commit.content.updatePath
 
-//    println("Processing Commit.")
+    println("Processing Commit.")
 //    printGhostUsers()
 
     val preTree = proposalResult.updatedTree ?: tree
@@ -303,7 +299,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
   either {
 
 
-    val deleteMembers = groupGhostInfo.removeDeadGhosts(tree, groupContext.epoch, QUARANTEEN_DELAY)
+    val deleteMembers = groupGhostInfo.removeDeadGhosts(tree, groupContext.epoch, DELETE_FROM_QUARANTINE_DELAY)
 
     val newGhostMembers = mutableListOf<GhostMemberCommit>()
     val newGhostSecrets = mutableListOf<Secret>()
@@ -313,6 +309,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
     tree.leafNodeIndices.forEach {
       if(it.leafIndex != leafIndex){
         val leaf = tree.leaves[it.leafIndex.value.toInt()]
+        // New Ghost
         if((leaf != null) && (leaf.equar.compareTo(0U) == 0) && ((groupContext.epoch + 1u - leaf.epk) >= INACTIVITY_DELAY)){
 
           // Generating a new secret for each new ghost
@@ -330,6 +327,28 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
             groupContext.epoch + 1u
           )
           newTree = newTree.update(it.leafIndex, newGhostLeafNode)
+        }
+        // Old Ghost but need to renew Quarantine Key
+        else if((leaf != null) && (leaf.source == LeafNodeSource.Ghost)) {
+          if(groupContext.epoch + 1u - groupGhostInfo.lastGhostKeyUpdate(it.leafIndex) >= UPDATE_QUARANTINE_KEYS_DELAY){
+            // Generating a new secret for each new ghost
+            val secret = generateSecret(hashLen)
+            newGhostSecrets.add(secret)
+
+            // Generating a new encryption key for each new ghost
+            // The public keys are returned in the commit message
+            val newKeys = deriveKeyPair(secret)
+
+            newGhostMembers.add(groupGhostInfo.addNewGhostKey(it.leafIndex, groupContext.epoch+1u, newKeys.public))
+
+            val newGhostLeafNode = LeafNode(newKeys.public, leaf.signaturePublicKey, leaf.credential,
+              leaf.capabilities, LeafNodeSource.Ghost, null, leaf.extensions, Signature(ByteArray(1)), leaf.epk,
+              leaf.equar
+            )
+
+            newTree = newTree.update(it.leafIndex, newGhostLeafNode)
+
+          }
         }
       }
     }
@@ -349,12 +368,26 @@ private fun GroupState.Active.processGhostMembers(
 
     val leaf = tree.leaves[ghostMember.leafIndex.value.toInt()] ?: raise(CommitError.GhostUserNotFound)
 
-    val newGhostLeafNode = LeafNode(ghostMember.ghostEncryptionKey, leaf.signaturePublicKey, leaf.credential,
-      leaf.capabilities, LeafNodeSource.Ghost, null, leaf.extensions, Signature(ByteArray(1)), leaf.epk,
-      ghostMember.ghostEncryptionKeyEpoch)
 
+    val newGhostLeafNode = LeafNode(
+      ghostMember.ghostEncryptionKey,
+      leaf.signaturePublicKey,
+      leaf.credential,
+      leaf.capabilities,
+      LeafNodeSource.Ghost,
+      null,
+      leaf.extensions,
+      Signature(ByteArray(1)),
+      leaf.epk,
+      if(leaf.source == LeafNodeSource.Ghost) leaf.equar else ghostMember.ghostEncryptionKeyEpoch
+    )
 
-    groupGhostInfo.addNewGhostMember(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
+    println(ghostMember.leafIndex.toString() + leaf.source)
+    if(leaf.source == LeafNodeSource.Ghost){
+      groupGhostInfo.addNewGhostKey(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
+    } else {
+      groupGhostInfo.addNewGhostMember(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
+    }
 
     newTree = if(ghostMember.leafIndex.eq(newTree.leafIndex)){
       newTree.update(ghostMember.leafIndex, newGhostLeafNode, ghostKeyPair!!.private)

@@ -91,7 +91,8 @@ sealed class GroupState(
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
   val INACTIVITY_DELAY: ULong = 2U
-  val QUARANTEEN_DELAY: ULong = 100U
+  val UPDATE_QUARANTINE_KEYS_DELAY = 1u
+  val DELETE_FROM_QUARANTINE_DELAY: ULong = 100U
 
 
   fun isActive(): Boolean = this is Active
@@ -177,7 +178,7 @@ sealed class GroupState(
       )
 
     context(Raise<GhostRecoveryProcessError>)
-    suspend fun recoverKeyPair(): Either<GhostRecoveryProcessError, HpkeKeyPair> = either {
+    suspend fun recoverKeyPairs(): Either<GhostRecoveryProcessError, List<Pair<ULong,HpkeKeyPair>>> = either {
       val shares = mutableListOf<Pair<HpkePublicKey, MutableList<GhostShareHolder>>>()
       recoveredShares.forEach{ghostShareHolder ->
         shares.firstOrNull {
@@ -193,20 +194,33 @@ sealed class GroupState(
       if(shares.isEmpty()){
         raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
       }
-      if(shares.size > 1){
-        raise(GhostRecoveryProcessError.NotImplementedYetForMultipleQuarantineKeys)
+
+      shares.forEach {
+        val indices = mutableSetOf<UInt>()
+        val t = it.second[0].ghostShare.t
+
+        it.second.forEach {share ->
+          indices.add(share.ghostShare.rank)
+        }
+        if(indices.size.toUInt() != t){
+          raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
+        }
       }
 
-      val t = shares[0].second[0].ghostShare.t
-      val indices = mutableSetOf<UInt>()
-      shares[0].second.forEach {
-        indices.add(it.ghostShare.rank)
+      val secretsWithEpochs = shares.map{
+        Pair(
+          it.second[0].epoch,
+          ShamirSecretSharing.retrieveSecret(it.second.map{ it.ghostShare })
+        )
       }
-      if(indices.size.toUInt() != t){
-        raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
+
+      val res = secretsWithEpochs.map { Pair(it.first, derive(it.second)) }
+      res.forEachIndexed{ idx, (_, key) ->
+        if(!key.public.eq(shares[idx].first)){
+          raise(GhostRecoveryProcessError.IncorrectRecoveredKey(shares[idx].first, key.public))
+        }
       }
-      val secret = ShamirSecretSharing.retrieveSecret(shares[0].second.map{ it.ghostShare })
-      derive(secret)
+      res
     }
 
     suspend fun canRecoverKeyPairs(): Boolean  {
@@ -234,6 +248,7 @@ sealed class GroupState(
         if(indices.size.toUInt() != t){
           return false
         }
+        println(indices)
       }
       return true
     }

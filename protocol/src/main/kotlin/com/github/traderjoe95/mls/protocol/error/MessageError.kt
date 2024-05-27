@@ -1,6 +1,7 @@
 package com.github.traderjoe95.mls.protocol.error
 
 import com.github.traderjoe95.mls.protocol.types.GroupId
+import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
 import com.github.traderjoe95.mls.protocol.types.framing.enums.SenderType
 import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
@@ -52,6 +53,8 @@ sealed interface GhostRecoveryProcessError {
   data object UnexpectedEpochAfterMessageRecovery : GhostRecoveryProcessError
 
   data object IncoherentStates : GhostRecoveryProcessError
+
+  data class IncorrectRecoveredKey(val expected: HpkePublicKey, val obtained: HpkePublicKey) : GhostRecoveryProcessError
 
   data object NotImplementedYetForMultipleQuarantineKeys : GhostRecoveryProcessError
 

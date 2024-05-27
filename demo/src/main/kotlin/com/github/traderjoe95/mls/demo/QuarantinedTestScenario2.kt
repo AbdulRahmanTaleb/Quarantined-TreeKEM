@@ -152,7 +152,7 @@ suspend fun main() {
   //////////////////////////////////////////////////////////////////////
   // SENDING MESSAGES
   //////////////////////////////////////////////////////////////////////
-  basicConversation(clients, groups, clients.slice(idxGhosts), id = "2")
+  basicConversation(clients, groups, clients.slice(listOf(idxGhost2)), id = "2")
 
   //////////////////////////////////////////////////////////////////////
   // RECOVERING MESSAGES TEST
@@ -161,6 +161,7 @@ suspend fun main() {
   // At this stage, the ghost user have recovered enough shares to reconstruct its ghost key
   // and decrypt all of the messages cached during its quarantine period
   println("RECOVERING MESSAGES TEST")
+  clients[idxGhost1].retrievedEnoughShares(groups[idxGhost1].groupId)
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   groups[idxGhost1].startGhostMessageRecovery().getOrThrow()
   clients[idxGhost1].processCachedGhostMessages().getOrThrow()

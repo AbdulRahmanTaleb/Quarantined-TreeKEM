@@ -44,7 +44,7 @@ suspend fun main() {
   )
 
   val idxGhosts = listOf(clients.size-1)
-  for(i in 0..1) {
+  for(i in 0..2) {
     updateKeys(
       groups,
       clients,
@@ -91,8 +91,8 @@ suspend fun main() {
     }
   }
 
-  println("")
-  updateKeys(groups, clients, clientsList, 4, idxUpdate.filter { it != idxGhosts[0] }, idxCommit, noCommit =  true)
+//  println("")
+//  updateKeys(groups, clients, clientsList, 4, idxUpdate.filter { it != idxGhosts[0] }, idxCommit, noCommit =  true)
 
   // When a user commits here, it sends to the recovering ghost user a
   // WelcomeBackGhostMessage with the new groupContext for this epoch
@@ -126,5 +126,7 @@ suspend fun main() {
   clients[clients.size-1].processCachedGhostMessages().getOrThrow()
   groups[clients.size-1].endGhostMessageRecovery().getOrThrow()
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+  printGroups(groups, clients, clientsList)
 
 }

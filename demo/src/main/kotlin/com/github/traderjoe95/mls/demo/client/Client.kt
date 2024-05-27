@@ -99,8 +99,9 @@ class Client(
 
   suspend fun processCachedGhostMessages(): Either<Any, Unit> =
     either {
-      println("Processing cached messages")
+      println("Processing cached messages (total: " + cachedGhostMessages.size + ")")
       cachedGhostMessages.forEach{(messageId, encoded) ->
+//        println(idx)
         processMessage(messageId, encoded)
       }
       println("Finished processing cached messages")

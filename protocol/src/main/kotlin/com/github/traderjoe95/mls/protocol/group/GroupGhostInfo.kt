@@ -56,6 +56,21 @@ data class GroupGhostInfo(
   }
 
   context(Raise<GroupGhostInfoError>)
+  fun addNewGhostKey(leafIndex: LeafIndex, epoch: ULong, encryptionKey: HpkePublicKey): GhostMemberCommit{
+    currentGhostMembers.firstOrNull{
+      it.leafIndex == leafIndex
+    }.also{
+      if(it == null){
+        raise(GroupGhostInfoError.GhostNotFound(leafIndex))
+      }
+      else{
+        it.addNewEncryptionKey(epoch, encryptionKey)
+        return GhostMemberCommit(leafIndex, encryptionKey, epoch)
+      }
+    }
+  }
+
+  context(Raise<GroupGhostInfoError>)
   fun removeGhostMember(leafIndex: LeafIndex){
     currentGhostMembers.removeIf {
       it.leafIndex == leafIndex
@@ -96,16 +111,15 @@ data class GroupGhostInfo(
   }
 
   context(Raise<GroupGhostInfoError>)
-  fun addNewGhostKey(leafIndex: LeafIndex, epoch: ULong, encryptionKey: HpkePublicKey){
+  fun lastGhostKeyUpdate(leafIndex: LeafIndex): ULong{
     currentGhostMembers.firstOrNull{
-      it.leafIndex == leafIndex
-    }.also{
+      it.leafIndex.eq(leafIndex)
+    }.also {
       if(it == null){
         raise(GroupGhostInfoError.GhostNotFound(leafIndex))
       }
-      else{
-        it.addNewEncryptionKey(epoch, encryptionKey)
-      }
+
+      return it.ghostEncryptionKeys.fold(0u) { max, epochAndKey -> if(epochAndKey.first > max) epochAndKey.first else max }
     }
   }
 
@@ -137,7 +151,7 @@ data class GroupGhostInfo(
           raise(GroupGhostInfoError.KeyNotFoundForEpoch(shareHolder.epoch))
         }
         ghostMembersShares.firstOrNull { ghostShareHolder ->
-          ghostShareHolder.epoch == shareHolder.epoch || ghostShareHolder.ghostEncryptionKey.eq(shareHolder.ghostEncryptionKey)
+          (ghostShareHolder.leafIndex == shareHolder.leafIndex) && (ghostShareHolder.epoch == shareHolder.epoch || ghostShareHolder.ghostEncryptionKey.eq(shareHolder.ghostEncryptionKey))
         }.also{
           if(it != null){
             raise(GroupGhostInfoError.GhostShareAlreadySavedForThisKey(shareHolder.ghostEncryptionKey))

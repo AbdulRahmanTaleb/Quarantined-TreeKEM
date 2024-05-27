@@ -109,7 +109,7 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
 
   var isGhost: Boolean = false
   var ghostEpoch: ULong = 0u
-  var ghostKeyPair: HpkeKeyPair? = null
+  var ghostKeyPairs: List<Pair<ULong, HpkeKeyPair>>? = null
   val temporaryCachedStates = mutableListOf<GroupState>()
 
   val state: State
@@ -533,14 +533,24 @@ class ActiveGroupClient<Identity : Any> internal constructor(
 
         val newState =
           state.ensureActive {
-            if((temporaryCachedStates.size > 0) && (temporaryCachedStates[0].epoch == handshakeMessage.epoch + 1u)){
-//              println("detected")
-              val ghostLeaf = temporaryCachedStates[0].tree.leafNode(leafIndex)
-              val privateKey = temporaryCachedStates[0].tree.private.getPrivateKey(leafIndex)
-//              println("private = " +privateKey)
-              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPair, ghostLeaf, privateKey)
-            }else{
-              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPair)
+            if((ghostKeyPairs != null) && (ghostKeyPairs!!.map { it.first }.contains(handshakeMessage.epoch + 1u))){
+              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPairs!!.first{ it.first ==  handshakeMessage.epoch + 1u}.second)
+
+            } else if ((temporaryCachedStates.size > 0) && (temporaryCachedStates[0].epoch == handshakeMessage.epoch + 1u)) {
+              val newLeaf = temporaryCachedStates[0].tree.leafNode(leafIndex)
+              val newEncryptionKey = temporaryCachedStates[0].tree.private.getPrivateKey(leafIndex.nodeIndex)
+
+              process(
+                handshakeMessage,
+                authService,
+                psks = psks,
+                cachedState = cached?.newState,
+                null,
+                newLeaf,
+                newEncryptionKey,
+              )
+            } else {
+              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState)
             }
           }.bind()
 
@@ -664,10 +674,11 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
 //      println("epoch = " + ghostEpoch + " , " + stateHistory[ghostStateIdx].tree.private.getPrivateKey(state.leafIndex))
 
-      println(state.recoveredShares.map{ it.epoch})
-      println(state.recoveredShares.map{it.ghostShare.rank})
-      println(ghostEpoch)
-      ghostKeyPair = state.recoverKeyPair().bind()
+//      println(state.recoveredShares.map{ it.epoch})
+//      println(state.recoveredShares.map{it.ghostShare.rank})
+//      println(state.recoveredShares.map{it.ghostShare.t})
+//      println(ghostEpoch)
+      ghostKeyPairs = state.recoverKeyPairs().bind()
 
       for(i in 0..<ghostStateIdx){
         temporaryCachedStates.add(0, stateHistory[0])
@@ -696,7 +707,7 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       }
       temporaryCachedStates.clear()
       ghostEpoch = 0u
-      ghostKeyPair = null
+      ghostKeyPairs = null
     }
 
 
