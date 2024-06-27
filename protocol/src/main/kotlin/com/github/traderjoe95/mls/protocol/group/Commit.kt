@@ -97,11 +97,11 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
     val proposalResult = processProposals(proposals, None, authenticationService, leafIndex, inReInit, inBranch, psks)
 
     // Determining new ghost members if any
-    val (updatedTreeGhost, newGhostMembers, newGhostSecrets, _) = updateGhostMembers(proposalResult.updatedTree ?: tree).bind()
+    val (updatedTreeGhost, newGhostMembers, newGhostSecrets, deleteGhostMembers) = updateGhostMembers(proposalResult.updatedTree ?: tree).bind()
     println("Preparing Commit.")
     printGhostUsers(newGhostMembers)
 
-    val forcePathGhost = newGhostMembers.isNotEmpty()
+    val forcePathGhost = newGhostMembers.isNotEmpty() || deleteGhostMembers.isNotEmpty()
 
     val (updatedTree, updatePath, pathSecrets, ownGhostShares) =
       if (proposalResult.updatePathRequired || forcePath || forcePathGhost) {
@@ -112,6 +112,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
           signaturePrivateKey,
           newGhostMembers,
           newGhostSecrets,
+          MINIMUM_SECRET_SHARING_NB
         ).bind()
       } else {
         Tuple4(updatedTreeGhost, null, listOf(), listOf())
@@ -124,7 +125,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
 
     val partialCommit =
       messages.createAuthenticatedContent(
-        Commit(proposals, updatePath.toOption(), newGhostMembers, emptyList(), emptyList()),
+        Commit(proposals, updatePath.toOption(), newGhostMembers, deleteGhostMembers),
         messageOptions,
         authenticatedData,
       )
@@ -173,7 +174,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
       ).bind()
 
 
-    val ghostReconnectKeys = cachedQuarantineEnd.map{
+    val ghostReconnectNodes = cachedQuarantineEnd.map{
       it.leafNode
     }
 
@@ -198,7 +199,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
           )
         } ?: listOf(),
 
-      ghostReconnectKeys.takeIf { it.isNotEmpty() }
+      ghostReconnectNodes.takeIf { it.isNotEmpty() }
         ?.let{ newMembers ->
           listOf(
             PrepareCommitResult.WelcomeBackGhostMessage(
@@ -239,7 +240,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     }
 
     val updatedTreeGhost =
-      processGhostMembers(preTree, commit.content.ghostUsers, ghostKeyPair).bind()
+      processGhostMembers(preTree, commit.content.ghostUsers, commit.content.deadGhostsToDelete ,ghostKeyPair).bind()
 
     val (updatedTree, commitSecret, ghostSecretShares) =
       updatePath.map { path ->
@@ -304,11 +305,17 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
     val newGhostMembers = mutableListOf<GhostMemberCommit>()
     val newGhostSecrets = mutableListOf<Secret>()
 
-    var newTree = tree
+    val interTree = if(deleteMembers.isNotEmpty()){
+      tree.remove(deleteMembers)
+    } else {
+      tree
+    }
 
-    tree.leafNodeIndices.forEach {
+    var newTree = interTree
+
+    interTree.leafNodeIndices.forEach {
       if(it.leafIndex != leafIndex){
-        val leaf = tree.leaves[it.leafIndex.value.toInt()]
+        val leaf = interTree.leaves[it.leafIndex.value.toInt()]
         // New Ghost
         if((leaf != null) && (leaf.equar.compareTo(0U) == 0) && ((groupContext.epoch + 1u - leaf.epk) >= INACTIVITY_DELAY)){
 
@@ -359,14 +366,21 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
 private fun GroupState.Active.processGhostMembers(
   tree: RatchetTree,
   newGhostUsers: List<GhostMemberCommit>,
+  deleteGhostMembers: List<LeafIndex>,
   ghostKeyPair: HpkeKeyPair? = null,
   ) : Either<CommitError,RatchetTree>  = either{
 
-  var newTree = tree
+  val interTree = if(deleteGhostMembers.isNotEmpty()){
+    tree.remove(deleteGhostMembers)
+  } else {
+    tree
+  }
+
+  var newTree = interTree
 
   newGhostUsers.forEach { ghostMember ->
 
-    val leaf = tree.leaves[ghostMember.leafIndex.value.toInt()] ?: raise(CommitError.GhostUserNotFound)
+    val leaf = interTree.leaves[ghostMember.leafIndex.value.toInt()] ?: raise(CommitError.GhostUserNotFound)
 
 
     val newGhostLeafNode = LeafNode(

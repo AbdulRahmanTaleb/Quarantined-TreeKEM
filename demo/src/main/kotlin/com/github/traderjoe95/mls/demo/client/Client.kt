@@ -102,7 +102,7 @@ class Client(
       println("Processing cached messages (total: " + cachedGhostMessages.size + ")")
       cachedGhostMessages.forEach{(messageId, encoded) ->
 //        println(idx)
-        processMessage(messageId, encoded)
+        processMessage(messageId, encoded, cached = true)
       }
       println("Finished processing cached messages")
     }
@@ -115,7 +115,7 @@ class Client(
     }
 
 
-  suspend fun processMessage(messageId: ULID, encoded: ByteArray): GroupClient<String, *>? {
+  suspend fun processMessage(messageId: ULID, encoded: ByteArray, cached: Boolean = false): GroupClient<String, *>? {
       println("[$userName] Message received: $messageId")
 
       when (val res = mlsClient.processMessage(encoded, isGhost).getOrThrow()) {
@@ -153,7 +153,7 @@ class Client(
         }
 
         is ProcessMessageResult.QuarantineEndReceived -> {
-          if(res.shareRecoveryMessage != null){
+          if((res.shareRecoveryMessage != null) && (!cached)){
             DeliveryService.sendMessageToGroup(
               res.shareRecoveryMessage!!,
               res.groupId,
@@ -234,7 +234,7 @@ class Client(
         }
 
         is ProcessMessageResult.ShareResendReceived -> {
-          if(res.shareRecoveryMessage != null){
+          if((res.shareRecoveryMessage != null) && (!cached)){
             DeliveryService.sendMessageToGroup(
               res.shareRecoveryMessage!!,
               res.groupId,

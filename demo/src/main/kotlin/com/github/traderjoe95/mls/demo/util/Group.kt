@@ -94,6 +94,15 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
     println("ADDING " + clientsList[i].uppercase() + " TO THE GROUP")
     println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     val otherKeyPackage = clients[i-1].getKeyPackageFor(Config.cipherSuite, clientsList[i])
+
+    for(j in 0..i-2){
+      val updateMember = groups[j].update().getOrThrow()
+      DeliveryService.sendMessageToGroup(updateMember, groups[j].groupId).getOrThrow()
+      clients.forEach {client ->
+        client.processNextMessage().getOrThrow()
+      }
+    }
+
     val otherAddMemberCommit = groups[i-1].commit(listOf(Add(otherKeyPackage))).getOrThrow()
     DeliveryService.sendMessageToGroup(otherAddMemberCommit, groups[i-1].groupId).getOrThrow()
 

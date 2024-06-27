@@ -268,6 +268,19 @@ data class GhostShareHolder(
         shareHolder.ghostShareHolderRank
       )
 
+    fun changeRank(
+      shareHolder: GhostShareHolder,
+      newRank: UInt,
+    ): GhostShareHolder =
+
+      GhostShareHolder(
+        shareHolder.ghostEncryptionKey,
+        shareHolder.leafIndex,
+        shareHolder.epoch,
+        shareHolder.ghostShare,
+        newRank
+      )
+
   }
 
   }

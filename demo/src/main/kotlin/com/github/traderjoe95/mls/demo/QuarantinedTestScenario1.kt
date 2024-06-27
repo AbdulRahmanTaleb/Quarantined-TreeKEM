@@ -14,7 +14,8 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 
 
 //////////////////////////////////////////////////////////////////////
-// BASIC QUARANTINE TEST
+// BASIC QUARANTINE TEST: A user becomes ghost, reconnects
+// and recovers previous messages
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
   val clientsList = listOf("Alice", "Bob", "Charlie", "Dan")

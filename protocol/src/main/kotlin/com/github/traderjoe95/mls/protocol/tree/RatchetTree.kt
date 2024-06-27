@@ -305,36 +305,98 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
   override val firstBlankLeaf: LeafIndex?
     get() = leafNodeIndices.find { it.isBlank }?.leafIndex
 
+  fun getLevelWithEnoughNodes(minimum_nb: Int, fromLeafIndex: LeafIndex) : Pair<Int, List<NodeIndex>>?{
+    val path = directPath(fromLeafIndex)
+
+    var oldNodeIndices = leafNodeIndices.map { it.nodeIndex }
+    var newNodeIndices = mutableListOf<NodeIndex>()
+
+    for(level in 1..<root.level.toInt()){
+
+      for(i in oldNodeIndices.indices step 2){
+        newNodeIndices.add(oldNodeIndices[i].parent)
+      }
+
+      var nb = 0
+      newNodeIndices.forEach {
+        if(nodes[it.value] != null){
+          nb++
+        }
+        else if(it.value == path[level-1].value){
+          nb++
+        }
+      }
+
+      println(newNodeIndices)
+      newNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
+      println("")
+      println(nb)
+
+      if(nb >= minimum_nb){
+        return Pair(nb, newNodeIndices.filter { nodes[it.value] != null })
+      }
+
+      oldNodeIndices = newNodeIndices
+      newNodeIndices = mutableListOf()
+
+    }
+    return null
+  }
+
+  fun getRankFromLevel(leaf: LeafIndex, parent: NodeIndex): UInt{
+    val subRange = parent.subtreeRange
+    var rank = 1u
+    for(n in subRange step 2){
+      if(n.leafIndex.value == leaf.value){
+        break
+      }
+      rank++
+    }
+
+    return rank
+  }
+
   fun insert(newLeaf: LeafNode<*>): Pair<PublicRatchetTree, LeafIndex> =
     firstBlankLeaf
       ?.let { insertAt(newLeaf, it) }
       ?: extend().insert(newLeaf)
 
   fun print(){
-    println("Leaves:")
+    print("L0: ")
     leafNodeIndices.forEach{
-      print(it)
-      if(nodes[it.value] == null){
-        print(" empty - ")
+      if(nodes[it.value] != null){
+        print(" node - ")
       }
       else{
-        print(" full - ")
+        print(" null - ")
       }
     }
     println("")
 
-    println("Parents:")
-    parentNodeIndices.forEach{
-      print(it)
-      if(nodes[it.value] == null){
-        print(" empty - ")
-      }
-      else{
-        print(" full - ")
+    var oldNodeIndices = leafNodeIndices.map { it.nodeIndex }
+    var newNodeIndices = mutableListOf<NodeIndex>()
+
+    for(level in 1..root.level.toInt()){
+      print("L" + level +": ")
+
+      for(i in 0..<oldNodeIndices.size step 2){
+        newNodeIndices.add(oldNodeIndices[i].parent)
       }
 
+      newNodeIndices.forEach {
+
+        if (nodes[it.value] != null) {
+          print(" node - ")
+        } else {
+          print(" null - ")
+        }
+      }
+      println("")
+
+      oldNodeIndices = newNodeIndices
+      newNodeIndices = mutableListOf()
+
     }
-    println("")
   }
 
   internal fun insertAt(
