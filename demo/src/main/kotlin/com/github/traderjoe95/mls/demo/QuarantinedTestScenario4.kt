@@ -24,26 +24,37 @@ suspend fun main() {
 
   println("HEREEEEEEEE +++++++++++++++++++++++++++++++++++++++++++++++++++")
 
+//  groups[0].tree.print()
+
   for(idxCommit in 0..3){
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommit,
-      listOf(4),
-      idxCommit,
+      i = idxCommit,
+      updaterGroupsIdx = listOf(4),
+      committerGroupIdx =  idxCommit,
     )
   }
 
+//  updateKeys(
+//    groups,
+//    clients,
+//    clientsList,
+//    i = 3,
+//    updaterGroupsIdx = listOf(3),
+//    committerGroupIdx =  4,
+//  )
+
   groups[0].tree.print()
 
-  updateKeys(
-    groups,
-    clients,
-    clientsList,
-    4,
-    listOf(4),
-    4,
-    excludeClients = listOf(5),
-  )
+//  updateKeys(
+//    groups,
+//    clients,
+//    clientsList,
+//    i = 4,
+//    updaterGroupsIdx = listOf(3),
+//    committerGroupIdx = 4,
+//    excludeClients = listOf(5)
+//  )
 }

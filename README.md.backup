@@ -94,6 +94,16 @@ If a ghost user that successfully reconnected, was not able to recover all secre
 Once the user recovered all the necessary shares, they can start reconstructing the encryption keys and decrypting previous conversations. The recovery process starts with `protocol.client.ActiveGroupClient#startGhostMessageRecovery()` and ends with `protocol.client.ActiveGroupClient#endGhostMessageRecovery()`. An example is illustrated in the test files, where the method `demo.client.Client#processCachedGhostMessages()` is called to decrypted the cached messages.
 
 <br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
 # Original README from mls-kotlin repository
 
