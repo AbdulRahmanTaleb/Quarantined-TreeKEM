@@ -14,17 +14,10 @@ import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 
 
-//////////////////////////////////////////////////////////////////////
-// QUARANTINE TEST:
-//////////////////////////////////////////////////////////////////////
-suspend fun main() {
+suspend fun test1(){
   val clientsList = listOf("a", "b", "c", "d", "e", "f")
 
   val (clients, groups) = initiateGroup(clientsList)
-
-  println("HEREEEEEEEE +++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-//  groups[0].tree.print()
 
   for(idxCommit in 0..3){
     updateKeys(
@@ -37,24 +30,68 @@ suspend fun main() {
     )
   }
 
-//  updateKeys(
-//    groups,
-//    clients,
-//    clientsList,
-//    i = 3,
-//    updaterGroupsIdx = listOf(3),
-//    committerGroupIdx =  4,
-//  )
-
   groups[0].tree.print()
 
-//  updateKeys(
-//    groups,
-//    clients,
-//    clientsList,
-//    i = 4,
-//    updaterGroupsIdx = listOf(3),
-//    committerGroupIdx = 4,
-//    excludeClients = listOf(5)
-//  )
+  val idxGhost = 5
+
+  updateKeys(
+    groups,
+    clients,
+    clientsList,
+    i = 4,
+    updaterGroupsIdx = listOf(),
+    committerGroupIdx = 4,
+    excludeClients = listOf(idxGhost)
+  )
+
+  basicConversation(clients, groups, clients.slice(listOf(idxGhost)), id = "1")
+
+  for(i in 0..3){
+    updateKeys(
+      groups,
+      clients,
+      clientsList,
+      i = i,
+      updaterGroupsIdx = listOf(0,1,2,3),
+      committerGroupIdx =  4,
+      excludeClients =  listOf(idxGhost)
+    )
+  }
+
+  println("GHOST RECONNECTING")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  println("\n---------------------------- Sending Quarantine End")
+  clients[idxGhost].ghostReconnect(groups[idxGhost].groupId)
+  clients.filterIndexed{idx, _ -> idx != idxGhost}.forEach{
+    it.processNextMessage().getOrThrow()
+  }
+  println("\n---------------------------- Receiving Share Recovery Message")
+  for(k in 0..clients.size-1){
+    clients.forEach {
+      it.processNextMessage().getOrThrow()
+    }
+  }
+  println("\n---------------------------- Committing by " + clientsList[4])
+  commit(
+    groups[4],
+    clients,
+  )
+  clients[idxGhost].processNextMessage().getOrThrow()
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+  println("RECOVERING MESSAGES TEST")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  groups[idxGhost].startGhostMessageRecovery().getOrThrow()
+  clients[idxGhost].processCachedGhostMessages().getOrThrow()
+  groups[idxGhost].endGhostMessageRecovery().getOrThrow()
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+  basicConversation(clients, groups, id = "2")
+}
+
+//////////////////////////////////////////////////////////////////////
+// QUARANTINE TEST: testing horizontal method
+//////////////////////////////////////////////////////////////////////
+suspend fun main() {
+ test1()
 }

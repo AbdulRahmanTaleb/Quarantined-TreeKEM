@@ -112,7 +112,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
           signaturePrivateKey,
           newGhostMembers,
           newGhostSecrets,
-          MINIMUM_SECRET_SHARING_NB
+          GroupState.MINIMUM_SECRET_SHARING_NB
         ).bind()
       } else {
         Tuple4(updatedTreeGhost, null, listOf(), listOf())
@@ -252,6 +252,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
           proposalResult.newMemberLeafIndices(),
           commit.content.ghostUsers,
           groupGhostInfo.getCurrentGhosts(),
+          GroupState.MINIMUM_SECRET_SHARING_NB,
         )
       }.getOrElse { Triple(updatedTreeGhost, zeroesNh, null) }
 
@@ -300,7 +301,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
   either {
 
 
-    val deleteMembers = groupGhostInfo.removeDeadGhosts(tree, groupContext.epoch, DELETE_FROM_QUARANTINE_DELAY)
+    val deleteMembers = groupGhostInfo.removeDeadGhosts(tree, groupContext.epoch, GroupState.DELETE_FROM_QUARANTINE_DELAY)
 
     val newGhostMembers = mutableListOf<GhostMemberCommit>()
     val newGhostSecrets = mutableListOf<Secret>()
@@ -317,7 +318,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
       if(it.leafIndex != leafIndex){
         val leaf = interTree.leaves[it.leafIndex.value.toInt()]
         // New Ghost
-        if((leaf != null) && (leaf.equar.compareTo(0U) == 0) && ((groupContext.epoch + 1u - leaf.epk) >= INACTIVITY_DELAY)){
+        if((leaf != null) && (leaf.equar.compareTo(0U) == 0) && ((groupContext.epoch + 1u - leaf.epk) >= GroupState.INACTIVITY_DELAY)){
 
           // Generating a new secret for each new ghost
           val secret = generateSecret(hashLen)
@@ -337,7 +338,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
         }
         // Old Ghost but need to renew Quarantine Key
         else if((leaf != null) && (leaf.source == LeafNodeSource.Ghost)) {
-          if(groupContext.epoch + 1u - groupGhostInfo.lastGhostKeyUpdate(it.leafIndex) >= UPDATE_QUARANTINE_KEYS_DELAY){
+          if(groupContext.epoch + 1u - groupGhostInfo.lastGhostKeyUpdate(it.leafIndex) >= GroupState.UPDATE_QUARANTINE_KEYS_DELAY){
             // Generating a new secret for each new ghost
             val secret = generateSecret(hashLen)
             newGhostSecrets.add(secret)
@@ -396,7 +397,7 @@ private fun GroupState.Active.processGhostMembers(
       if(leaf.source == LeafNodeSource.Ghost) leaf.equar else ghostMember.ghostEncryptionKeyEpoch
     )
 
-    println(ghostMember.leafIndex.toString() + leaf.source)
+//    println(ghostMember.leafIndex.toString() + leaf.source)
     if(leaf.source == LeafNodeSource.Ghost){
       groupGhostInfo.addNewGhostKey(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
     } else {
@@ -467,11 +468,12 @@ private fun RatchetTree.applyCommitUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<GhostMemberCommit> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
+  minimum_secret_sharing_nb: Int,
 ): Triple<RatchetTree, Secret, GhostShareHolderList> =
   if (sender.type == SenderType.Member) {
-    applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers, ghostMembers)
+    applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers, ghostMembers, minimum_secret_sharing_nb = minimum_secret_sharing_nb)
   } else {
-    applyUpdatePathExternalJoin(groupContext, updatePath, excludeNewLeaves)
+    applyUpdatePathExternalJoin(groupContext, updatePath, excludeNewLeaves, minimum_secret_sharing_nb = minimum_secret_sharing_nb)
   }
 
 context(GroupState.Active, Raise<SenderCommitError>)

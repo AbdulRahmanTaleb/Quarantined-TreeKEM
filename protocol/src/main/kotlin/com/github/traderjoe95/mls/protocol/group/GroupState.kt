@@ -90,12 +90,6 @@ sealed class GroupState(
 
   val members: List<LeafNode<*>> by lazy { tree.leaves.filterNotNull() }
 
-  val MINIMUM_SECRET_SHARING_NB: Int = 3
-  val INACTIVITY_DELAY: ULong = 5U
-  val UPDATE_QUARANTINE_KEYS_DELAY: ULong = 1u
-  val DELETE_FROM_QUARANTINE_DELAY: ULong = 15U
-
-
   fun isActive(): Boolean = this is Active
 
   context(Raise<GroupSuspended>)
@@ -629,5 +623,11 @@ sealed class GroupState(
     )
   }
 
-  companion object
+  companion object {
+    val MINIMUM_SECRET_SHARING_NB: Int = 3
+    val INACTIVITY_DELAY: ULong = 5U
+    val UPDATE_QUARANTINE_KEYS_DELAY: ULong = 1u
+    val DELETE_FROM_QUARANTINE_DELAY: ULong = 15U
+
+  }
 }

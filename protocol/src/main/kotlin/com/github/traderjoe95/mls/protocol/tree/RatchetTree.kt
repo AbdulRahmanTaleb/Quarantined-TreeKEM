@@ -26,6 +26,7 @@ import com.github.traderjoe95.mls.protocol.types.tree.KeyPackageLeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.Node
 import com.github.traderjoe95.mls.protocol.types.tree.ParentNode
+import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
 import com.github.traderjoe95.mls.protocol.util.get
 import com.github.traderjoe95.mls.protocol.util.log2
 import com.github.traderjoe95.mls.protocol.util.shl
@@ -308,17 +309,13 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
   fun getLevelWithEnoughNodes(minimum_nb: Int, fromLeafIndex: LeafIndex) : Pair<Int, List<NodeIndex>>?{
     val path = directPath(fromLeafIndex)
 
-    var oldNodeIndices = leafNodeIndices.map { it.nodeIndex }
+    var oldNodeIndices = mutableListOf(root)
     var newNodeIndices = mutableListOf<NodeIndex>()
 
-    for(level in 1..<root.level.toInt()){
-
-      for(i in oldNodeIndices.indices step 2){
-        newNodeIndices.add(oldNodeIndices[i].parent)
-      }
+    for(level in root.level.toInt() downTo 1){
 
       var nb = 0
-      newNodeIndices.forEach {
+      oldNodeIndices.forEach {
         if(nodes[it.value] != null){
           nb++
         }
@@ -327,19 +324,40 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
         }
       }
 
-      println(newNodeIndices)
-      newNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
-      println("")
-      println(nb)
+//      println(oldNodeIndices)
+//      oldNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
+//      println("")
+//      println(nb)
 
       if(nb >= minimum_nb){
-        return Pair(nb, newNodeIndices.filter { nodes[it.value] != null })
+        return Pair(nb, oldNodeIndices.filter { nodes[it.value] != null })
+      }
+
+      oldNodeIndices.forEach {
+        newNodeIndices.add(it.leftChild)
+        newNodeIndices.add(it.rightChild)
       }
 
       oldNodeIndices = newNodeIndices
       newNodeIndices = mutableListOf()
-
     }
+
+    // leaf nodes
+    var nb = 0
+    oldNodeIndices.forEach {
+      if(leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost){
+        nb++
+      }
+    }
+//    println(oldNodeIndices)
+//    oldNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
+//    println("")
+//    println(nb)
+
+    if(nb >= minimum_nb){
+      return Pair(nb, oldNodeIndices.filter { leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost })
+    }
+
     return null
   }
 

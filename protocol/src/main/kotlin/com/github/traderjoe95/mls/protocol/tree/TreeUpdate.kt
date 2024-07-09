@@ -44,7 +44,7 @@ internal fun createUpdatePath(
   signaturePrivateKey: SignaturePrivateKey,
   newGhostMembers: List<GhostMemberCommit> = listOf(),
   newGhostSecrets: List<Secret> = listOf(),
-  minimum_secret_sharing_nb: Int = 3,
+  minimum_secret_sharing_nb: Int,
 ): Either<UnexpectedError, Tuple4<RatchetTree, UpdatePath, List<Secret>, List<GhostShareHolder>>> =
   createUpdatePath(
     originalTree,
@@ -186,7 +186,7 @@ internal fun createUpdatePath(
         val (nodeIdx, resolution) = nodeAndRes
         val encryptFor = resolution - excludedNodeIndices
 
-        println(encryptFor)
+//        println(encryptFor)
 //        println(updatedTree.leafNode(encryptFor[0]).encryptionKey)
 
         UpdatePathNode(
@@ -206,7 +206,7 @@ internal fun createUpdatePath(
 
     if(horizontalShareDistributionUsed){
       ghostShares = nodeIndices.map{
-        if(directPath[it.level.toInt()-1].value == it.value){
+        if((it.level.toInt() == 0 && it.leafIndex.value == from.value) || (it.level.toInt() > 0 && directPath[it.level.toInt()-1].value == it.value)){
           GhostShareDistribution(
             updatedTree.node(it).encryptionKey,
             listOf(encryptWithLabel(
@@ -297,6 +297,7 @@ internal fun applyUpdatePath(
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<GhostMemberCommit> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
+  minimum_secret_sharing_nb: Int,
 ): Triple<RatchetTree, Secret, GhostShareHolderList> {
   var updatedTree = originalTree.mergeUpdatePath(fromLeafIndex, updatePath)
 
@@ -311,6 +312,7 @@ internal fun applyUpdatePath(
       excludedNodeIndices,
       newGhostUsers,
       ghostMembers,
+      minimum_secret_sharing_nb,
     )
 
   updatedTree = updatedTree.insertPathSecrets(commonAncestor, pathSecret)
@@ -323,9 +325,10 @@ internal fun RatchetTree.applyUpdatePathExternalJoin(
   groupContext: GroupContext,
   updatePath: UpdatePath,
   excludeNewLeaves: Set<LeafIndex>,
+  minimum_secret_sharing_nb: Int,
 ): Triple<RatchetTree, Secret, GhostShareHolderList> =
   insert(updatePath.leafNode).let { (tree, newLeaf) ->
-    applyUpdatePath(tree, groupContext, newLeaf, updatePath, excludeNewLeaves)
+    applyUpdatePath(tree, groupContext, newLeaf, updatePath, excludeNewLeaves, minimum_secret_sharing_nb = minimum_secret_sharing_nb)
   }
 
 context(Raise<RecipientTreeUpdateError>)
@@ -367,6 +370,7 @@ internal fun RatchetTree.extractCommonPathSecret(
   excludeNewLeaves: Set<NodeIndex>,
   newGhostUsers: List<GhostMemberCommit> = listOf(),
   ghostMembers: List<LeafIndex> = listOf(),
+  minimum_secret_sharing_nb: Int,
 ): Triple<NodeIndex, Secret, GhostShareHolderList> {
   val filteredDirectPath = filteredDirectPath(fromLeafIdx)
 
@@ -421,12 +425,13 @@ internal fun RatchetTree.extractCommonPathSecret(
       }
     } else {
       println("Ghost shares were not encrypted using the default share method, trying to find a level node from the horizontal setting ...")
-      val res = public.getLevelWithEnoughNodes(3, fromLeafIdx)
+      val res = public.getLevelWithEnoughNodes(minimum_secret_sharing_nb, fromLeafIdx)
       if (res != null) {
         val nodeIndices = res.second
         val ownDirectPath = directPath(leafIndex)
-        nodeIndices.firstOrNull { it.value == ownDirectPath[it.level.toInt() - 1].value }
+        nodeIndices.firstOrNull { if(it.level.toInt() == 0) it.leafIndex.value == leafIndex.value  else  it.value == ownDirectPath[it.level.toInt() - 1].value }
           ?.let { nodeIdxShare ->
+//            println(nodeIdxShare.leafIndex.toString() + fromLeafIdx + leafIndex)
             updatePath.shares.firstOrNull { it.encryptionKey.eq(public.node(nodeIdxShare).encryptionKey) }
               ?.let { ghostShareDistribution ->
                 ghostSecretShares = GhostShareHolderList.decodeUnsafe(
@@ -442,7 +447,7 @@ internal fun RatchetTree.extractCommonPathSecret(
                 ghostSecretShares = GhostShareHolderList(ghostSecretShares.ghostShareHolders.map {
                   GhostShareHolder.changeRank(it, rank)
                 })
-                println(ghostSecretShares)
+//                println(ghostSecretShares)
               }
           }
       }
