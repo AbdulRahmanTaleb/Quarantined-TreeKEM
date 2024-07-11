@@ -21,3 +21,4 @@ typealias MlsApplicationMessage = MlsMessage<ApplicationMessage>
 typealias MlsQuarantineEndMessage = MlsMessage<QuarantineEnd>
 typealias MlsShareRecoveryMessage = MlsMessage<ShareRecoveryMessage>
 typealias MlsShareResendMessage = MlsMessage<ShareResend>
+typealias MlsRequestWelcomeBackGhostMessage = MlsMessage<RequestWelcomeBackGhost>

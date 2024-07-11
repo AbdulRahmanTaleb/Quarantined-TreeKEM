@@ -31,6 +31,7 @@ import com.github.traderjoe95.mls.protocol.message.HandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsHandshakeMessage
 import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.RequestWelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.WelcomeBackGhost
@@ -117,6 +118,7 @@ sealed class GroupState(
     private val cachedProposals: Map<String, CachedProposal> = mapOf(),
     internal var cachedUpdate: CachedUpdate? = null,
     internal val cachedQuarantineEnd: MutableList<CachedQuarantineEnd> = mutableListOf(),
+    internal val cachedRequestWelcomeBackGhost: MutableList<CachedRequestWelcomeBackGhost> = mutableListOf(),
     val groupGhostInfo: GroupGhostInfo = GroupGhostInfo(),
     val recoveredShares: List<GhostShareHolder> = listOf(),
   ) : GroupState(groupContext, tree, keySchedule), SecretTree.Lookup, PskLookup {
@@ -154,6 +156,7 @@ sealed class GroupState(
           ).let { it.ref.hex to it },
         cachedUpdate,
         cachedQuarantineEnd,
+         cachedRequestWelcomeBackGhost,
          groupGhostInfo,
         recoveredShares,
       )
@@ -168,6 +171,7 @@ sealed class GroupState(
         cachedProposals,
         cachedUpdate,
         cachedQuarantineEnd,
+        cachedRequestWelcomeBackGhost,
         groupGhostInfo,
         recoveredShares + secretShares.ghostShareHolders,
       )
@@ -268,10 +272,35 @@ sealed class GroupState(
         cachedProposals,
         cachedUpdate,
         cachedQuarantineEnd,
+        cachedRequestWelcomeBackGhost,
         groupGhostInfo,
         recoveredShares,
       )
     }
+
+    private suspend fun storeRequestWelcomeBackGhost(requestWelcomeBackGhost: RequestWelcomeBackGhost): Active {
+      if(requestWelcomeBackGhost.leafIndex != leafIndex) {
+        cachedRequestWelcomeBackGhost.add(
+          CachedRequestWelcomeBackGhost(
+            requestWelcomeBackGhost.leafIndex
+          )
+        )
+      }
+
+      return Active(
+        groupContext,
+        tree,
+        keySchedule,
+        signaturePrivateKey,
+        cachedProposals,
+        cachedUpdate,
+        cachedQuarantineEnd,
+        cachedRequestWelcomeBackGhost,
+        groupGhostInfo,
+        recoveredShares,
+      )
+    }
+
 
     fun getStoredProposals(): List<CachedProposal> = cachedProposals.values.toList()
 
@@ -388,6 +417,19 @@ sealed class GroupState(
 
     context(Raise<ProcessMessageError>)
     suspend fun process(
+      requestWelcomeBackGhost: RequestWelcomeBackGhost,
+    ): Either<ProcessMessageError, GroupState> =
+      either {
+        ensure(requestWelcomeBackGhost.groupId eq groupId) { MessageRecipientError.WrongGroup(requestWelcomeBackGhost.groupId, groupId) }
+
+        val newState = storeRequestWelcomeBackGhost(requestWelcomeBackGhost)
+        validations.validated(requestWelcomeBackGhost).bind()
+
+        newState
+      }
+
+    context(Raise<ProcessMessageError>)
+    suspend fun process(
       shareResend: ShareResend,
     ): Either<ProcessMessageError, MlsShareRecoveryMessage?> =
       either {
@@ -413,15 +455,16 @@ sealed class GroupState(
 
     context(Raise<ProcessMessageError>)
     suspend fun process(
-      shareRecoveryMessage: ShareRecoveryMessage
+      shareRecoveryMessage: ShareRecoveryMessage,
+      encryptionPrivateKey: HpkePrivateKey,
     ): Either<ProcessMessageError, GroupState> = either {
 
       ensure(shareRecoveryMessage.groupId eq groupId) { MessageRecipientError.WrongGroup(shareRecoveryMessage.groupId, groupId) }
 
-      ensure(cachedUpdate != null) { ShareRecoveryMessageError.MissingCachedUpdateForGhost }
+//      ensure(cachedUpdate != null) { ShareRecoveryMessageError.MissingCachedUpdateForGhost }
 
       val res = decryptWithLabel(
-        cachedUpdate!!.encryptionPrivateKey,
+        encryptionPrivateKey,
         "ShareRecoveryMessage",
         ByteArray(0),
         shareRecoveryMessage.encryptedShare
@@ -435,15 +478,16 @@ sealed class GroupState(
     context(Raise<ProcessMessageError>)
     suspend fun process(
       welcomeBackGhost: WelcomeBackGhost,
+      leafNode: LeafNode<*>,
+      keyPair: HpkeKeyPair,
       psks: PskLookup = PskLookup.EMPTY
     ): Either<ProcessMessageError, GroupState> = either {
 
       ensure(welcomeBackGhost.groupId eq groupId) { MessageRecipientError.WrongGroup(welcomeBackGhost.groupId, groupId) }
 
-      ensure(cachedUpdate != null) { WelcomeBackGhostMessageError.MissingCachedUpdateForGhost }
+//      ensure(cachedUpdate != null) { WelcomeBackGhostMessageError.MissingCachedUpdateForGhost }
 
-
-      val keyPair = reconstructPublicKey(cachedUpdate!!.encryptionPrivateKey).bind()
+//      val keyPair = reconstructPublicKey(cachedUpdate!!.encryptionPrivateKey).bind()
 
       val groupSecrets = welcomeBackGhost.decryptWelcomeBackGroupSecrets(keyPair).bind()
 
@@ -461,9 +505,9 @@ sealed class GroupState(
 
       val secretTree = PrivateRatchetTree(cipherSuite, leafIndex, mapOf(Pair(publicTree.root,groupSecrets.pathSecret)))
 
-      cachedUpdate!!.leafNode.epk = groupInfo.groupContext.epoch
+      leafNode.epk = groupInfo.groupContext.epoch
 
-      val newTree = RatchetTree(cipherSuite, publicTree, secretTree).update(leafIndex, cachedUpdate!!.leafNode, cachedUpdate!!.encryptionPrivateKey)
+      val newTree = RatchetTree(cipherSuite, publicTree, secretTree).update(leafIndex, leafNode, keyPair.private)
 
       var groupContext = groupInfo.groupContext
 
@@ -531,7 +575,7 @@ sealed class GroupState(
     fun updateGhostLeafNode(
       newEncryptionKeyPair: HpkeKeyPair,
     ): UpdateLeafNode {
-      if (cachedUpdate != null) raise(CreateQuarantineEndError.AlreadyUpdatedThisEpoch)
+//      if (cachedUpdate != null) raise(CreateQuarantineEndError.AlreadyUpdatedThisEpoch)
 
       val oldLeaf = tree.leafNode(leafIndex)
       val newLeaf =
@@ -547,7 +591,7 @@ sealed class GroupState(
           epoch+1u,
         ).bind()
 
-      cachedUpdate = CachedUpdate(newLeaf, newEncryptionKeyPair.private, null, true)
+//      cachedUpdate = CachedUpdate(newLeaf, newEncryptionKeyPair.private, null, true)
 
       return newLeaf
     }
@@ -565,6 +609,7 @@ sealed class GroupState(
         newSignaturePrivateKey,
         mapOf(),
         null,
+        mutableListOf(),
         mutableListOf(),
         groupGhostInfo,
         recoveredShares,
@@ -605,6 +650,10 @@ sealed class GroupState(
   internal data class CachedQuarantineEnd(
     val leafIndex: LeafIndex,
     val leafNode: UpdateLeafNode,
+  )
+
+  internal data class CachedRequestWelcomeBackGhost(
+    val leafIndex: LeafIndex,
   )
 
   data class CachedProposal(

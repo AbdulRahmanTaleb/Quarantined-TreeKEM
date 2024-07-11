@@ -1,6 +1,7 @@
 package com.github.traderjoe95.mls.protocol.error
 
 import com.github.traderjoe95.mls.protocol.types.framing.Sender
+import org.bouncycastle.asn1.ocsp.Request
 
 sealed interface DecryptError : PrivateMessageRecipientError, WelcomeJoinError, WelcomeBackGhostError
 
@@ -26,6 +27,7 @@ sealed interface VerifySignatureError :
   MessageRecipientError,
   KeyPackageValidationError,
   QuarantineEndValidationError,
+  RequestWelcomeBackGhostValidationError,
 ShareResendValidationError{
   data object BadSignature : VerifySignatureError
 

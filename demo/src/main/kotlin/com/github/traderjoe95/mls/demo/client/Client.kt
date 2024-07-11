@@ -118,7 +118,7 @@ class Client(
   suspend fun processMessage(messageId: ULID, encoded: ByteArray, cached: Boolean = false): GroupClient<String, *>? {
       println("[$userName] Message received: $messageId")
 
-      when (val res = mlsClient.processMessage(encoded, isGhost).getOrThrow()) {
+      when (val res = mlsClient.processMessage(encoded, isGhost, cached).getOrThrow()) {
 
         is ProcessMessageResult.WelcomeMessageReceived -> {
           val keyPackage = res.welcome.secrets.firstNotNullOf {
@@ -217,6 +217,10 @@ class Client(
           return null
         }
 
+        is ProcessMessageResult.RequestWelcomeBackGhostMessageReceived -> {
+          return null
+        }
+
         is ProcessMessageResult.WelcomeBackGhostMessageIgnored -> {
           println("[$userName] $res")
           return null
@@ -258,6 +262,17 @@ class Client(
 
     DeliveryService.sendMessageToGroup(
       endQuarantineMessage,
+      groupId,
+      fromUser = userName,
+    )
+  }
+
+  suspend fun requestWelcomeBackGhost(groupId: GroupId) {
+
+    val requestWelcomeBackGhostMessage = (mlsClient[groupId]!! as ActiveGroupClient<String>).requestWelcomeBackGhost().getOrThrow()
+
+    DeliveryService.sendMessageToGroup(
+      requestWelcomeBackGhostMessage,
       groupId,
       fromUser = userName,
     )

@@ -11,12 +11,14 @@ import arrow.core.recover
 import com.github.traderjoe95.mls.codec.util.uSize
 import com.github.traderjoe95.mls.protocol.client.ProcessHandshakeResult.CommitProcessedWithNewMembers
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
+import com.github.traderjoe95.mls.protocol.crypto.impl.Hpke
 import com.github.traderjoe95.mls.protocol.error.BranchError
 import com.github.traderjoe95.mls.protocol.error.CreateAddError
 import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
 import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
+import com.github.traderjoe95.mls.protocol.error.CreateRequestWelcomeBackGhostError
 import com.github.traderjoe95.mls.protocol.error.CreateShareResendMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateUpdateError
 import com.github.traderjoe95.mls.protocol.error.DecoderError
@@ -35,6 +37,8 @@ import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.ReInitError
 import com.github.traderjoe95.mls.protocol.error.SenderCommitError
+import com.github.traderjoe95.mls.protocol.error.UnexpectedError
+import com.github.traderjoe95.mls.protocol.error.WelcomeBackGhostMessageError
 import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
 import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.group.WelcomeBackGhostMessages
@@ -58,6 +62,7 @@ import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFo
 import com.github.traderjoe95.mls.protocol.message.MlsShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.PrivateMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.RequestWelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.UsePrivateMessage
@@ -109,6 +114,7 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
 
   var isGhost: Boolean = false
   var ghostEpoch: ULong = 0u
+  var endQuarantineNewParams: Pair<LeafNode<*>, HpkeKeyPair>? = null
   var ghostKeyPairs: List<Pair<ULong, HpkeKeyPair>>? = null
   val temporaryCachedStates = mutableListOf<GroupState>()
 
@@ -592,6 +598,17 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       shareRecoveryMessage
     }
 
+  suspend fun processRequestWelcomeBackGhost(requestWelcomeBackGhost: RequestWelcomeBackGhost): Either<ProcessMessageError, Unit> =
+    either {
+
+      val newState =
+        state.ensureActive {
+          process(requestWelcomeBackGhost)
+        }.bind()
+
+      replaceCurrentState(newState)
+    }
+
   suspend fun processShareResend(shareResend: ShareResend): Either<ProcessMessageError, MlsShareRecoveryMessage?> =
     either {
 
@@ -606,8 +623,10 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun processShareRecoveryMessage(shareRecoveryMessage: ShareRecoveryMessage): Either<ProcessMessageError, Unit> =
     either {
 
+      ensure(endQuarantineNewParams != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
+
       val newState = state.ensureActive {
-        process(shareRecoveryMessage)
+        process(shareRecoveryMessage, endQuarantineNewParams!!.second.private)
       }.bind()
 
 
@@ -618,12 +637,15 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun processWelcomeBackGhostMessage(welcomeBackGhost: WelcomeBackGhost): Either<ProcessMessageError, Unit> =
     either {
 
+      ensure(endQuarantineNewParams != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
+
       val newState = state.ensureActive {
-        process(welcomeBackGhost, psks)
+        process(welcomeBackGhost, endQuarantineNewParams!!.first, endQuarantineNewParams!!.second, psks)
       }.bind()
 
       advanceCurrentState(newState)
       isGhost = false
+      endQuarantineNewParams = null
     }
 
   suspend fun addMember(keyPackage: KeyPackage): Either<CreateAddError, ByteArray> =
@@ -652,7 +674,9 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       isGhost = true
       ghostEpoch = state.epoch
       return either {
-        val newLeaf = state.updateGhostLeafNode(cipherSuite.generateHpkeKeyPair())
+        val keys = cipherSuite.generateHpkeKeyPair()
+        val newLeaf = state.updateGhostLeafNode(keys)
+        endQuarantineNewParams = Pair(newLeaf, keys)
         state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey)
           .bind().encodeUnsafe()
       }
@@ -668,44 +692,45 @@ class ActiveGroupClient<Identity : Any> internal constructor(
       .bind().encodeUnsafe()
   }
 
+  suspend fun requestWelcomeBackGhost():  Either<CreateRequestWelcomeBackGhostError, ByteArray> =
+    either {
+      state.messages.requestWelcomeBackGhost(state.leafIndex, state.signaturePrivateKey)
+        .bind().encodeUnsafe()
+    }
+
   suspend fun startGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {
-//      println("stateHistory size = " + stateHistory.size)
-      val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
-//      println("epoch = " + ghostEpoch + " , " + stateHistory[ghostStateIdx].tree.private.getPrivateKey(state.leafIndex))
-
-//      println(state.recoveredShares.map{ it.epoch})
-//      println(state.recoveredShares.map{it.ghostShare.rank})
-//      println(state.recoveredShares.map{it.ghostShare.t})
-//      println(ghostEpoch)
       ghostKeyPairs = state.recoverKeyPairs().bind()
 
-      for(i in 0..<ghostStateIdx){
-        temporaryCachedStates.add(0, stateHistory[0])
-        stateHistory.removeAt(0)
+      if(!isGhost) {
+        val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
+        for (i in 0..<ghostStateIdx) {
+          temporaryCachedStates.add(0, stateHistory[0])
+          stateHistory.removeAt(0)
+        }
+        if (stateHistory[0].epoch != ghostEpoch) {
+          raise(GhostRecoveryProcessError.WrongGhostEpoch)
+        }
       }
-      if(stateHistory[0].epoch != ghostEpoch){
-        raise(GhostRecoveryProcessError.WrongGhostEpoch)
-      }
-//      println("cachedStates size = " + temporaryCachedStates.size)
     }
 
   suspend fun endGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {
 
-      if(temporaryCachedStates[0].epoch != state.epoch){
-        raise(GhostRecoveryProcessError.UnexpectedEpochAfterMessageRecovery)
+      if(!isGhost){
+        if(temporaryCachedStates[0].epoch != state.epoch){
+          raise(GhostRecoveryProcessError.UnexpectedEpochAfterMessageRecovery)
+        }
+        temporaryCachedStates.removeAt(0)
+        temporaryCachedStates.forEach {
+          stateHistory.add(it)
+        }
+        temporaryCachedStates.clear()
+      }
+      else{
+        isGhost = false
       }
 
-//      if(temporaryCachedStates[0].tree.public.leaves != state.tree.public.leaves){
-//        raise(GhostRecoveryProcessError.IncoherentStates)
-//      }
-
-      temporaryCachedStates.removeAt(0)
-      temporaryCachedStates.forEach {
-        stateHistory.add(it)
-      }
-      temporaryCachedStates.clear()
       ghostEpoch = 0u
       ghostKeyPairs = null
     }

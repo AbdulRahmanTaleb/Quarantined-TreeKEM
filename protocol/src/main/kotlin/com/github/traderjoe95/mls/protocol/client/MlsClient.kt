@@ -26,6 +26,7 @@ import com.github.traderjoe95.mls.protocol.message.MlsMessage
 import com.github.traderjoe95.mls.protocol.message.MlsMessage.Companion.ensureFormat
 import com.github.traderjoe95.mls.protocol.message.PublicMessage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.RequestWelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.message.Welcome
@@ -46,6 +47,7 @@ import com.github.traderjoe95.mls.protocol.types.framing.enums.ContentType
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.Capabilities
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.Lifetime
 import com.github.traderjoe95.mls.protocol.util.hex
+import org.bouncycastle.asn1.ocsp.Request
 
 class MlsClient<Identity : Any>(
   val authenticationService: AuthenticationService<Identity>,
@@ -172,13 +174,13 @@ class MlsClient<Identity : Any>(
 
   fun decodeMessage(messageBytes: ByteArray): Either<DecoderError, MlsMessage<*>> = GroupClient.decodeMessage(messageBytes)
 
-  suspend fun processMessage(messageBytes: ByteArray, isGhost: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  suspend fun processMessage(messageBytes: ByteArray, isGhost: Boolean = false, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     decodeMessage(messageBytes)
-      .flatMap { processMessage(it, isGhost) }
+      .flatMap { processMessage(it, isGhost, cached) }
 
-  private suspend fun processMessage(message: MlsMessage<*>, isGhost: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  private suspend fun processMessage(message: MlsMessage<*>, isGhost: Boolean = false, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
-      if(isGhost && (message.message !is ShareRecoveryMessage) && (message.message !is WelcomeBackGhost)){
+      if(isGhost && (!cached) && (message.message !is ShareRecoveryMessage) && (message.message !is WelcomeBackGhost)){
         ProcessMessageResult.MessageToCachForLater
       }
       else {
@@ -203,6 +205,11 @@ class MlsClient<Identity : Any>(
             processQuarantineEnd(message.message).bind()
           }
 
+          is RequestWelcomeBackGhost -> {
+            println("RequestWelcomeBackGhost received")
+            processRequestWelcomeBackGhost(message.message).bind()
+          }
+
           is GroupMessage<*> -> {
             processGroupMessage(message.message).bind()
           }
@@ -213,7 +220,7 @@ class MlsClient<Identity : Any>(
           }
 
           is WelcomeBackGhost -> {
-            println("welcomebackghost")
+            println("WelcomeBackGhost")
             processWelcomeBackGhostMessage(message.message).bind()
           }
 
@@ -287,6 +294,30 @@ class MlsClient<Identity : Any>(
       }
     }
 
+  private suspend fun processRequestWelcomeBackGhost(requestWelcomeBackGhost: RequestWelcomeBackGhost): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+    either{
+      val groupId = requestWelcomeBackGhost.groupId
+      val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
+
+      if(requestWelcomeBackGhost.leafIndex == group.state.leafIndex){
+        println("Ignoring own QuarantineEnd Received")
+        ProcessMessageResult.RequestWelcomeBackGhostMessageReceived(
+          requestWelcomeBackGhost
+        )
+      }
+      else{
+        if (group is ActiveGroupClient<Identity>) {
+          group.processRequestWelcomeBackGhost(requestWelcomeBackGhost).bind()
+
+          ProcessMessageResult.RequestWelcomeBackGhostMessageReceived(
+            requestWelcomeBackGhost
+          )
+        } else {
+          raise(GroupSuspended(requestWelcomeBackGhost.groupId))
+        }
+      }
+    }
+
   private suspend fun processShareResend(shareResend: ShareResend): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either{
       val groupId = shareResend.groupId
@@ -323,7 +354,7 @@ class MlsClient<Identity : Any>(
 
       else{
         if (group is ActiveGroupClient<Identity>) {
-          group.processShareRecoveryMessage(shareRecoveryMessage)
+          group.processShareRecoveryMessage(shareRecoveryMessage).bind()
           println("Processed share recovery message")
           ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
         } else {
@@ -342,7 +373,7 @@ class MlsClient<Identity : Any>(
       }
       else{
         if (group is ActiveGroupClient<Identity>) {
-          group.processWelcomeBackGhostMessage(welcomeBackGhost)
+          group.processWelcomeBackGhostMessage(welcomeBackGhost).bind()
           ProcessMessageResult.WelcomeBackGhostMessageProcessed
         } else {
           raise(GroupSuspended(welcomeBackGhost.groupId))

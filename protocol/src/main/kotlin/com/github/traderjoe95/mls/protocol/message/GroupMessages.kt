@@ -11,6 +11,7 @@ import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
 import com.github.traderjoe95.mls.protocol.error.CreateQuarantineEndError
 import com.github.traderjoe95.mls.protocol.error.CreateReInitError
 import com.github.traderjoe95.mls.protocol.error.CreateRemoveError
+import com.github.traderjoe95.mls.protocol.error.CreateRequestWelcomeBackGhostError
 import com.github.traderjoe95.mls.protocol.error.CreateShareRecoveryMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateShareResendMessageError
 import com.github.traderjoe95.mls.protocol.error.CreateSignatureError
@@ -49,6 +50,7 @@ import com.github.traderjoe95.mls.protocol.types.framing.content.Remove
 import com.github.traderjoe95.mls.protocol.types.framing.content.Update
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion
 import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
+import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.UpdateLeafNode
 
 class GroupMessageFactory internal constructor(
@@ -97,6 +99,13 @@ class GroupMessageFactory internal constructor(
     signaturePrivateKey: SignaturePrivateKey,
   ): Either<CreateShareResendMessageError, MlsShareResendMessage> = either {
     MlsMessage(ShareResend.create(groupContext.groupId, groupContext.cipherSuite, leafIndex, shareHolderRank, signaturePrivateKey).bind())
+  }
+
+  suspend fun requestWelcomeBackGhost(
+    leafIndex: LeafIndex,
+    signaturePrivateKey: SignaturePrivateKey,
+  ): Either<CreateRequestWelcomeBackGhostError, MlsRequestWelcomeBackGhostMessage> = either {
+    MlsMessage(RequestWelcomeBackGhost.create(groupContext.groupId, groupContext.cipherSuite, leafIndex, signaturePrivateKey).bind())
   }
 
   suspend fun applicationMessage(

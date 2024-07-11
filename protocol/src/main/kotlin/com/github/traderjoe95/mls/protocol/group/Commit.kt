@@ -174,8 +174,8 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
       ).bind()
 
 
-    val ghostReconnectNodes = cachedQuarantineEnd.map{
-      it.leafNode
+    val ghostReconnectNodes = cachedRequestWelcomeBackGhost.map{
+      updatedTree.leafNode(it.leafIndex)
     }
 
     PrepareCommitResult(

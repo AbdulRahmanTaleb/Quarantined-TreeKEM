@@ -14,6 +14,10 @@ sealed interface CreateQuarantineEndError {
   data object AlreadyUpdatedThisEpoch : CreateQuarantineEndError
 }
 
+sealed interface CreateRequestWelcomeBackGhostError {
+
+}
+
 sealed interface CreateShareRecoveryMessageError : ProcessMessageError {
   data object ShareRecoveryCreationError : CreateShareRecoveryMessageError
 }

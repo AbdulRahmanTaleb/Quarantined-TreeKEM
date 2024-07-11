@@ -15,6 +15,7 @@ sealed interface CreateMessageError :
   CreateGroupContextExtensionsError,
   CreateReInitError,
   CreateQuarantineEndError,
+  CreateRequestWelcomeBackGhostError,
   CreateShareResendMessageError
 
 sealed interface MessageSenderError : PrivateMessageSenderError, PublicMessageSenderError {

@@ -3,11 +3,13 @@ package com.github.traderjoe95.mls.protocol.client
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
 import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.RequestWelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.ShareRecoveryMessage
 import com.github.traderjoe95.mls.protocol.message.Welcome
 import com.github.traderjoe95.mls.protocol.types.GroupId
 import com.github.traderjoe95.mls.protocol.types.framing.content.ApplicationData
 import com.github.traderjoe95.mls.protocol.types.framing.content.AuthenticatedContent
+import org.bouncycastle.asn1.ocsp.Request
 
 sealed interface ProcessMessageResult<out Identity : Any> {
   data class WelcomeMessageReceived(
@@ -25,6 +27,12 @@ sealed interface ProcessMessageResult<out Identity : Any> {
   data class ShareRecoveryMessageReceived(
     val shareRecoveryMessage: ShareRecoveryMessage,
   ) : ProcessMessageResult<Nothing>
+
+  data class RequestWelcomeBackGhostMessageReceived(
+    val requestWelcomeBackGhost: RequestWelcomeBackGhost,
+  ) : ProcessMessageResult<Nothing>
+
+
   data class QuarantineEndReceived(
     val groupId: GroupId,
     val shareRecoveryMessage: ByteArray?

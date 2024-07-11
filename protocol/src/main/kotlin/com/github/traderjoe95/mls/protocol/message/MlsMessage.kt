@@ -113,6 +113,7 @@ class MlsMessage<out M : Message>
                   .case(WireFormat.MlsShareRecoveryMessage).then(ShareRecoveryMessage.T, "share_recovery_message")
                   .case(WireFormat.MlsWelcomeBackGhost).then(WelcomeBackGhost.T, "welcome_back_ghost")
                   .case(WireFormat.MlsShareResend).then(ShareResend.T, "share_resend")
+                  .case(WireFormat.MlsRequestWelcomeBackGhost).then(RequestWelcomeBackGhost.T, "request_welcome_back_ghost")
               }
           }.lift { v, _, msg -> MlsMessage(v, msg) }
         }

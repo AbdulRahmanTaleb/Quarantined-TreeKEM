@@ -16,11 +16,13 @@ import com.github.traderjoe95.mls.protocol.error.ProposalValidationError.BadExte
 import com.github.traderjoe95.mls.protocol.error.QuarantineEndValidationError
 import com.github.traderjoe95.mls.protocol.error.ReInitValidationError
 import com.github.traderjoe95.mls.protocol.error.RemoveValidationError
+import com.github.traderjoe95.mls.protocol.error.RequestWelcomeBackGhostValidationError
 import com.github.traderjoe95.mls.protocol.error.ShareResendValidationError
 import com.github.traderjoe95.mls.protocol.error.UnexpectedExtension
 import com.github.traderjoe95.mls.protocol.error.UpdateValidationError
 import com.github.traderjoe95.mls.protocol.message.KeyPackage
 import com.github.traderjoe95.mls.protocol.message.QuarantineEnd
+import com.github.traderjoe95.mls.protocol.message.RequestWelcomeBackGhost
 import com.github.traderjoe95.mls.protocol.message.ShareResend
 import com.github.traderjoe95.mls.protocol.psk.PskLookup
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
@@ -124,6 +126,26 @@ class Validations(
       quarantineEnd.verifySignature().bind()
 
       quarantineEnd
+    }
+
+  fun validated(
+    requestWelcomeBackGhost: RequestWelcomeBackGhost,
+    currentTree: RatchetTreeOps = this.currentTree,
+  ): Either<RequestWelcomeBackGhostValidationError, RequestWelcomeBackGhost> =
+    either {
+
+      ensure(requestWelcomeBackGhost.cipherSuite == cipherSuite) {
+        RequestWelcomeBackGhostValidationError.IncompatibleCipherSuite(requestWelcomeBackGhost.cipherSuite, cipherSuite)
+      }
+
+      ensure(currentTree.leafNodeOrNull(requestWelcomeBackGhost.leafIndex) != null) {
+        RequestWelcomeBackGhostValidationError.LeafNotFound(requestWelcomeBackGhost.leafIndex)
+      }
+
+      val leafNode = currentTree.leafNode(requestWelcomeBackGhost.leafIndex)
+      requestWelcomeBackGhost.verifySignature(leafNode.signaturePublicKey).bind()
+
+      requestWelcomeBackGhost
     }
 
   fun validated(

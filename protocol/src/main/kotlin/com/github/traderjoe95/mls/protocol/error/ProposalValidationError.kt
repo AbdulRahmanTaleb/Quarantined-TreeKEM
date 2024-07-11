@@ -46,6 +46,13 @@ sealed interface QuarantineEndValidationError : ProposalValidationError {
   data class LeafIsNotGhost(val leafIdx: LeafIndex) : QuarantineEndValidationError
 }
 
+sealed interface RequestWelcomeBackGhostValidationError : ProposalValidationError {
+  data class IncompatibleCipherSuite(val keyPackage: CipherSuite, val group: CipherSuite) : RequestWelcomeBackGhostValidationError
+
+
+  data class LeafNotFound(val leafIdx: LeafIndex) : RequestWelcomeBackGhostValidationError
+}
+
 sealed interface ShareResendValidationError : ProposalValidationError {
   data class IncompatibleCipherSuite(val keyPackage: CipherSuite, val group: CipherSuite) : ShareResendValidationError
 
