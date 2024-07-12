@@ -81,6 +81,12 @@ When a ghost user reconnects, they send an `QuarantineEndMessage` to the other u
 
 Each user that receives `QuarantineEndMessage` checks whether they have secret shares for ghost encryption keys of this user (using the `protocol.client.ActiveGroupClient#processQuarantineEnd()` method), for which they are share holder of rank 1, in this case, they send the corresponding shares to the reconnecting user in a `ShareRecoveryMessage`.
 
+The ghost user can retrieve the current state of the group with one of the two following options:
+- ask for a `WelcomeBackGhostMessage` at the next commit as described further in this section
+- start by reconstructing all of their ghost encryption keys and decryption cached conversations to update their view of the group (c.f. Section 3)
+
+The user has the option since sending a complete view of the ratchet tree can be expensive for large groups. Hence the `WelcomeBackGhostMessage` is only sent if the ghost user asks for it, in the case where they are not able to recover their encryption keys immediately and need to join the group anyway. In this case, the ghost user sends a `RequestWelcomeBackGhostMessage` message (`protocol.message.RequestWelcomeBackGhost`) so that at the next commit, the committer sends a `WelcomeBackGhostMessage`.
+
 When the next user commits, they create a `WelcomeBackGhostMessage` (`protocol.group.PrepareCommitResult.WelcomeBackGhostMessage`) destined to be sent to the reconnecting user. This message essentially contains the root keys and the ratchet tree for the next epoch, so that the reconnecting user can join the group, without having to decrypt previous conversations (in case they did not recover all the secret shares from other users yet). More precisely, the `protocol.message.WelcomeBackGhost` data object contained in the `WelcomeBackGhostMessage` has essentially the fields:
 - encrypted `GroupInfo` of the current group, with the current status of the public ratchet tree, enabling the ghost user to sync their view of the group
 - encrypted root secrets of the ratchet tree so that the ghost user can participate in future conversations, without having to recover their ghost encryption keys.

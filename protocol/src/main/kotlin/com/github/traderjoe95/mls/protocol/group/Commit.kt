@@ -69,16 +69,13 @@ import com.github.traderjoe95.mls.protocol.util.hex
 import com.github.traderjoe95.mls.protocol.types.RatchetTree as RatchetTreeExt
 
 
-fun GroupState.Active.printGhostUsers(newGhostMembers: List<GhostMemberCommit>){
+private fun GroupState.Active.printGhostUsers(newGhostMembers: List<GhostMemberCommit>){
   if(newGhostMembers.isNotEmpty()){
-    println("\nnew ghosts:")
-    println("current epoch:"+(groupContext.epoch+1u))
+    print("\nNew ghosts or ghosts key update at epoch " + (groupContext.epoch+1u)  +": ")
     newGhostMembers.forEach {
-      val leaf = tree.leaves[it.leafIndex.value.toInt()]!!
-      println(leaf.encryptionKey.hex + ", " + leaf.epk + ", "  + leaf.equar)
+      print(it.leafIndex.toString()+ ", ")
     }
-    println(groupGhostInfo.getCurrentGhosts())
-    println("end of ghosts.\n")
+    println("\n")
   }
 }
 

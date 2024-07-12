@@ -28,13 +28,19 @@ import java.util.concurrent.ConcurrentMap
 import com.github.traderjoe95.mls.codec.error.EncoderError as BaseEncoderError
 
 object DeliveryService : DeliveryService<String> {
-  private val users: ConcurrentMap<String, Channel<Pair<ULID, ByteArray>>> = ConcurrentHashMap()
-  private val groups: ConcurrentMap<Int, GroupView> = ConcurrentHashMap()
+  private var users: ConcurrentMap<String, Channel<Pair<ULID, ByteArray>>> = ConcurrentHashMap()
+  private var groups: ConcurrentMap<Int, GroupView> = ConcurrentHashMap()
 
-  private val keyPackages: ConcurrentMap<Triple<String, ProtocolVersion, CipherSuite>, ConcurrentLinkedQueue<ByteArray>> =
+  private var keyPackages: ConcurrentMap<Triple<String, ProtocolVersion, CipherSuite>, ConcurrentLinkedQueue<ByteArray>> =
     ConcurrentHashMap()
 
   fun registerUser(user: String): Channel<Pair<ULID, ByteArray>> = users.computeIfAbsent(user) { Channel(UNLIMITED) }
+
+  fun empty(){
+    users = ConcurrentHashMap()
+    groups = ConcurrentHashMap()
+    keyPackages = ConcurrentHashMap()
+  }
 
   fun registerForGroup(
     group: GroupId,

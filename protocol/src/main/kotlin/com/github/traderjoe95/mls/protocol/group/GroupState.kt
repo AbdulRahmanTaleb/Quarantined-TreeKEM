@@ -70,6 +70,7 @@ import com.github.traderjoe95.mls.protocol.types.tree.UpdateLeafNode
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.Capabilities
 import com.github.traderjoe95.mls.protocol.util.hex
 import java.time.Instant
+import kotlin.math.ceil
 import com.github.traderjoe95.mls.protocol.types.RatchetTree as RatchetTreeExt
 
 sealed class GroupState(
@@ -162,8 +163,16 @@ sealed class GroupState(
       )
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeRecoveredShare(secretShares: GhostShareHolderList): Active =
-      Active(
+    private suspend fun storeRecoveredShare(secretShares: GhostShareHolderList): Active {
+
+      val filteredShares = secretShares.ghostShareHolders.filter{ ghostShareHolder ->
+        recoveredShares.find { storedShareHolder ->
+          (ghostShareHolder.ghostEncryptionKey.eq(storedShareHolder.ghostEncryptionKey)) &&
+            (ghostShareHolder.ghostShare == storedShareHolder.ghostShare)
+        } == null
+      }
+
+      return Active(
         groupContext,
         tree,
         keySchedule,
@@ -173,8 +182,9 @@ sealed class GroupState(
         cachedQuarantineEnd,
         cachedRequestWelcomeBackGhost,
         groupGhostInfo,
-        recoveredShares + secretShares.ghostShareHolders,
+        recoveredShares + filteredShares,
       )
+    }
 
     context(Raise<GhostRecoveryProcessError>)
     suspend fun recoverKeyPairs(): Either<GhostRecoveryProcessError, List<Pair<ULong,HpkeKeyPair>>> = either {
@@ -201,7 +211,7 @@ sealed class GroupState(
         it.second.forEach {share ->
           indices.add(share.ghostShare.rank)
         }
-        if(indices.size.toUInt() != t){
+        if(indices.size.toUInt() < t){
           raise(GhostRecoveryProcessError.NotEnoughSharesForKeyRecoveryError)
         }
       }
@@ -244,7 +254,7 @@ sealed class GroupState(
         for (shareHolder in it.second) {
           indices.add(shareHolder.ghostShare.rank)
         }
-        if(indices.size.toUInt() != t){
+        if(indices.size.toUInt() < t){
           return false
         }
 //        println(indices)
@@ -405,7 +415,7 @@ sealed class GroupState(
             ).bind()
             Pair(
               newState,
-              messages.shareRecoveryMessage(quarantineEnd.leafIndex ,quarantineEnd.leafNode.encryptionKey, ct).bind()
+              messages.shareRecoveryMessage(quarantineEnd.leafIndex, epoch ,quarantineEnd.leafNode.encryptionKey, ct).bind()
             )
           } else {
             Pair(newState, null)
@@ -435,19 +445,17 @@ sealed class GroupState(
       either {
         ensure(shareResend.groupId eq groupId) { MessageRecipientError.WrongGroup(shareResend.groupId, groupId) }
 
-        val cached = cachedQuarantineEnd.firstOrNull{ it.leafIndex == shareResend.leafIndex }
-        ensure(cached != null) { ShareResendError.InvalidLeafIndexNotFoundInCachedQuarantineEnd }
-
+        val encryptionKey = tree.leafNode(shareResend.leafIndex).encryptionKey
         validations.validated(shareResend).bind()
         if (groupGhostInfo.hasKeyShares(shareResend.leafIndex, shareResend.requiredShareHolderRank)) {
           val ghostShareHolderList = groupGhostInfo.getKeyShares(shareResend.leafIndex, shareResend.requiredShareHolderRank)
           val ct = encryptWithLabel(
-            cached.leafNode.encryptionKey,
+            encryptionKey,
             "ShareRecoveryMessage",
             ByteArray(0),
             ghostShareHolderList.encodeUnsafe()
           ).bind()
-            messages.shareRecoveryMessage(shareResend.leafIndex ,cached.leafNode.encryptionKey, ct).bind()
+            messages.shareRecoveryMessage(shareResend.leafIndex, epoch, encryptionKey, ct).bind()
         } else {
           null
         }
@@ -457,7 +465,7 @@ sealed class GroupState(
     suspend fun process(
       shareRecoveryMessage: ShareRecoveryMessage,
       encryptionPrivateKey: HpkePrivateKey,
-    ): Either<ProcessMessageError, GroupState> = either {
+    ): Either<ProcessMessageError, Pair<ULong, GroupState>> = either {
 
       ensure(shareRecoveryMessage.groupId eq groupId) { MessageRecipientError.WrongGroup(shareRecoveryMessage.groupId, groupId) }
 
@@ -472,7 +480,16 @@ sealed class GroupState(
 
       val shares = GhostShareHolderList.decodeUnsafe(res)
 
-      storeRecoveredShare(shares)
+      var ep: ULong = 0u
+      shares.ghostShareHolders.forEach {
+        if(it.ghostShareHolderRank == 1u){
+          ep = shareRecoveryMessage.currentEpoch
+        }
+      }
+
+//      println("ep = " + ep)
+
+      Pair(ep, storeRecoveredShare(shares))
     }
 
     context(Raise<ProcessMessageError>)
@@ -677,6 +694,10 @@ sealed class GroupState(
     val INACTIVITY_DELAY: ULong = 5U
     val UPDATE_QUARANTINE_KEYS_DELAY: ULong = 1u
     val DELETE_FROM_QUARANTINE_DELAY: ULong = 15U
+
+    fun computeSecretSharingTValue(m: Int): Int {
+      return ceil(m.toDouble()/2).toInt()
+    }
 
   }
 }

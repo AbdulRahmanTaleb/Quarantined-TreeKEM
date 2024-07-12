@@ -57,6 +57,6 @@ sealed interface GhostRecoveryProcessError {
 
   data class IncorrectRecoveredKey(val expected: HpkePublicKey, val obtained: HpkePublicKey) : GhostRecoveryProcessError
 
-  data object NotImplementedYetForMultipleQuarantineKeys : GhostRecoveryProcessError
+  data object UnexpectedErrorUserIsNotGhost : GhostRecoveryProcessError
 
 }

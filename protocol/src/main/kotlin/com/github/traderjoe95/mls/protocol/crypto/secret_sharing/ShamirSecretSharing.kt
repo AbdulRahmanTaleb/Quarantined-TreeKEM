@@ -26,6 +26,7 @@ import com.github.traderjoe95.mls.protocol.types.extensionList
 import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion
 import com.github.traderjoe95.mls.protocol.types.tree.hash.ParentHashInput
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.ParentHash
+import kotlin.math.min
 
 class ShamirSecretSharing() {
   companion object{
@@ -60,13 +61,15 @@ class ShamirSecretSharing() {
     fun retrieveSecret(shares: List<SecretShare>): ByteArray{
       var res = BigInteger("0")
 
-      for (j in 0..<shares.size) {
+      val nb =  min(shares.size, shares[0].t.toInt())
+
+      for (j in 0..< nb) {
 
         var tmp = BigInteger(1, shares[j].y)
 
         val xj = BigInteger(1, shares[j].x)
 
-        for (i in 0..<shares.size) {
+        for (i in 0..< nb) {
 
           if (i != j) {
 

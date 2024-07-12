@@ -38,7 +38,6 @@ suspend fun main() {
     groups,
     clients,
     clientsList,
-    1,
     idxUpdate,
     idxCommit,
   )
@@ -55,7 +54,6 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      i+2,
       idxUpdate,
       idxCommit,
       listOf(idxGhost1)
@@ -75,7 +73,6 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      i+2,
       idxUpdate,
       idxCommit,
       idxGhosts
@@ -107,6 +104,10 @@ suspend fun main() {
   // who have a valid share with a shareholder rank = 1
   println("\n---------------------------- Sending Quarantine End")
   clients[idxGhost1].ghostReconnect(groups[idxGhost1].groupId)
+  clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
+    it.processNextMessage().getOrThrow()
+  }
+  clients[idxGhost1].requestWelcomeBackGhost(groups[idxGhost1].groupId)
   clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
     it.processNextMessage().getOrThrow()
   }
@@ -183,12 +184,16 @@ suspend fun main() {
   // who have a valid share with a shareholder rank = 1
   println("\n---------------------------- Sending Quarantine End")
   clients[idxGhost2].ghostReconnect(groups[idxGhost2].groupId)
-  clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
+  clients.forEach{
+    it.processNextMessage().getOrThrow()
+  }
+  clients[idxGhost2].requestWelcomeBackGhost(groups[idxGhost2].groupId)
+  clients.forEach{
     it.processNextMessage().getOrThrow()
   }
 
   println("\n---------------------------- Receiving Share Recovery Message")
-  for(k in 0..clients.size-2){
+  for(k in 0..clients.size-1){
     clients.forEach {
       it.processNextMessage().getOrThrow()
     }

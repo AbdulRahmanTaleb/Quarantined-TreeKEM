@@ -44,7 +44,6 @@ class Client(
   private val signatureKeyPairs: MutableMap<CipherSuite, SignatureKeyPair> = mutableMapOf()
 
   private val mlsClient: MlsClient<String> = MlsClient(this)
-  private var isGhost = false
 
   fun generateKeyPackages(
     amount: UInt,
@@ -118,7 +117,7 @@ class Client(
   suspend fun processMessage(messageId: ULID, encoded: ByteArray, cached: Boolean = false): GroupClient<String, *>? {
       println("[$userName] Message received: $messageId")
 
-      when (val res = mlsClient.processMessage(encoded, isGhost, cached).getOrThrow()) {
+      when (val res = mlsClient.processMessage(encoded, cached).getOrThrow()) {
 
         is ProcessMessageResult.WelcomeMessageReceived -> {
           val keyPackage = res.welcome.secrets.firstNotNullOf {
@@ -154,6 +153,7 @@ class Client(
 
         is ProcessMessageResult.QuarantineEndReceived -> {
           if((res.shareRecoveryMessage != null) && (!cached)){
+            println("sending ShareRecoveryMessage")
             DeliveryService.sendMessageToGroup(
               res.shareRecoveryMessage!!,
               res.groupId,
@@ -227,7 +227,6 @@ class Client(
         }
         is ProcessMessageResult.WelcomeBackGhostMessageProcessed -> {
           println("[$userName] $res")
-          isGhost = false
           return null
         }
 
@@ -251,7 +250,6 @@ class Client(
     }
 
   suspend fun ghostReconnect(groupId: GroupId) {
-    isGhost = true
     var message = messages.tryReceive().getOrNull()
     while(message != null){
       cachedGhostMessages.add(message)

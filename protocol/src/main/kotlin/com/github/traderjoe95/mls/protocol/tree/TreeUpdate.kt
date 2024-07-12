@@ -32,6 +32,7 @@ import com.github.traderjoe95.mls.protocol.group.GhostMemberCommit
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolder
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolderList
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolderList.Companion.encodeUnsafe
+import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkeCiphertext
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
 import com.github.traderjoe95.mls.protocol.types.tree.GhostShareDistribution
@@ -85,36 +86,41 @@ internal fun createUpdatePath(
     var nodeIndices =  listOf<NodeIndex>()
     if (newGhostSecrets.isNotEmpty()) {
       // Trying with the default share distribution method
+//      println(filteredDirectPath.map { Pair(it.first, it.first.level) })
+//      originalTree.print()
+//      println("filtered direct path = " + filteredDirectPath.map{it.first})
       var nbShares = filteredDirectPath.size + 1
-      filteredDirectPath.mapIndexed { idx, (_, res) ->
+      filteredDirectPath.forEachIndexed { idx, (nodeIdx, res) ->
         res.map {
           if((!it.isLeaf) || (originalTree.leaves[it.leafIndex.value.toInt()]!!.source != LeafNodeSource.Ghost)){
             onlyGhostsInRes[idx] = false
           }
         }
-        if(onlyGhostsInRes[idx]){ nbShares-- }
+        if((onlyGhostsInRes[idx]) || (nodeIdx.level == 1u)) nbShares--
+
       }
 
       // If not enough shares can be constructed with the default method,
       // try the horizontal share distribution method
       if(nbShares < minimum_secret_sharing_nb){
 
-        println("Not enough shares with the default share distribution method, trying the horizontal method ...")
+        println("Not enough shares (" + nbShares + ") with the default share distribution method, trying the horizontal method ...")
 
         val res = originalTree.public.getLevelWithEnoughNodes(minimum_secret_sharing_nb, from)
           ?: raise(UnexpectedError("NotEnoughNodesForSecretSharing"))
 
         nbShares = res.first
         nodeIndices = res.second
-        println(nodeIndices)
+        println("Found Level with enough nodes: level " + nodeIndices[0].level)
 
         horizontalShareDistributionUsed = true
       }
 
-      println("nb_shares = " + nbShares)
+      val t = GroupState.computeSecretSharingTValue(nbShares)
 
+      println("Parameters for secret sharing for this epoch: m = " + nbShares+ ", t = "+ t + "\n")
       newGhostSecrets.forEach {
-        ghostSecretShares.add(ShamirSecretSharing.generateShares(it.bytes, nbShares, nbShares))
+        ghostSecretShares.add(ShamirSecretSharing.generateShares(it.bytes, t, nbShares))
       }
     }
 
@@ -201,10 +207,11 @@ internal fun createUpdatePath(
           })
       }
 
-    var shareIdx = 1
+
     val ghostShares: List<GhostShareDistribution>
 
     if(horizontalShareDistributionUsed){
+      var shareIdx = 1
       ghostShares = nodeIndices.map{
         if((it.level.toInt() == 0 && it.leafIndex.value == from.value) || (it.level.toInt() > 0 && directPath[it.level.toInt()-1].value == it.value)){
           GhostShareDistribution(
@@ -240,6 +247,7 @@ internal fun createUpdatePath(
         }
       }
     } else {
+      var shareIdx = 1
       ghostShares = filteredDirectPath.mapIndexed { index, nodeAndRes ->
         val (nodeIdx, resolution) = nodeAndRes
         val encryptFor = resolution - excludedNodeIndices
@@ -249,7 +257,7 @@ internal fun createUpdatePath(
           when {
             !onlyGhostsInRes[index] -> {
 //              println(nodeAndRes)
-              shareIdx++
+              if(nodeIdx.level != 1u) shareIdx++
               var holderRank = 0u
               encryptFor.mapNotNull { idx ->
                 when {

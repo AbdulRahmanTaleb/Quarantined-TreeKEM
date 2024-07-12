@@ -24,7 +24,6 @@ suspend fun test1(){
       groups,
       clients,
       clientsList,
-      i = idxCommit,
       updaterGroupsIdx = listOf(4),
       committerGroupIdx =  idxCommit,
     )
@@ -38,7 +37,6 @@ suspend fun test1(){
     groups,
     clients,
     clientsList,
-    i = 4,
     updaterGroupsIdx = listOf(),
     committerGroupIdx = 4,
     excludeClients = listOf(idxGhost)
@@ -51,7 +49,6 @@ suspend fun test1(){
       groups,
       clients,
       clientsList,
-      i = i,
       updaterGroupsIdx = listOf(0,1,2,3),
       committerGroupIdx =  4,
       excludeClients =  listOf(idxGhost)

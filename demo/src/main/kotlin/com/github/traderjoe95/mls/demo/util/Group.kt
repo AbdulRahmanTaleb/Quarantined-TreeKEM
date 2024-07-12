@@ -122,9 +122,9 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
   return Pair(clients, groups)
 }
 
-suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, i:Int, updaterGroupsIdx: List<Int>, committerGroupIdx: Int, excludeClients: List<Int> = listOf(), noCommit: Boolean = false){
+suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, updaterGroupsIdx: List<Int>, committerGroupIdx: Int, excludeClients: List<Int> = listOf(), noCommit: Boolean = false){
 
-  println(i.toString() + ": UPDATING " + clientsList.slice(updaterGroupsIdx.filter{ !excludeClients.contains(it) && it!=committerGroupIdx}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerGroupIdx].uppercase())
+  println("UPDATING " + clientsList.slice(updaterGroupsIdx.filter{ !excludeClients.contains(it) && it!=committerGroupIdx}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerGroupIdx].uppercase())
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   updaterGroupsIdx.forEach { updaterGroup ->
     if((updaterGroup != committerGroupIdx) && (!excludeClients.contains(updaterGroup))){

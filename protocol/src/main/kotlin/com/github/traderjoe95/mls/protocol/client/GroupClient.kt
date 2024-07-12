@@ -7,11 +7,11 @@ import arrow.core.prependTo
 import arrow.core.raise.Raise
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import arrow.core.raise.recover
 import arrow.core.recover
 import com.github.traderjoe95.mls.codec.util.uSize
 import com.github.traderjoe95.mls.protocol.client.ProcessHandshakeResult.CommitProcessedWithNewMembers
 import com.github.traderjoe95.mls.protocol.crypto.CipherSuite
-import com.github.traderjoe95.mls.protocol.crypto.impl.Hpke
 import com.github.traderjoe95.mls.protocol.error.BranchError
 import com.github.traderjoe95.mls.protocol.error.CreateAddError
 import com.github.traderjoe95.mls.protocol.error.CreatePreSharedKeyError
@@ -37,7 +37,6 @@ import com.github.traderjoe95.mls.protocol.error.ProcessMessageError
 import com.github.traderjoe95.mls.protocol.error.PskError
 import com.github.traderjoe95.mls.protocol.error.ReInitError
 import com.github.traderjoe95.mls.protocol.error.SenderCommitError
-import com.github.traderjoe95.mls.protocol.error.UnexpectedError
 import com.github.traderjoe95.mls.protocol.error.WelcomeBackGhostMessageError
 import com.github.traderjoe95.mls.protocol.error.WelcomeJoinError
 import com.github.traderjoe95.mls.protocol.group.GroupState
@@ -93,6 +92,16 @@ import com.github.traderjoe95.mls.protocol.types.framing.enums.WireFormat
 import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import com.github.traderjoe95.mls.protocol.util.hex
 
+data class RecoveringGhostData(
+  val lastActivityEpoch: ULong,
+  var reconnectEpoch: ULong,
+  val leafAtReconnection: LeafNode<*>,
+  val encryptionKeysAtReconnection: HpkeKeyPair,
+  var reconstructedEncryptionKeysDuringQuarantine: List<Pair<ULong, HpkeKeyPair>>?,
+  var temporaryCachedStates: MutableList<GroupState>,
+  var reconnected: Boolean,
+)
+
 sealed class GroupClient<Identity : Any, State : GroupState>(
   internal val stateHistory: MutableList<GroupState>,
   internal val authService: AuthenticationService<Identity>,
@@ -112,11 +121,13 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
   val epochAuthenticator: Secret
     get() = state.keySchedule.epochAuthenticator
 
-  var isGhost: Boolean = false
-  var ghostEpoch: ULong = 0u
-  var endQuarantineNewParams: Pair<LeafNode<*>, HpkeKeyPair>? = null
-  var ghostKeyPairs: List<Pair<ULong, HpkeKeyPair>>? = null
-  val temporaryCachedStates = mutableListOf<GroupState>()
+  // this field is used when a user that was a ghost is reconnecting
+  var recoveringGhostData: RecoveringGhostData? = null
+//  var isGhost: Boolean = false
+//  var lastActivityEpoch: ULong = 0u
+//  var endQuarantineNewParams: Pair<LeafNode<*>, HpkeKeyPair>? = null
+//  var ghostKeyPairs: List<Pair<ULong, HpkeKeyPair>>? = null
+//  val temporaryCachedStates = mutableListOf<GroupState>()
 
   val state: State
     get() = stateHistory.first().coerceState()
@@ -184,6 +195,10 @@ sealed class GroupClient<Identity : Any, State : GroupState>(
 
   protected open fun advanceCurrentState(newState: GroupState) {
     stateHistory.add(0, newState)
+  }
+
+  fun isRecoveringGhost(): Boolean{
+    return (recoveringGhostData != null) && (!recoveringGhostData!!.reconnected)
   }
 
   companion object {
@@ -539,25 +554,45 @@ class ActiveGroupClient<Identity : Any> internal constructor(
 
         val newState =
           state.ensureActive {
-            if((ghostKeyPairs != null) && (ghostKeyPairs!!.map { it.first }.contains(handshakeMessage.epoch + 1u))){
-              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState, ghostKeyPairs!!.first{ it.first ==  handshakeMessage.epoch + 1u}.second)
 
-            } else if ((temporaryCachedStates.size > 0) && (temporaryCachedStates[0].epoch == handshakeMessage.epoch + 1u)) {
-              val newLeaf = temporaryCachedStates[0].tree.leafNode(leafIndex)
-              val newEncryptionKey = temporaryCachedStates[0].tree.private.getPrivateKey(leafIndex.nodeIndex)
+            var res: Either<ProcessMessageError, GroupState>? = null
+            var done = false
+            recoveringGhostData?.reconstructedEncryptionKeysDuringQuarantine?.let{ ghostKeys ->
+              ghostKeys.firstOrNull { it.first ==  handshakeMessage.epoch + 1u}?.let{
+                done = true
+                res = process(
+                  handshakeMessage,
+                  authService,
+                  psks = psks,
+                  cachedState = cached?.newState,
+                  ghostKeyPair = it.second
+                )
 
-              process(
-                handshakeMessage,
-                authService,
-                psks = psks,
-                cachedState = cached?.newState,
-                null,
-                newLeaf,
-                newEncryptionKey,
-              )
-            } else {
-              process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState)
+              }
             }
+            if(!done) {
+              recoveringGhostData?.reconnectEpoch?.let {
+                if (it == handshakeMessage.epoch){
+                  done = true
+                  res = process(
+                    handshakeMessage,
+                    authService,
+                    psks = psks,
+                    cachedState = cached?.newState,
+                    ghostKeyPair = null,
+                    newGhostLeafNode = recoveringGhostData!!.leafAtReconnection,
+                    newGhostPrivateEncryptionKey = recoveringGhostData!!.encryptionKeysAtReconnection.private,
+                  )
+                }
+              }
+            }
+
+            if(!done){
+              res = process(handshakeMessage, authService, psks = psks, cachedState = cached?.newState)
+            }
+
+            res!!
+
           }.bind()
 
         when (newState.epoch) {
@@ -623,11 +658,17 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun processShareRecoveryMessage(shareRecoveryMessage: ShareRecoveryMessage): Either<ProcessMessageError, Unit> =
     either {
 
-      ensure(endQuarantineNewParams != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
+      ensure(recoveringGhostData != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
 
-      val newState = state.ensureActive {
-        process(shareRecoveryMessage, endQuarantineNewParams!!.second.private)
+      val (ep, newState) = state.ensureActive {
+        process(shareRecoveryMessage, recoveringGhostData!!.encryptionKeysAtReconnection.private)
       }.bind()
+
+      if((ep != 0u.toULong()) && (recoveringGhostData!!.reconnectEpoch == 0u.toULong())){
+        recoveringGhostData!!.reconnectEpoch = ep
+      }
+
+//      println("reconnectEpoch = " + recoveringGhostData!!.reconnectEpoch)
 
 
       replaceCurrentState(newState)
@@ -637,15 +678,19 @@ class ActiveGroupClient<Identity : Any> internal constructor(
   suspend fun processWelcomeBackGhostMessage(welcomeBackGhost: WelcomeBackGhost): Either<ProcessMessageError, Unit> =
     either {
 
-      ensure(endQuarantineNewParams != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
+      ensure(recoveringGhostData != null) { raise(WelcomeBackGhostMessageError.MissingCachedUpdateForGhost) }
 
       val newState = state.ensureActive {
-        process(welcomeBackGhost, endQuarantineNewParams!!.first, endQuarantineNewParams!!.second, psks)
+        process(
+          welcomeBackGhost,
+          recoveringGhostData!!.leafAtReconnection,
+          recoveringGhostData!!.encryptionKeysAtReconnection,
+          psks)
       }.bind()
 
+      recoveringGhostData!!.reconnected = true
+
       advanceCurrentState(newState)
-      isGhost = false
-      endQuarantineNewParams = null
     }
 
   suspend fun addMember(keyPackage: KeyPackage): Either<CreateAddError, ByteArray> =
@@ -669,17 +714,22 @@ class ActiveGroupClient<Identity : Any> internal constructor(
         .encodeUnsafe()
     }
 
-  suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray>
-    {
-      isGhost = true
-      ghostEpoch = state.epoch
-      return either {
-        val keys = cipherSuite.generateHpkeKeyPair()
-        val newLeaf = state.updateGhostLeafNode(keys)
-        endQuarantineNewParams = Pair(newLeaf, keys)
-        state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey)
-          .bind().encodeUnsafe()
-      }
+  suspend fun endQuarantine(): Either<CreateQuarantineEndError, ByteArray> =
+    either {
+
+      val keys = cipherSuite.generateHpkeKeyPair()
+      val newLeaf = state.updateGhostLeafNode(keys)
+      recoveringGhostData = RecoveringGhostData(
+        lastActivityEpoch = state.epoch,
+        reconnectEpoch = 0u,
+        leafAtReconnection = newLeaf,
+        encryptionKeysAtReconnection = keys,
+        reconstructedEncryptionKeysDuringQuarantine = null,
+        temporaryCachedStates = mutableListOf(),
+        reconnected = false,
+      )
+      state.messages.quarantineEndMessage(state.leafIndex, newLeaf, state.signaturePrivateKey)
+        .bind().encodeUnsafe()
     }
 
   suspend fun retrievedEnoughShares(): Boolean {
@@ -700,39 +750,47 @@ class ActiveGroupClient<Identity : Any> internal constructor(
 
   suspend fun startGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {
-      ghostKeyPairs = state.recoverKeyPairs().bind()
 
-      if(!isGhost) {
-        val ghostStateIdx = stateHistory.indexOfFirst { it.epoch == ghostEpoch }
-        for (i in 0..<ghostStateIdx) {
-          temporaryCachedStates.add(0, stateHistory[0])
-          stateHistory.removeAt(0)
-        }
-        if (stateHistory[0].epoch != ghostEpoch) {
-          raise(GhostRecoveryProcessError.WrongGhostEpoch)
-        }
+      ensure(recoveringGhostData!= null) { raise(GhostRecoveryProcessError.UnexpectedErrorUserIsNotGhost) }
+
+      recoveringGhostData!!.reconstructedEncryptionKeysDuringQuarantine = state.recoverKeyPairs().bind()
+
+      while(stateHistory[0].epoch > recoveringGhostData!!.lastActivityEpoch){
+        recoveringGhostData!!.temporaryCachedStates.add(0, stateHistory[0])
+        stateHistory.removeAt(0)
+      }
+
+      if (stateHistory[0].epoch != recoveringGhostData!!.lastActivityEpoch) {
+        raise(GhostRecoveryProcessError.WrongGhostEpoch)
       }
     }
 
   suspend fun endGhostMessageRecovery(): Either<GhostRecoveryProcessError, Unit> =
     either {
 
-      if(!isGhost){
-        if(temporaryCachedStates[0].epoch != state.epoch){
-          raise(GhostRecoveryProcessError.UnexpectedEpochAfterMessageRecovery)
+      ensure(recoveringGhostData!= null) { raise(GhostRecoveryProcessError.UnexpectedErrorUserIsNotGhost) }
+
+      recoveringGhostData!!.temporaryCachedStates.let {
+        if(it.size > 0){
+
+          if(it[0].epoch != state.epoch){
+            raise(GhostRecoveryProcessError.UnexpectedEpochAfterMessageRecovery)
+          }
+
+          it.removeAt(0)
+
+          while(it.size > 0){
+            stateHistory.add(it[0])
+            it.removeAt(0)
+          }
         }
-        temporaryCachedStates.removeAt(0)
-        temporaryCachedStates.forEach {
-          stateHistory.add(it)
-        }
-        temporaryCachedStates.clear()
-      }
-      else{
-        isGhost = false
       }
 
-      ghostEpoch = 0u
-      ghostKeyPairs = null
+      recoveringGhostData!!.reconstructedEncryptionKeysDuringQuarantine!!.forEach {
+        it.second.wipe()
+      }
+      recoveringGhostData = null
+
     }
 
 

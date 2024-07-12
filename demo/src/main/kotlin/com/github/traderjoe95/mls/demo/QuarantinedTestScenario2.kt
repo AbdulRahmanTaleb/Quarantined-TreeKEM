@@ -39,7 +39,6 @@ suspend fun main() {
     groups,
     clients,
     clientsList,
-    1,
     idxUpdate,
     idxCommit,
   )
@@ -50,7 +49,6 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      i+2,
       idxUpdate,
       idxCommit,
       idxGhosts
@@ -69,7 +67,6 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      i,
       idxUpdate,
       idxCommit,
       idxGhosts

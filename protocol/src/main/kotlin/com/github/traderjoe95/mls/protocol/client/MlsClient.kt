@@ -174,58 +174,78 @@ class MlsClient<Identity : Any>(
 
   fun decodeMessage(messageBytes: ByteArray): Either<DecoderError, MlsMessage<*>> = GroupClient.decodeMessage(messageBytes)
 
-  suspend fun processMessage(messageBytes: ByteArray, isGhost: Boolean = false, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  suspend fun processMessage(messageBytes: ByteArray, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     decodeMessage(messageBytes)
-      .flatMap { processMessage(it, isGhost, cached) }
+      .flatMap { processMessage(it, cached) }
 
-  private suspend fun processMessage(message: MlsMessage<*>, isGhost: Boolean = false, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
+  private suspend fun processMessage(message: MlsMessage<*>, cached: Boolean = false): Either<ProcessMessageError, ProcessMessageResult<Identity>> =
     either {
-      if(isGhost && (!cached) && (message.message !is ShareRecoveryMessage) && (message.message !is WelcomeBackGhost)){
-        ProcessMessageResult.MessageToCachForLater
-      }
-      else {
-        when (message.message) {
-          is KeyPackage -> {
-            println("key package received")
-            ProcessMessageResult.KeyPackageMessageReceived(message.message)
-          }
+      when (message.message) {
+        is KeyPackage -> {
+          println("key package received")
+          ProcessMessageResult.KeyPackageMessageReceived(message.message)
+        }
 
-          is Welcome -> {
-            println("welcome received")
-            ProcessMessageResult.WelcomeMessageReceived(message.message)
-          }
+        is Welcome -> {
+          println("welcome received")
+          ProcessMessageResult.WelcomeMessageReceived(message.message)
+        }
 
-          is GroupInfo -> {
-            println("groupInfo received")
-            ProcessMessageResult.GroupInfoMessageReceived(message.message)
-          }
+        is GroupInfo -> {
+          println("groupInfo received")
+          ProcessMessageResult.GroupInfoMessageReceived(message.message)
+        }
 
-          is QuarantineEnd -> {
-            println("QuarantineEnd received")
+        is QuarantineEnd -> {
+          println("QuarantineEnd received")
+          val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
+          if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
+            ProcessMessageResult.MessageToCachForLater
+          }
+          else{
             processQuarantineEnd(message.message).bind()
           }
+        }
 
-          is RequestWelcomeBackGhost -> {
-            println("RequestWelcomeBackGhost received")
+        is RequestWelcomeBackGhost -> {
+          println("RequestWelcomeBackGhost received")
+          val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
+          if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
+            ProcessMessageResult.MessageToCachForLater
+          }
+          else{
             processRequestWelcomeBackGhost(message.message).bind()
           }
 
-          is GroupMessage<*> -> {
+        }
+
+        is GroupMessage<*> -> {
+          val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
+          if(!cached && group.isRecoveringGhost()) {
+            ProcessMessageResult.MessageToCachForLater
+          }
+          else {
             processGroupMessage(message.message).bind()
           }
+        }
 
-          is ShareRecoveryMessage -> {
-            println("ShareRecoveryMessage Received")
-            processShareRecoveryMessage(message.message).bind()
+        is ShareRecoveryMessage -> {
+          println("ShareRecoveryMessage Received")
+          processShareRecoveryMessage(message.message).bind()
+        }
+
+        is WelcomeBackGhost -> {
+          println("WelcomeBackGhost")
+          processWelcomeBackGhostMessage(message.message).bind()
+        }
+
+        is ShareResend -> {
+          println("ShareResend received")
+          val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
+          if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
+            ProcessMessageResult.MessageToCachForLater
           }
-
-          is WelcomeBackGhost -> {
-            println("WelcomeBackGhost")
-            processWelcomeBackGhostMessage(message.message).bind()
-          }
-
-          is ShareResend -> {
-            println("ShareResend received")
+          else {
             processShareResend(message.message).bind()
           }
         }
@@ -368,7 +388,7 @@ class MlsClient<Identity : Any>(
       val groupId = welcomeBackGhost.groupId
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
 
-      if(!group.isGhost){
+      if(!group.isRecoveringGhost()){
         ProcessMessageResult.WelcomeBackGhostMessageIgnored
       }
       else{
