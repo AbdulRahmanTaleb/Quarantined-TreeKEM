@@ -95,7 +95,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
 
     // Determining new ghost members if any
     val (updatedTreeGhost, newGhostMembers, newGhostSecrets, deleteGhostMembers) = updateGhostMembers(proposalResult.updatedTree ?: tree).bind()
-    println("Preparing Commit.")
+//    println("Preparing Commit.")
     printGhostUsers(newGhostMembers)
 
     val forcePathGhost = newGhostMembers.isNotEmpty() || deleteGhostMembers.isNotEmpty()
@@ -227,7 +227,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     val proposalResult = commit.content.validateAndApply(commit.sender, psks, authenticationService, newGhostLeafNode, newGhostPrivateEncryptionKey)
     val updatePath = commit.content.updatePath
 
-    println("Processing Commit.")
+//    println("Processing Commit.")
 //    printGhostUsers()
 
     val preTree = proposalResult.updatedTree ?: tree

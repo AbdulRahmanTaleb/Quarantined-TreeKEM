@@ -9,109 +9,86 @@ import com.github.traderjoe95.mls.demo.util.printGroup
 import com.github.traderjoe95.mls.demo.util.printGroups
 import com.github.traderjoe95.mls.demo.util.updateKeys
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
+import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 
 
 //////////////////////////////////////////////////////////////////////
-// QUARANTINE TEST: 2 users becoming ghosts one after the other
+// QUARANTINE TEST: a ghost user has to ask for shares with share
+// holder rank = 2, since they could not retrieve all shares with
+// rank = 1
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
-  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan", "Eve")
-
+  val clientsList = listOf("Alice", "Bob", "Charlie", "Dan", "Eve", "Fred", "Gregory")
   val (clients, groups) = initiateGroup(clientsList)
-
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
   basicConversation(clients, groups, id = "0")
 
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-  // UPDATING KEYS
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-
-  val idxCommit = 1
-  val idxUpdate = IntRange(0, clients.size-1).toList()
+  var idxCommit = 1
   updateKeys(
     groups,
     clients,
     clientsList,
-    idxUpdate,
     idxCommit,
   )
 
-  // First user to become ghost -> Eve
+  // First user to become ghost -> Gregory
   val idxGhost1 = clients.size-1
-
-  // Second user to become ghost -> Charlie
-  val idxGhost2 = clients.size-3
-
   // Updating keys for all users except Ghost1 so that it can become ghost first
-  for(i in 0..4) {
+  for(i in 0..< GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxUpdate,
       idxCommit,
       listOf(idxGhost1)
     )
   }
+  printGroups(groups, clientsList, listOf(idxGhost1))
 
-  printGroups(groups, clients, clientsList)
+  // At this point, Gregory became a ghost, the committer is Bob
+  // the structure of the tree is :
 
-//  groups.forEach {
-//    println(it.state.ghostMembersShareHolderRank)
-//  }
+  // groups[0].tree.print()
+  // L0:  node (A) -  node (B) -  node (C) -  node (D) -  node (E) -  node (F) -  node (G) -  null
+  // L1:  node -  null -  null -  null
+  // L2:  node -  null
+  // L3:  node
 
-  // Now making Ghost2 a ghost user too
+  // Since the committer is Bob, they chose the default share distribution method (3 shares) and assigned
+  // the first share to Alice and Bob, the second share to Charlie and Dan, and the third share to
+  // Eve and Fred
+
+  // So Eve hold the third share with shareholder rank = 1, and Fred the third share with rank = 2
+  // In the following, we will transform Eve into a ghost, so when Gregory reconnects, they cannot
+  // retrieve the third share by asking for shareholder rank = 1, since Eve is not connected, and they
+  // need to send another request with shareholder rank = 2
+
+
+
+  // Second user to become ghost -> Eve
+  val idxGhost2 = clients.size-3
   val idxGhosts = listOf(idxGhost1, idxGhost2)
-  for(i in 0..4) {
+  for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxUpdate,
       idxCommit,
       idxGhosts
     )
   }
+  printGroups(groups, clientsList, idxGhosts)
+  basicConversation(clients, groups, idxGhosts, id = "1")
 
-  printGroups(groups, clients, clientsList)
-
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
-  basicConversation(clients, groups, clients.slice(idxGhosts), id = "1")
-
-//  groups.forEach {
-//    println(it.state.ghostMembersShareHolderRank)
-//  }
-
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-  // GHOST RECONNECTING: Ghost1
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-
-  println("GHOST RECONNECTING: Ghost1")
+  // Gregory reconnecting
+  println("GHOST RECONNECTING: " + clientsList[idxGhost1])
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-  // Ghost1 user sending QuarantineEnd message to all group members in order to retrieve shares
-  // When users receive this message, they automatically send ShareRecoveryMessage, for those
-  // who have a valid share with a shareholder rank = 1
   println("\n---------------------------- Sending Quarantine End")
   clients[idxGhost1].ghostReconnect(groups[idxGhost1].groupId)
   clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
     it.processNextMessage().getOrThrow()
   }
-  clients[idxGhost1].requestWelcomeBackGhost(groups[idxGhost1].groupId)
-  clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
-    it.processNextMessage().getOrThrow()
-  }
-
   println("\n---------------------------- Receiving Share Recovery Message")
   for(k in 0..clients.size-2){
     clients.filterIndexed{idx, _ -> idx != idxGhost2}.forEach {
@@ -119,9 +96,16 @@ suspend fun main() {
     }
   }
 
-  // Since Ghost2 holds a share with shareholder rank = 1 for Ghost1,
-  // Ghost1 has to ask for the same share with shareholder rank = 2,
-  // since Ghost2 is now a ghost and couldn't respond to Ghost1's request
+  println("\n---------------------------- Committing by " + clientsList[idxCommit])
+  commit(
+    groups[idxCommit],
+    clients,
+    listOf(clients[idxGhost2])
+  )
+
+  // Since Eve holds a share with shareholder rank = 1 for Gregory,
+  // Gregory has to ask for the same share with shareholder rank = 2,
+  // since Eve is now a ghost and couldn't respond to Ghost1's request
   if(!clients[idxGhost1].retrievedEnoughShares(groups[idxGhost1].groupId)){
     println("\n---------------------------- Sending ADDITIONAL Share Resend Message")
     clients[idxGhost1].sendShareResend(groups[idxGhost1].groupId)
@@ -134,32 +118,7 @@ suspend fun main() {
     }
   }
 
-  // When a user commits here, it sends to the recovering ghost user a
-  // WelcomeBackGhostMessage with the new groupContext for this epoch
-  println("\n---------------------------- Committing by " + clientsList[idxCommit])
-  commit(
-    groups[idxCommit],
-    clients,
-    listOf(clients[idxGhost2])
-  )
-
-  // The ghost user processes the WelcomeBackGhost Message
-  clients[idxGhost1].processNextMessage().getOrThrow()
-
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-
-  printGroups(groups, clients, clientsList)
-
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
-  basicConversation(clients, groups, clients.slice(listOf(idxGhost2)), id = "2")
-
-  //////////////////////////////////////////////////////////////////////
-  // RECOVERING MESSAGES TEST
-  //////////////////////////////////////////////////////////////////////
-
-  // At this stage, the ghost user have recovered enough shares to reconstruct its ghost key
+  // At this stage, Gregory have recovered enough shares to reconstruct its ghost key
   // and decrypt all of the messages cached during its quarantine period
   println("RECOVERING MESSAGES TEST")
   clients[idxGhost1].retrievedEnoughShares(groups[idxGhost1].groupId)
@@ -169,13 +128,10 @@ suspend fun main() {
   groups[idxGhost1].endGhostMessageRecovery().getOrThrow()
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
+  printGroups(groups, clientsList, listOf(idxGhost2))
+  basicConversation(clients, groups, listOf(idxGhost2), id = "2")
 
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-  // GHOST RECONNECTING: Ghost2
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-
+  // Eve reconnecting
   println("GHOST RECONNECTING: Ghost2")
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
@@ -191,21 +147,18 @@ suspend fun main() {
   clients.forEach{
     it.processNextMessage().getOrThrow()
   }
-
   println("\n---------------------------- Receiving Share Recovery Message")
   for(k in 0..clients.size-1){
     clients.forEach {
       it.processNextMessage().getOrThrow()
     }
   }
-
   if(!clients[idxGhost2].retrievedEnoughShares(groups[idxGhost2].groupId)){
     println("\nSOMETHING IS WRONG")
-
+    return
   }
 
-  // When a user commits here, it sends to the recovering ghost user a
-  // WelcomeBackGhostMessage with the new groupContext for this epoch
+  idxCommit = clientsList.size - 1 // Gregory (the former ghost)
   println("\n---------------------------- Committing by " + clientsList[idxCommit])
   commit(
     groups[idxCommit],
@@ -217,18 +170,13 @@ suspend fun main() {
 
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
-  printGroups(groups, clients, clientsList)
-
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
+  printGroups(groups, clientsList)
   basicConversation(clients, groups, id = "3")
 
   //////////////////////////////////////////////////////////////////////
   // RECOVERING MESSAGES TEST
   //////////////////////////////////////////////////////////////////////
-
-  // At this stage, the ghost user have recovered enough shares to reconstruct its ghost key
+  // At this stage, Eve has recovered enough shares to reconstruct their ghost key
   // and decrypt all of the messages cached during its quarantine period
   println("RECOVERING MESSAGES TEST")
   clients[idxGhost2].retrievedEnoughShares(groups[idxGhost2].groupId)

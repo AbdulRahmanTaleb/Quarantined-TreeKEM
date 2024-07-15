@@ -29,6 +29,7 @@ import com.github.traderjoe95.mls.protocol.util.debug
 import com.github.traderjoe95.mls.protocol.util.nextBytes
 import java.math.BigInteger
 import java.security.SecureRandom
+import kotlin.time.measureTime
 
 
 private data class ShamirSharingList(val listSecrets: List<ShamirSecretSharing.SecretShare>) : Struct1T.Shape<List<ShamirSecretSharing.SecretShare>>{
@@ -44,31 +45,30 @@ private data class ShamirSharingList(val listSecrets: List<ShamirSecretSharing.S
 
 suspend fun main() {
 
-    for(i in 1..100){
+    val nbIters = 50
+    var totalGen = 0.0
+    var totalRecover = 0.0
+
+    for(i in 1..nbIters){
 
         val secret = SecureRandom().nextBytes(64)
-        val shares = ShamirSecretSharing.generateShares(secret, 4,4)
+
+        val shares:  List<ShamirSecretSharing.SecretShare>
+
+        totalGen += measureTime {  shares = ShamirSecretSharing.generateShares(secret, 32,64) }.inWholeMilliseconds
 
         val newShares = shares.map{
             ShamirSecretSharing.SecretShare.decodeUnsafe(it.encodeUnsafe())
         }
-        val s = BigInteger(1, ShamirSecretSharing.retrieveSecret(newShares))
 
-        assert(s == BigInteger(1, secret))
+        val sb: ByteArray
+
+        totalRecover += measureTime { sb = ShamirSecretSharing.retrieveSecret(newShares) }.inWholeMilliseconds
+
+        assert(BigInteger(1, sb) == BigInteger(1, secret))
     }
 
-    for(i in 1..100){
-        val secret = SecureRandom().nextBytes(64)
-
-        val shares = ShamirSharingList(ShamirSecretSharing.generateShares(secret, 4,4))
-
-        val sharesBytes = shares.encodeUnsafe()
-
-        val newShares = ShamirSharingList.decodeUnsafe(sharesBytes).listSecrets
-
-        val s = BigInteger(1, ShamirSecretSharing.retrieveSecret(newShares))
-
-        assert(s == BigInteger(1, secret))
-    }
+    println("Generating shares took " + (totalGen / nbIters) + " ms")
+    println("Recovering secret took " + (totalRecover / nbIters) + " ms")
 
 }

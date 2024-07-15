@@ -104,21 +104,29 @@ internal fun createUpdatePath(
       // try the horizontal share distribution method
       if(nbShares < minimum_secret_sharing_nb){
 
-        println("Not enough shares (" + nbShares + ") with the default share distribution method, trying the horizontal method ...")
+//        println("Not enough shares (" + nbShares + ") with the default share distribution method, trying the horizontal method ...")
 
         val res = originalTree.public.getLevelWithEnoughNodes(minimum_secret_sharing_nb, from)
           ?: raise(UnexpectedError("NotEnoughNodesForSecretSharing"))
 
         nbShares = res.first
         nodeIndices = res.second
-        println("Found Level with enough nodes: level " + nodeIndices[0].level)
+//        println("Found Level with enough nodes: level " + nodeIndices[0].level)
+
+//        println(nodeIndices)
 
         horizontalShareDistributionUsed = true
       }
 
       val t = GroupState.computeSecretSharingTValue(nbShares)
 
-      println("Parameters for secret sharing for this epoch: m = " + nbShares+ ", t = "+ t + "\n")
+      if(horizontalShareDistributionUsed){
+        println("Horizontal Share Distribution Method used")
+      }
+      else{
+        println("Default Share Distribution Method used")
+      }
+      println("Parameters for secret sharing for this epoch: m = $nbShares, t = $t\n")
       newGhostSecrets.forEach {
         ghostSecretShares.add(ShamirSecretSharing.generateShares(it.bytes, t, nbShares))
       }
@@ -432,7 +440,7 @@ internal fun RatchetTree.extractCommonPathSecret(
         ghostSecretShares = GhostShareHolderList.decodeUnsafe(secrets)
       }
     } else {
-      println("Ghost shares were not encrypted using the default share method, trying to find a level node from the horizontal setting ...")
+//      println("Ghost shares were not encrypted using the default share method, trying to find a level node from the horizontal setting ...")
       val res = public.getLevelWithEnoughNodes(minimum_secret_sharing_nb, fromLeafIdx)
       if (res != null) {
         val nodeIndices = res.second
@@ -450,7 +458,7 @@ internal fun RatchetTree.extractCommonPathSecret(
                     ghostShareDistribution.encryptedGhostSecrets[0],
                   ).bind()
                 )
-                println("Found with Horizontal Method")
+//                println("Found with Horizontal Method")
                 val rank = public.getRankFromLevel(leafIndex, nodeIdxShare)
                 ghostSecretShares = GhostShareHolderList(ghostSecretShares.ghostShareHolders.map {
                   GhostShareHolder.changeRank(it, rank)

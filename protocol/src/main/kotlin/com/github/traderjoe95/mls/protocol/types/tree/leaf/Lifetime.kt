@@ -6,6 +6,8 @@ import com.github.traderjoe95.mls.codec.type.struct.Struct2T
 import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.struct
 import com.github.traderjoe95.mls.codec.type.uint64
+import com.github.traderjoe95.mls.protocol.types.RefinedBytes.Companion.neqNullable
+import com.github.traderjoe95.mls.protocol.types.tree.LeafNode
 import java.time.Instant
 
 data class Lifetime(
@@ -27,6 +29,18 @@ data class Lifetime(
   operator fun contains(epochSeconds: ULong): Boolean = epochSeconds in notBefore..notAfter
 
   operator fun contains(epochSeconds: Long): Boolean = epochSeconds.toULong() in this
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Lifetime
+
+    if(notAfter != other.notAfter) return false
+    if(notBefore != other.notBefore) return false
+
+    return true
+  }
 
   companion object : Encodable<Lifetime> {
     @Suppress("kotlin:S6531", "ktlint:standard:property-naming")

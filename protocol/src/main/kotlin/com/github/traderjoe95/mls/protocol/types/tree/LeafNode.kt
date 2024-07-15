@@ -108,7 +108,6 @@ data class LeafNode<S : LeafNodeSource>(
     if (credential != other.credential) return false
     if (capabilities != other.capabilities) return false
     if (source != other.source) return false
-    if (info != other.info) return false
     if (extensions != other.extensions) return false
     if (signature neq other.signature) return false
     if (parentHash neqNullable other.parentHash) return false

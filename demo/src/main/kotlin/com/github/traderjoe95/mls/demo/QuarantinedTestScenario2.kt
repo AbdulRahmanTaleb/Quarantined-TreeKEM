@@ -9,6 +9,7 @@ import com.github.traderjoe95.mls.demo.util.printGroup
 import com.github.traderjoe95.mls.demo.util.printGroups
 import com.github.traderjoe95.mls.demo.util.updateKeys
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
+import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.framing.content.Add
 
@@ -22,79 +23,68 @@ suspend fun main() {
 
   val (clients, groups) = initiateGroup(clientsList)
 
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
+  // A basic conversation
   basicConversation(clients, groups, id = "0")
 
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-  // UPDATING KEYS
-  //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////
-
-  val idxCommit = 1
-  val idxUpdate = IntRange(0, clients.size-1).toList()
+  // Updating keys
+  val idxCommit = 3
   updateKeys(
     groups,
     clients,
     clientsList,
-    idxUpdate,
     idxCommit,
   )
 
-  val idxGhosts = listOf(clients.size-1)
-  for(i in 0..4) {
+  val idxGhosts = listOf(0)
+  for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxUpdate,
+      idxCommit,
+      idxGhosts
+    )
+  }
+  printGroups(groups, clientsList, idxGhosts)
+
+  // A basic conversation
+  basicConversation(clients, groups, idxGhosts, id = "1")
+
+  // Doing many commits so that the ghost user stays inactive
+  // long enough to be deleted from the group
+  for(i in 0..<GroupState.DELETE_FROM_QUARANTINE_DELAY.toInt()) {
+    updateKeys(
+      groups,
+      clients,
+      clientsList,
       idxCommit,
       idxGhosts
     )
   }
 
-  printGroups(groups, clients, clientsList)
-
-  //////////////////////////////////////////////////////////////////////
-  // SENDING MESSAGES
-  //////////////////////////////////////////////////////////////////////
-  basicConversation(clients, groups, clients.slice(idxGhosts), id = "1")
-
-  for(i in 0..14) {
-    updateKeys(
-      groups,
-      clients,
-      clientsList,
-      idxUpdate,
-      idxCommit,
-      idxGhosts
-    )
-  }
-
-  println("GHOST RECONNECTING")
+  println("GHOST " + clientsList[idxGhosts[0]] +  " RECONNECTING")
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  println("\n---------------------------- Sending Quarantine End")
+  clients[idxGhosts[0]].ghostReconnect(groups[idxGhosts[0]].groupId)
 
-  try {
-    println("\n---------------------------- Sending Quarantine End")
-    clients[idxGhosts[0]].ghostReconnect(groups[idxGhosts[0]].groupId)
-    clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach{
+  var error = true
+  clients.filterIndexed{idx, _ -> !idxGhosts.contains(idx)}.forEach {
+    try {
       it.processNextMessage().getOrThrow()
+      println("SOMETHING IS WRONG, TEST SHOULD END WITH EXCEPTION SINCE GHOST LEAF IS DELETED AND CAN'T RECONNECT ANYMORE")
+      error = false
+    }  catch (exception: IllegalStateException) {
+      println("+++ Test throws exception as expected since ghost leaf trying to reconnect is already deleted from the group, exception says: " + exception.message)
     }
+  }
 
-    println("\n---------------------------- Receiving Share Recovery Message")
-    for(k in 0..clients.size-2){
-      clients.forEach {
-        it.processNextMessage().getOrThrow()
-      }
-    }
-
-    println("SOMETHING IS WRONG, TEST SHOULD END WITH EXCEPTION SINCE GHOST LEAF IS DELETED AND CAN'T RECONNECT ANYMORE")
-  }  catch (exception: IllegalStateException) {
-    println("+++ Test throws exception as expected since ghost leaf trying to reconnect is already deleted from the group, exception says: " + exception.message)
+  if(error){
     println("Test Success !")
   }
+
+  // A basic conversation
+  basicConversation(clients, groups, idxGhosts, id = "2")
+  printGroups(groups, clientsList, idxGhosts)
 
 
 

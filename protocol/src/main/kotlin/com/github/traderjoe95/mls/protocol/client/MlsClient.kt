@@ -182,22 +182,22 @@ class MlsClient<Identity : Any>(
     either {
       when (message.message) {
         is KeyPackage -> {
-          println("key package received")
+//          println("key package received")
           ProcessMessageResult.KeyPackageMessageReceived(message.message)
         }
 
         is Welcome -> {
-          println("welcome received")
+//          println("welcome received")
           ProcessMessageResult.WelcomeMessageReceived(message.message)
         }
 
         is GroupInfo -> {
-          println("groupInfo received")
+//          println("groupInfo received")
           ProcessMessageResult.GroupInfoMessageReceived(message.message)
         }
 
         is QuarantineEnd -> {
-          println("QuarantineEnd received")
+//          println("QuarantineEnd received")
           val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
           if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
             ProcessMessageResult.MessageToCachForLater
@@ -208,7 +208,7 @@ class MlsClient<Identity : Any>(
         }
 
         is RequestWelcomeBackGhost -> {
-          println("RequestWelcomeBackGhost received")
+//          println("RequestWelcomeBackGhost received")
           val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
           if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
             ProcessMessageResult.MessageToCachForLater
@@ -230,17 +230,17 @@ class MlsClient<Identity : Any>(
         }
 
         is ShareRecoveryMessage -> {
-          println("ShareRecoveryMessage Received")
+//          println("ShareRecoveryMessage Received")
           processShareRecoveryMessage(message.message).bind()
         }
 
         is WelcomeBackGhost -> {
-          println("WelcomeBackGhost")
+//          println("WelcomeBackGhost")
           processWelcomeBackGhostMessage(message.message).bind()
         }
 
         is ShareResend -> {
-          println("ShareResend received")
+//          println("ShareResend received")
           val group = groups[message.message.groupId.hex] ?: raise(UnknownGroup(message.message.groupId))
           if(!cached && group.isRecoveringGhost() && message.message.leafIndex != group.state.leafIndex) {
             ProcessMessageResult.MessageToCachForLater
@@ -368,14 +368,14 @@ class MlsClient<Identity : Any>(
       val group = groups[groupId.hex] ?: raise(UnknownGroup(groupId))
 
       if(shareRecoveryMessage.leafIndex != group.state.leafIndex){
-        println("Ignoring share recovery message")
+//        println("Ignoring share recovery message")
         ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
       }
 
       else{
         if (group is ActiveGroupClient<Identity>) {
           group.processShareRecoveryMessage(shareRecoveryMessage).bind()
-          println("Processed share recovery message")
+//          println("Processed share recovery message")
           ProcessMessageResult.ShareRecoveryMessageReceived(shareRecoveryMessage)
         } else {
           raise(GroupSuspended(shareRecoveryMessage.groupId))

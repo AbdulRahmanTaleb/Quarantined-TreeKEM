@@ -115,7 +115,7 @@ class Client(
 
 
   suspend fun processMessage(messageId: ULID, encoded: ByteArray, cached: Boolean = false): GroupClient<String, *>? {
-      println("[$userName] Message received: $messageId")
+//      println("[$userName] Message received: $messageId")
 
       when (val res = mlsClient.processMessage(encoded, cached).getOrThrow()) {
 
@@ -153,7 +153,7 @@ class Client(
 
         is ProcessMessageResult.QuarantineEndReceived -> {
           if((res.shareRecoveryMessage != null) && (!cached)){
-            println("sending ShareRecoveryMessage")
+//            println("sending ShareRecoveryMessage")
             DeliveryService.sendMessageToGroup(
               res.shareRecoveryMessage!!,
               res.groupId,
@@ -166,15 +166,15 @@ class Client(
         is ProcessMessageResult.HandshakeMessageReceived -> {
           when (val handshakeResult = res.result) {
             is ProcessHandshakeResult.ProposalReceived, is ProcessHandshakeResult.CommitProcessed -> {
-              println("[$userName] ${res.result}")
+//              println("[$userName] ${res.result}")
               return mlsClient[res.groupId]
             }
 
             is ProcessHandshakeResult.CommitProcessedWithNewMembers -> {
-              println("[$userName] CommitProcessed")
-              if(handshakeResult.welcomeMessages.isNotEmpty()){
-                println("adding new members - sending Welcome messages")
-              }
+//              println("[$userName] CommitProcessed")
+//              if(handshakeResult.welcomeMessages.isNotEmpty()){
+//                println("adding new members - sending Welcome messages")
+//              }
 
               handshakeResult.welcomeMessages.forEach { (welcome, to) ->
                 DeliveryService.sendMessageToIdentities(
@@ -185,9 +185,9 @@ class Client(
                 )
               }
 
-              if(handshakeResult.welcomeBackGhostMessages.isNotEmpty()){
-                println("reviving ghosts - sending WelcomeBackGhost messages")
-              }
+//              if(handshakeResult.welcomeBackGhostMessages.isNotEmpty()){
+//                println("reviving ghosts - sending WelcomeBackGhost messages")
+//              }
               handshakeResult.welcomeBackGhostMessages.forEach { (welcomeBack, to) ->
                 DeliveryService.sendMessageToIdentities(
                   welcomeBack.encoded,
@@ -201,7 +201,7 @@ class Client(
             }
 
             is ProcessHandshakeResult.ReInitProcessed -> {
-              println("[$userName] ReInit processed, returning suspended group")
+//              println("[$userName] ReInit processed, returning suspended group")
               return handshakeResult.suspendedClient
             }
 
@@ -209,7 +209,7 @@ class Client(
         }
 
         is ProcessMessageResult.KeyPackageMessageReceived -> {
-          println("Key package received, ignoring")
+//          println("Key package received, ignoring")
           return null
         }
 
@@ -222,16 +222,16 @@ class Client(
         }
 
         is ProcessMessageResult.WelcomeBackGhostMessageIgnored -> {
-          println("[$userName] $res")
+//          println("[$userName] $res")
           return null
         }
         is ProcessMessageResult.WelcomeBackGhostMessageProcessed -> {
-          println("[$userName] $res")
+//          println("[$userName] $res")
           return null
         }
 
         ProcessMessageResult.MessageToCachForLater -> {
-          println("Temporarily caching message because user is a ghost reconnecting")
+//          println("Temporarily caching message because user is a ghost reconnecting")
           cachedGhostMessages.add(Pair(messageId, encoded))
           return null
         }

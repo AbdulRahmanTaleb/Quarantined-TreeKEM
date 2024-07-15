@@ -68,6 +68,7 @@ dependencies {
   testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
+
 tasks.test {
   useJUnitPlatform()
   finalizedBy(tasks.koverHtmlReport, tasks.koverXmlReport, tasks.koverBinaryReport)
