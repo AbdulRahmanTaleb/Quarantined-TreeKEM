@@ -35,6 +35,8 @@ suspend fun main() {
     idxCommit,
   )
 
+  groups[0].tree.print()
+
   val idxGhosts = listOf(0)
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(

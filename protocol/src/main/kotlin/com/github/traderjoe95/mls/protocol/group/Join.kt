@@ -212,7 +212,7 @@ suspend fun <Identity : Any> GroupInfo.joinGroupExternal(
       )
 
     val (updatedTree, updatePath, pathSecrets, _) =
-      createUpdatePath(newTree, setOf(), groupContext, keyPackage.signaturePrivateKey, minimum_secret_sharing_nb =  GroupState.MINIMUM_SECRET_SHARING_NB).bind()
+      createUpdatePath(newTree, setOf(), groupContext, keyPackage.signaturePrivateKey).bind()
 
     val commitSecret = cipherSuite.deriveSecret(pathSecrets.last(), "path")
 

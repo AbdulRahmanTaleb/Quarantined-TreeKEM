@@ -163,9 +163,9 @@ sealed class GroupState(
       )
 
     context(Raise<ProposalValidationError>)
-    private suspend fun storeRecoveredShare(secretShares: GhostShareHolderList): Active {
+    private suspend fun storeRecoveredShare(secretShares: List<GhostShareHolder>): Active {
 
-      val filteredShares = secretShares.ghostShareHolders.filter{ ghostShareHolder ->
+      val filteredShares = secretShares.filter{ ghostShareHolder ->
         recoveredShares.find { storedShareHolder ->
           (ghostShareHolder.ghostEncryptionKey.eq(storedShareHolder.ghostEncryptionKey)) &&
             (ghostShareHolder.ghostShare == storedShareHolder.ghostShare)
@@ -411,7 +411,7 @@ sealed class GroupState(
               quarantineEnd.leafNode.encryptionKey,
               "ShareRecoveryMessage",
               ByteArray(0),
-              ghostShareHolderList.encodeUnsafe()
+              GhostShareHolderList(ghostShareHolderList).encodeUnsafe()
             ).bind()
             Pair(
               newState,
@@ -453,7 +453,7 @@ sealed class GroupState(
             encryptionKey,
             "ShareRecoveryMessage",
             ByteArray(0),
-            ghostShareHolderList.encodeUnsafe()
+            GhostShareHolderList(ghostShareHolderList).encodeUnsafe()
           ).bind()
             messages.shareRecoveryMessage(shareResend.leafIndex, epoch, encryptionKey, ct).bind()
         } else {
@@ -489,7 +489,7 @@ sealed class GroupState(
 
 //      println("ep = " + ep)
 
-      Pair(ep, storeRecoveredShare(shares))
+      Pair(ep, storeRecoveredShare(shares.ghostShareHolders))
     }
 
     context(Raise<ProcessMessageError>)

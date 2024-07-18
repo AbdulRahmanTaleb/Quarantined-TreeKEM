@@ -12,6 +12,7 @@ import com.github.traderjoe95.mls.codec.type.opaque
 import com.github.traderjoe95.mls.codec.type.struct.Struct1T
 import com.github.traderjoe95.mls.codec.type.struct.Struct2T
 import com.github.traderjoe95.mls.codec.type.struct.Struct3T
+import com.github.traderjoe95.mls.codec.type.struct.Struct4T
 import com.github.traderjoe95.mls.codec.type.struct.Struct5T
 import com.github.traderjoe95.mls.codec.type.struct.lift
 import com.github.traderjoe95.mls.codec.type.struct.struct
@@ -30,6 +31,11 @@ data class GroupGhostInfo(
   fun getCurrentGhosts(): List<LeafIndex> = currentGhostMembers.map { it.leafIndex }
 
 
+  fun printRanks(){
+    ghostMembersShares.forEach {
+      println(it.leafIndex.toString() + " ,shareIdx = " + it.ghostShare.rank + " ,rank = " + it.ghostShareHolderRank)
+    }
+  }
   fun containsGhost(leafIndex: LeafIndex): Boolean{
     currentGhostMembers.firstOrNull {
       it.leafIndex.eq(leafIndex)
@@ -123,10 +129,6 @@ data class GroupGhostInfo(
     }
   }
 
-  context(Raise<GroupGhostInfoError>)
-  fun addNewGhostKeyShares(ghostShareHolders: GhostShareHolderList){
-   addNewGhostKeyShares(ghostShareHolders.ghostShareHolders)
-  }
 
   context(Raise<GroupGhostInfoError>)
   fun addNewGhostKeyShares(ghostShareHolders: List<GhostShareHolder>){
@@ -174,10 +176,10 @@ data class GroupGhostInfo(
 
   context(Raise<GroupGhostInfoError>)
   fun getKeyShares(leafIndex: LeafIndex,
-                   rank: UInt): GhostShareHolderList {
-    val res = GhostShareHolderList(ghostMembersShares.filter {
+                   rank: UInt): List<GhostShareHolder> {
+    val res = ghostMembersShares.filter {
       it.leafIndex == leafIndex && it.ghostShareHolderRank == rank
-    })
+    }
 
     ghostMembersShares.removeAll{
       it.leafIndex == leafIndex && it.ghostShareHolderRank == rank
@@ -220,7 +222,6 @@ data class GhostMember(
   }
 }
 
-
 data class GhostShareHolder(
   val ghostEncryptionKey: HpkePublicKey,
   val leafIndex: LeafIndex,
@@ -256,6 +257,19 @@ data class GhostShareHolder(
         ghostShareHolderRank
       )
 
+    fun create(
+      ghostShareHolderCommit: GhostShareHolderCommit,
+      ghostShareHolderRank: UInt
+    ): GhostShareHolder =
+
+      GhostShareHolder(
+        ghostShareHolderCommit.ghostEncryptionKey,
+        ghostShareHolderCommit.leafIndex,
+        ghostShareHolderCommit.epoch,
+        ghostShareHolderCommit.ghostShare,
+        ghostShareHolderRank
+      )
+
     fun copy(
       shareHolder: GhostShareHolder
     ): GhostShareHolder =
@@ -267,46 +281,74 @@ data class GhostShareHolder(
         shareHolder.ghostShare,
         shareHolder.ghostShareHolderRank
       )
-
-    fun changeRank(
-      shareHolder: GhostShareHolder,
-      newRank: UInt,
-    ): GhostShareHolder =
-
-      GhostShareHolder(
-        shareHolder.ghostEncryptionKey,
-        shareHolder.leafIndex,
-        shareHolder.epoch,
-        shareHolder.ghostShare,
-        newRank
-      )
-
   }
-
   }
-
 
 data class GhostShareHolderList(
   val ghostShareHolders: List<GhostShareHolder>
 ) : Struct1T.Shape<List<GhostShareHolder>> {
-
   companion object : Encodable<GhostShareHolderList> {
     @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
     override val T: DataType<GhostShareHolderList> =
       struct("GhostShareHolderList") {
         it.field("ghost_share_holders", GhostShareHolder.T[V])
       }.lift(::GhostShareHolderList)
+  }
+}
+
+data class GhostShareHolderCommit(
+  val ghostEncryptionKey: HpkePublicKey,
+  val leafIndex: LeafIndex,
+  val epoch: ULong,
+  val ghostShare: ShamirSecretSharing.SecretShare,
+) : Struct4T.Shape<HpkePublicKey, LeafIndex, ULong, ShamirSecretSharing.SecretShare> {
+
+  fun create(
+    ghostEncryptionKey: HpkePublicKey,
+    leafIndex: LeafIndex,
+    epoch: ULong,
+    ghostShare: ShamirSecretSharing.SecretShare,
+  ): GhostShareHolderCommit =
+
+    GhostShareHolderCommit(
+      ghostEncryptionKey,
+      leafIndex,
+      epoch,
+      ghostShare,
+    )
+
+  companion object : Encodable<GhostShareHolderCommit> {
+    @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
+    override val T: DataType<GhostShareHolderCommit> =
+      struct("GhostShareHolder") {
+        it.field("ghost_encryption_key", HpkePublicKey.T)
+          .field("leaf_Index", LeafIndex.T)
+          .field("epoch", uint64.asULong)
+          .field("ghost_share", ShamirSecretSharing.SecretShare.T)
+      }.lift(::GhostShareHolderCommit)
+  }
+}
+
+data class GhostShareHolderCommitList(
+  val ghostShareHolders: List<GhostShareHolderCommit>
+) : Struct1T.Shape<List<GhostShareHolderCommit>> {
+
+  companion object : Encodable<GhostShareHolderCommitList> {
+    @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
+    override val T: DataType<GhostShareHolderCommitList> =
+      struct("GhostShareHolderCommitList") {
+        it.field("ghost_share_holders", GhostShareHolderCommit.T[V])
+      }.lift(::GhostShareHolderCommitList)
 
 
     fun construct(
       ghostMembers: List<GhostMemberCommit>,
       ghostSecretShares: List<List<ShamirSecretSharing.SecretShare>>,
       shareIdx: Int,
-      holderRank: UInt
-      ): GhostShareHolderList{
+      ): GhostShareHolderCommitList{
 
-      return GhostShareHolderList(ghostMembers.mapIndexed{ idx, ghost ->
-        GhostShareHolder(ghost.ghostEncryptionKey, ghost.leafIndex, ghost.ghostEncryptionKeyEpoch, ghostSecretShares[idx][shareIdx], holderRank)
+      return GhostShareHolderCommitList(ghostMembers.mapIndexed{ idx, ghost ->
+        GhostShareHolderCommit(ghost.ghostEncryptionKey, ghost.leafIndex, ghost.ghostEncryptionKeyEpoch, ghostSecretShares[idx][shareIdx])
       })
 
     }

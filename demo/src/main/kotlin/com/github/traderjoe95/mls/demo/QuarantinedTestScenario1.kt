@@ -59,6 +59,12 @@ suspend fun main() {
   val idxGhost1 = idxGhosts[0]
   val idxGhost2 = idxGhosts[1]
 
+  groups.forEachIndexed {idx, it ->
+    println(clientsList[idx])
+    it.state.groupGhostInfo.printRanks()
+    println("")
+  }
+
   // Fred reconnecting after their quarantine
   println(clientsList[idxGhost1] + " RECONNECTING")
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

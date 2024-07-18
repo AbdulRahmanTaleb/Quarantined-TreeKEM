@@ -306,69 +306,50 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
   override val firstBlankLeaf: LeafIndex?
     get() = leafNodeIndices.find { it.isBlank }?.leafIndex
 
-  fun getLevelWithEnoughNodes(minimum_nb: Int, fromLeafIndex: LeafIndex) : Pair<Int, List<NodeIndex>>?{
-    val path = directPath(fromLeafIndex)
+  fun getLevelWithEnoughNodes(minimumNb: Int, excludeLeaves: Set<LeafIndex>) : List<NodeIndex>?{
 
     var oldNodeIndices = mutableListOf(root)
     var newNodeIndices = mutableListOf<NodeIndex>()
 
     for(level in root.level.toInt() downTo 1){
-
-      var nb = 0
-      oldNodeIndices.forEach {
-        if(nodes[it.value] != null){
-          nb++
-        }
-        else if(it.value == path[level-1].value){
-          nb++
+      oldNodeIndices.filter{
+        nodes[it.value] != null
+      }.let{
+        if(it.size >= minimumNb){
+          return it
         }
       }
-
-//      println(oldNodeIndices)
-//      oldNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
-//      println("")
-//      println(nb)
-
-      if(nb >= minimum_nb){
-        return Pair(nb, oldNodeIndices.filter { nodes[it.value] != null })
-      }
-
       oldNodeIndices.forEach {
         newNodeIndices.add(it.leftChild)
         newNodeIndices.add(it.rightChild)
       }
-
       oldNodeIndices = newNodeIndices
       newNodeIndices = mutableListOf()
     }
 
     // leaf nodes
-    var nb = 0
-    oldNodeIndices.forEach {
-      if(leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost){
-        nb++
+    leafNodeIndices.filter {
+      leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost &&
+        !excludeLeaves.contains(it.leafIndex)
+    }.let{
+      if(it.size >= minimumNb){
+        return it
       }
-    }
-//    println(oldNodeIndices)
-//    oldNodeIndices.forEach { if(nodes[it.value] != null) print("full - ") else print("empty - ") }
-//    println("")
-//    println(nb)
-
-    if(nb >= minimum_nb){
-      return Pair(nb, oldNodeIndices.filter { leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost })
     }
 
     return null
   }
 
-  fun getRankFromLevel(leaf: LeafIndex, parent: NodeIndex): UInt{
+  fun getLeafRankInSubtree(leaf: LeafIndex, parent: NodeIndex): UInt{
     val subRange = parent.subtreeRange
     var rank = 1u
     for(n in subRange step 2){
       if(n.leafIndex.value == leaf.value){
         break
       }
-      rank++
+      if(leaves[n.leafIndex.value] != null && leaves[n.leafIndex.value]!!.source != LeafNodeSource.Ghost) {
+        rank++
+      }
     }
 
     return rank

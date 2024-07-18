@@ -20,6 +20,8 @@ sealed interface CommitError : SenderCommitError, RecipientCommitError {
 
   data object NotEnoughNodesForSecretSharing : CommitError
 
+  data object UnexpectedInconsistentFirstNodeInFilteredPath : CommitError
+
   data class CachedUpdateDoesNotMatch(val cachedLeafNode: LeafNode<*>, val proposalLeafNode: LeafNode<*>) : CommitError
 }
 

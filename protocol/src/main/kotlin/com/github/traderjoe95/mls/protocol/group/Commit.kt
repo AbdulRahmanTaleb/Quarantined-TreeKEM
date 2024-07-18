@@ -19,6 +19,7 @@ import com.github.traderjoe95.mls.protocol.error.RecipientTreeUpdateError
 import com.github.traderjoe95.mls.protocol.error.RemoveValidationError
 import com.github.traderjoe95.mls.protocol.error.RemovedFromGroup
 import com.github.traderjoe95.mls.protocol.error.SenderCommitError
+import com.github.traderjoe95.mls.protocol.error.UnexpectedError
 import com.github.traderjoe95.mls.protocol.message.GroupInfo
 import com.github.traderjoe95.mls.protocol.message.GroupInfo.Companion.encodeUnsafe
 import com.github.traderjoe95.mls.protocol.message.GroupSecrets
@@ -108,8 +109,7 @@ suspend fun <Identity : Any> GroupState.Active.prepareCommit(
           groupContext.withExtensions((proposalResult as? ProcessProposalsResult.CommitByMember)?.extensions),
           signaturePrivateKey,
           newGhostMembers,
-          newGhostSecrets,
-          GroupState.MINIMUM_SECRET_SHARING_NB
+          newGhostSecrets
         ).bind()
       } else {
         Tuple4(updatedTreeGhost, null, listOf(), listOf())
@@ -248,8 +248,6 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
           commit.sender,
           proposalResult.newMemberLeafIndices(),
           commit.content.ghostUsers,
-          groupGhostInfo.getCurrentGhosts(),
-          GroupState.MINIMUM_SECRET_SHARING_NB,
         )
       }.getOrElse { Triple(updatedTreeGhost, zeroesNh, null) }
 
@@ -457,20 +455,18 @@ private fun ProcessProposalsResult.newMemberLeafIndices(): Set<LeafIndex> =
     is ProcessProposalsResult.ReInitCommit -> setOf()
   }
 
-context(Raise<RecipientTreeUpdateError>)
+context(Raise<RecipientTreeUpdateError>,Raise<UnexpectedError>)
 private fun RatchetTree.applyCommitUpdatePath(
   groupContext: GroupContext,
   updatePath: UpdatePath,
   sender: Sender,
   excludeNewLeaves: Set<LeafIndex>,
   newGhostUsers: List<GhostMemberCommit> = listOf(),
-  ghostMembers: List<LeafIndex> = listOf(),
-  minimum_secret_sharing_nb: Int,
-): Triple<RatchetTree, Secret, GhostShareHolderList> =
+): Triple<RatchetTree, Secret, List<GhostShareHolder>> =
   if (sender.type == SenderType.Member) {
-    applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers, ghostMembers, minimum_secret_sharing_nb = minimum_secret_sharing_nb)
+    applyUpdatePath(this, groupContext, sender.index!!, updatePath, excludeNewLeaves, newGhostUsers)
   } else {
-    applyUpdatePathExternalJoin(groupContext, updatePath, excludeNewLeaves, minimum_secret_sharing_nb = minimum_secret_sharing_nb)
+    applyUpdatePathExternalJoin(groupContext, updatePath, excludeNewLeaves)
   }
 
 context(GroupState.Active, Raise<SenderCommitError>)

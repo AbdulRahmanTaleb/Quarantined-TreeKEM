@@ -35,6 +35,11 @@ fun printGroups(groups: List<ActiveGroupClient<String>>, clientsList: List<Strin
       }
     }
 
+    println(clientsList[idx] + ":")
+    group.state.groupGhostInfo.printRanks()
+    println()
+
+
   }
 }
 
