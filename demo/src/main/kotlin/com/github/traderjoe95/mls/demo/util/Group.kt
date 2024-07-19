@@ -16,16 +16,16 @@ fun ActiveGroupClient<String>.makePublic() {
   DeliveryService.storeGroupInfo(groupInfo().getOrThrow())
 }
 
-fun printGroups(groups: List<ActiveGroupClient<String>>, clientsList: List<String>, idxGhosts: List<Int> = listOf()){
+fun printGroups(clients: List<Client>, groups: List<ActiveGroupClient<String>>, clientsList: List<String>){
 
   var notGhost = 0
-  while(idxGhosts.contains(notGhost)) notGhost++
+  while(clients[notGhost].isGhost()) notGhost++
 
   println("Updated view of Group:")
   printGroup(groups[notGhost])
 
   groups.forEachIndexed { idx, group ->
-    if(idxGhosts.contains(idx)){
+    if(clients[idx].isGhost()){
       println("Ghost " + clientsList[idx] + " view of Group:")
       printGroup(groups[idx])
     }
@@ -34,12 +34,11 @@ fun printGroups(groups: List<ActiveGroupClient<String>>, clientsList: List<Strin
         throw(IllegalStateException("Incoherent views of group among members"))
       }
     }
+  }
 
-    println(clientsList[idx] + ":")
-    group.state.groupGhostInfo.printRanks()
+  groups.forEachIndexed { idx, it ->
+    it.state.groupGhostInfo.printRanks(clientsList[idx])
     println()
-
-
   }
 }
 
@@ -137,7 +136,6 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
     val otherKeyPackage = clients[i-1].getKeyPackageFor(Config.cipherSuite, clientsList[i])
 
     if((i % GroupState.INACTIVITY_DELAY.toInt()) < 1){
-      println("updating " + (i % GroupState.INACTIVITY_DELAY.toInt()))
       for(j in 0..i-2){
         val updateMember = groups[j].update().getOrThrow()
         DeliveryService.sendMessageToGroup(updateMember, groups[j].groupId).getOrThrow()
@@ -154,10 +152,6 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
 
     groups.add(clients[i].processNextMessage().getOrThrow()!! as ActiveGroupClient<String>)
 
-//    for(j in 0..i) {
-//      printGroup(groups[j], clientsList[j].uppercase(), i+1)
-//    }
-
     println("COMMIT DONE BY " + clientsList[i-1].uppercase())
     println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     println()
@@ -165,35 +159,33 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
 
   updateKeys(groups, clients, clientsList, 0)
 
-  printGroups(groups, clientsList)
+  printGroups(clients, groups, clientsList)
 
   return Pair(clients, groups)
 }
 
-suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, excludeClients: List<Int> = listOf(), excludeClientsOnlyFromUpdate: List<Int> = listOf(), noCommit: Boolean = false){
+suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, noCommit: Boolean = false){
 
-  println("UPDATING " + clientsList.slice(clients.indices.filter{ !excludeClients.contains(it) && it!=committerIdx}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
+  println("UPDATING " + clientsList.slice(clients.indices.filter{ !clients[it].isGhost() && it!=committerIdx}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   clients.indices.forEach { updaterGroup ->
-    if((updaterGroup != committerIdx) && (!excludeClients.contains(updaterGroup)) && (!excludeClientsOnlyFromUpdate.contains(updaterGroup))){
+    if((updaterGroup != committerIdx) && (!clients[updaterGroup].isGhost())){
       val updateMember = groups[updaterGroup].update().getOrThrow()
       DeliveryService.sendMessageToGroup(updateMember, groups[updaterGroup].groupId).getOrThrow()
 
-      clients.forEachIndexed {idx, client ->
-        if (!excludeClients.contains(idx)) {
-          client.processNextMessage().getOrThrow()
-        }
+      clients.forEach { client ->
+        client.processNextMessage().getOrThrow()
       }
     }
   }
 
   if(!noCommit){
-    commit(groups[committerIdx], clients, excludeClients.map{ clients[it] })
+    commit(groups[committerIdx], clients)
   }
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 }
 
-suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Client>, excludeClients: List<Client> = listOf()){
+suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Client>){
 
   val commitMsg: ByteArray
   val time = measureTime {
@@ -204,24 +196,30 @@ suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Clie
   DeliveryService.sendMessageToGroup(commitMsg, committerGroup.groupId).getOrThrow()
 
   clients.forEach {
-    if(! excludeClients.contains(it)){
-      it.processNextMessage().getOrThrow()
-    }
+    it.processNextMessage().getOrThrow()
   }
 }
 
-suspend fun basicConversation(clients: List<Client>, groups: List<ActiveGroupClient<String>>, excludeClients: List<Int> = listOf(), id: String){
+suspend fun basicConversation(clients: List<Client>, groups: List<ActiveGroupClient<String>>, id: String){
   println("SENDING MESSAGE")
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   for(i in 0..<clients.size){
-    if(! excludeClients.contains(i)){
+    if(!clients[i].isGhost()){
       clients[i].sendMessage(groups[i].groupId, "Hello from " + clients[i].userName.uppercase() + " " + id)
-      for(j in 0..<clients.size){
-        if((j != i) && (! excludeClients.contains(j))){
-          clients[j].processNextMessage()
-        }
+
+      clients.forEach {
+        it.processNextMessage().getOrThrow()
       }
     }
   }
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+}
+
+suspend fun recoverCachedMessaes(client: Client, group: ActiveGroupClient<String>, clientName: String){
+  println("$clientName RECOVERING CACHED MESSAGES")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  group.startGhostMessageRecovery().getOrThrow()
+  client.processCachedGhostMessages().getOrThrow()
+  group.endGhostMessageRecovery().getOrThrow()
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 }

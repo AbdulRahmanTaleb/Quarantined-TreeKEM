@@ -367,6 +367,7 @@ private fun GroupState.Active.processGhostMembers(
   ) : Either<CommitError,RatchetTree>  = either{
 
   val interTree = if(deleteGhostMembers.isNotEmpty()){
+    deleteGhostMembers.forEach{ groupGhostInfo.removeGhostMemberWithShares(it) }
     tree.remove(deleteGhostMembers)
   } else {
     tree

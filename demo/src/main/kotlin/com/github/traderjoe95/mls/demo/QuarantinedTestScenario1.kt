@@ -7,6 +7,7 @@ import com.github.traderjoe95.mls.demo.util.commit
 import com.github.traderjoe95.mls.demo.util.initiateGroup
 import com.github.traderjoe95.mls.demo.util.printGroup
 import com.github.traderjoe95.mls.demo.util.printGroups
+import com.github.traderjoe95.mls.demo.util.recoverCachedMessaes
 import com.github.traderjoe95.mls.demo.util.updateKeys
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
 import com.github.traderjoe95.mls.protocol.group.GroupState
@@ -31,39 +32,32 @@ suspend fun main() {
   val idxCommit = 1
   val idxGhosts = listOf(clients.size-2,clients.size-1)
 
+  idxGhosts.forEach { clients[it].declareAsGhost() }
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommit,
-      idxGhosts
+      idxCommit
     )
   }
-
-  printGroups(groups, clientsList, idxGhosts)
 
   for(i in 0..<GroupState.UPDATE_QUARANTINE_KEYS_DELAY.toInt()*2) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommit,
-      idxGhosts
+      idxCommit
     )
   }
 
+  printGroups(clients, groups, clientsList)
+
   // A basic conversation (except for idxGhosts - Dan)
-  basicConversation(clients, groups, idxGhosts, id = "1")
+  basicConversation(clients, groups, id = "1")
 
   val idxGhost1 = idxGhosts[0]
   val idxGhost2 = idxGhosts[1]
-
-  groups.forEachIndexed {idx, it ->
-    println(clientsList[idx])
-    it.state.groupGhostInfo.printRanks()
-    println("")
-  }
 
   // Fred reconnecting after their quarantine
   println(clientsList[idxGhost1] + " RECONNECTING")
@@ -101,27 +95,21 @@ suspend fun main() {
   // The ghost user processes the WelcomeBackGhost Message
   clients[idxGhost1].processNextMessage().getOrThrow()
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
-  printGroups(groups, clientsList,listOf(idxGhost2))
+  printGroups(clients, groups, clientsList)
 
   // A basic conversation
-  basicConversation(clients, groups, listOf(idxGhost2), id = "3")
+  basicConversation(clients, groups, id = "3")
   // At this stage, the ghost user have recovered enough shares to reconstruct its ghost key
   // and decrypt all of the messages cached during its quarantine period
-  println("RECOVERING MESSAGES TEST")
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  groups[idxGhost1].startGhostMessageRecovery().getOrThrow()
-  clients[idxGhost1].processCachedGhostMessages().getOrThrow()
-  groups[idxGhost1].endGhostMessageRecovery().getOrThrow()
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+  recoverCachedMessaes(clients[idxGhost1], groups[idxGhost1], clientsList[idxGhost1])
 
   updateKeys(
     groups,
     clients,
     clientsList,
     committerIdx = 0,
-    excludeClients = listOf(idxGhost2)
   )
-  printGroups(groups, clientsList, listOf(idxGhost2))
+  printGroups(clients, groups, clientsList)
 
   // Gregory reconnecting after their quarantine
   println(clientsList[idxGhost2] + " RECONNECTING")
@@ -144,12 +132,7 @@ suspend fun main() {
   )
   // Gregory does not request a welcomeBack, but decrypts their cached messages
   // instead to recover the current state
-  println("RECOVERING MESSAGES TEST")
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  groups[idxGhost2].startGhostMessageRecovery().getOrThrow()
-  clients[idxGhost2].processCachedGhostMessages().getOrThrow()
-  groups[idxGhost2].endGhostMessageRecovery().getOrThrow()
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+  recoverCachedMessaes(clients[idxGhost2], groups[idxGhost2], clientsList[idxGhost2])
 
   updateKeys(
     groups,
@@ -157,7 +140,7 @@ suspend fun main() {
     clientsList,
     committerIdx = 0,
   )
-  printGroups(groups, clientsList)
+  printGroups(clients, groups, clientsList)
 
   // A basic conversation
   basicConversation(clients, groups, id = "4")

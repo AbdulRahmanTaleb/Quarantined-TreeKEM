@@ -35,8 +35,7 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      idxCommitter,
-      idxGhosts,
+      idxCommitter
     )
   }
 

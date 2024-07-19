@@ -38,19 +38,19 @@ suspend fun main() {
   groups[0].tree.print()
 
   val idxGhosts = listOf(0)
+  idxGhosts.forEach { clients[it].declareAsGhost() }
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommit,
-      idxGhosts
+      idxCommit
     )
   }
-  printGroups(groups, clientsList, idxGhosts)
+  printGroups(clients, groups, clientsList)
 
   // A basic conversation
-  basicConversation(clients, groups, idxGhosts, id = "1")
+  basicConversation(clients, groups, id = "1")
 
   // Doing many commits so that the ghost user stays inactive
   // long enough to be deleted from the group
@@ -59,8 +59,7 @@ suspend fun main() {
       groups,
       clients,
       clientsList,
-      idxCommit,
-      idxGhosts
+      idxCommit
     )
   }
 
@@ -84,9 +83,11 @@ suspend fun main() {
     println("Test Success !")
   }
 
+  idxGhosts.forEach { clients[it].declareAsGhost() }
+
   // A basic conversation
-  basicConversation(clients, groups, idxGhosts, id = "2")
-  printGroups(groups, clientsList, idxGhosts)
+  basicConversation(clients, groups,  id = "2")
+  printGroups(clients, groups, clientsList)
 
 
 

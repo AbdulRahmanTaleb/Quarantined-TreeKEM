@@ -31,9 +31,12 @@ data class GroupGhostInfo(
   fun getCurrentGhosts(): List<LeafIndex> = currentGhostMembers.map { it.leafIndex }
 
 
-  fun printRanks(){
-    ghostMembersShares.forEach {
-      println(it.leafIndex.toString() + " ,shareIdx = " + it.ghostShare.rank + " ,rank = " + it.ghostShareHolderRank)
+  fun printRanks(name: String){
+    if(ghostMembersShares.size > 0) {
+      println(name + " holds the following ghost shares:")
+      ghostMembersShares.forEach {
+        println(it.leafIndex.toString() + ", epoch = " + it.epoch + ", shareIdx = " + it.ghostShare.rank + ", rank = " + it.ghostShareHolderRank)
+      }
     }
   }
   fun containsGhost(leafIndex: LeafIndex): Boolean{
@@ -88,7 +91,7 @@ data class GroupGhostInfo(
   }
 
   context(Raise<GroupGhostInfoError>)
-  private fun removeGhostMemberWithShares(leafIndex: LeafIndex){
+  fun removeGhostMemberWithShares(leafIndex: LeafIndex){
     currentGhostMembers.removeIf {
       it.leafIndex == leafIndex
     }.also{

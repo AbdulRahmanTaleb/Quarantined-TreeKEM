@@ -7,6 +7,7 @@ import com.github.traderjoe95.mls.demo.util.commit
 import com.github.traderjoe95.mls.demo.util.initiateGroup
 import com.github.traderjoe95.mls.demo.util.printGroup
 import com.github.traderjoe95.mls.demo.util.printGroups
+import com.github.traderjoe95.mls.demo.util.recoverCachedMessaes
 import com.github.traderjoe95.mls.demo.util.updateKeys
 import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
 import com.github.traderjoe95.mls.protocol.group.GroupState
@@ -38,19 +39,19 @@ suspend fun main() {
   groups[0].tree.print()
 
   val idxGhosts = listOf(0)
+  idxGhosts.forEach { clients[it].declareAsGhost() }
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()) {
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommit,
-      idxGhosts
+      idxCommit
     )
   }
-  printGroups(groups, clientsList, idxGhosts)
+  printGroups(clients, groups, clientsList)
 
   // A basic conversation
-  basicConversation(clients, groups, idxGhosts, id = "1")
+  basicConversation(clients, groups, id = "1")
 
   // Alice reconnecting after their quarantine
   val idxGhost = idxGhosts[0]
@@ -74,12 +75,7 @@ suspend fun main() {
   )
   // Gregory does not request a welcomeBack, but decrypts their cached messages
   // instead to recover the current state
-  println("RECOVERING MESSAGES TEST")
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-  groups[idxGhost].startGhostMessageRecovery().getOrThrow()
-  clients[idxGhost].processCachedGhostMessages().getOrThrow()
-  groups[idxGhost].endGhostMessageRecovery().getOrThrow()
-  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+  recoverCachedMessaes(clients[idxGhost], groups[idxGhost], clientsList[idxGhost])
 
   updateKeys(
     groups,
@@ -87,7 +83,7 @@ suspend fun main() {
     clientsList,
     committerIdx = 0,
   )
-  printGroups(groups, clientsList)
+  printGroups(clients, groups, clientsList)
 
   // A basic conversation
   basicConversation(clients, groups, id = "4")

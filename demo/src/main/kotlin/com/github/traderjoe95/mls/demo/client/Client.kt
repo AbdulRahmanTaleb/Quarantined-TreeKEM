@@ -45,6 +45,8 @@ class Client(
 
   private val mlsClient: MlsClient<String> = MlsClient(this)
 
+  private var ghost = false
+
   fun generateKeyPackages(
     amount: UInt,
     cipherSuite: CipherSuite = Config.cipherSuite,
@@ -108,8 +110,14 @@ class Client(
 
   suspend fun processNextMessage(): Either<Any, GroupClient<String, *>?> =
     either {
-      messages.tryReceive().getOrNull()?.let { (messageId, encoded) ->
-        processMessage(messageId, encoded)
+      if(ghost){
+        messages.tryReceive().getOrNull()?.let{ cachedGhostMessages.add(it) }
+        null
+      }
+      else{
+        messages.tryReceive().getOrNull()?.let { (messageId, encoded) ->
+          processMessage(messageId, encoded)
+        }
       }
     }
 
@@ -249,7 +257,21 @@ class Client(
       }
     }
 
+  suspend fun declareAsGhost(){
+    ghost = true
+    var message = messages.tryReceive().getOrNull()
+    while(message != null){
+      cachedGhostMessages.add(message)
+      message = messages.tryReceive().getOrNull()
+    }
+  }
+
+  fun isGhost(): Boolean {
+    return ghost
+  }
+
   suspend fun ghostReconnect(groupId: GroupId) {
+    ghost = false
     var message = messages.tryReceive().getOrNull()
     while(message != null){
       cachedGhostMessages.add(message)
