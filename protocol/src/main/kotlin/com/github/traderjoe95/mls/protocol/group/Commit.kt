@@ -74,7 +74,7 @@ private fun GroupState.Active.printGhostUsers(newGhostMembers: List<GhostMemberC
   if(newGhostMembers.isNotEmpty()){
     print("\nNew ghosts or ghosts key update at epoch " + (groupContext.epoch+1u)  +": ")
     newGhostMembers.forEach {
-      print(it.leafIndex.toString()+ ", ")
+      print(it.leafIndex.nodeIndex.toString() + ", ")
     }
     println("\n")
   }

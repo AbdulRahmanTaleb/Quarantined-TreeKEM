@@ -10,25 +10,26 @@ import java.security.SecureRandom
 // QUARANTINE TEST: testing horizontal method
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
+  val NB_MEMBERS = pow(2,5)
+  val NB_GHOSTS = 3
   val clientsList = mutableListOf<String>()
 
-  for(i in 1..pow(2, 7)){
+  for(i in 1..NB_MEMBERS){
     clientsList.add(i.toString())
   }
 
   val rand = SecureRandom()
   val idxGhosts = mutableListOf<Int>()
-
-  for(i in 1..2){
+  for(i in 1..NB_GHOSTS){
     idxGhosts.add(rand.nextInt(clientsList.size))
   }
-  println("idxGhosts = " + idxGhosts)
-
 
   val (clients, groups) = initiateGroup(clientsList)
 
   var idxCommitter = rand.nextInt(clients.size)
   while(idxGhosts.contains(idxCommitter)) idxCommitter = rand.nextInt(clients.size)
+  println("idxGhosts = " + idxGhosts)
+  idxGhosts.forEach { clients[it].declareAsGhost() }
 
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()){
     updateKeys(

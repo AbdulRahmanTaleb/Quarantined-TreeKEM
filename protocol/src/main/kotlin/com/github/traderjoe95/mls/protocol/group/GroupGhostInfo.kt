@@ -36,6 +36,7 @@ data class GroupGhostInfo(
       println(name + " holds the following ghost shares:")
       ghostMembersShares.forEach {
         println(it.leafIndex.toString() + ", epoch = " + it.epoch + ", shareIdx = " + it.ghostShare.rank + ", rank = " + it.ghostShareHolderRank)
+        println("")
       }
     }
   }

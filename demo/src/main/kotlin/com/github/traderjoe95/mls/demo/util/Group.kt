@@ -38,7 +38,6 @@ fun printGroups(clients: List<Client>, groups: List<ActiveGroupClient<String>>, 
 
   groups.forEachIndexed { idx, it ->
     it.state.groupGhostInfo.printRanks(clientsList[idx])
-    println()
   }
 }
 
@@ -191,7 +190,7 @@ suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Clie
   val time = measureTime {
     commitMsg = committerGroup.commit().getOrThrow()
   }
-  println("Construction of commit message took " + time.inWholeMilliseconds + " ms")
+  println("Construction of commit message (" + commitMsg.size + " bytes) took " + time.inWholeMilliseconds + " ms")
 
   DeliveryService.sendMessageToGroup(commitMsg, committerGroup.groupId).getOrThrow()
 

@@ -28,12 +28,17 @@ internal fun getFilteredDirectPathCleaned(
   excludeNewLeaves: Set<LeafIndex>,
 ): List<Pair<NodeIndex, List<NodeIndex>>> {
 
-  return tree.filteredDirectPath(from).filter { (_, resolution) ->
+  return tree.filteredDirectPath(from).mapNotNull { (nodeIdx, resolution) ->
     val encryptFor = resolution.filter {
       !(it.isLeaf && tree.leafNode(it).source == LeafNodeSource.Ghost) &&
         !(it.isLeaf && excludeNewLeaves.contains(it.leafIndex))
     }
-    encryptFor.isNotEmpty()
+    if(encryptFor.isNotEmpty()){
+      Pair(nodeIdx, encryptFor)
+    } else {
+      null
+    }
+
   }
 }
 
@@ -87,6 +92,12 @@ internal fun generateSharesUsingDefaultShareDistribution(
     val t = GroupState.computeSecretSharingTValue(nbShares)
     println("Default Share Distribution Method used")
     println("Parameters for secret sharing for this epoch: m = $nbShares, t = $t\n")
+    println("Need to perform a total of " +
+      filteredDirectPath.fold(0) { acc, elem -> acc + elem.second.size }
+      + " encryptions")
+//    filteredDirectPath.forEach {
+//      println(it.second)
+//    }
 
     val ghostSecretShares = newGhostSecrets.map {
       ShamirSecretSharing.generateShares(it.bytes, t, nbShares)
