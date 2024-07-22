@@ -163,12 +163,12 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
   return Pair(clients, groups)
 }
 
-suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, noCommit: Boolean = false){
+suspend fun updateKeys(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, excludeFromUpdate: List<Int> = listOf() ,noCommit: Boolean = false){
 
-  println("UPDATING " + clientsList.slice(clients.indices.filter{ !clients[it].isGhost() && it!=committerIdx}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
+  println("UPDATING " + clientsList.slice(clients.indices.filter{ !clients[it].isGhost() && it!=committerIdx && !excludeFromUpdate.contains(it)}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
   clients.indices.forEach { updaterGroup ->
-    if((updaterGroup != committerIdx) && (!clients[updaterGroup].isGhost())){
+    if((updaterGroup != committerIdx) && (!clients[updaterGroup].isGhost()) && !(excludeFromUpdate.contains(updaterGroup))){
       val updateMember = groups[updaterGroup].update().getOrThrow()
       DeliveryService.sendMessageToGroup(updateMember, groups[updaterGroup].groupId).getOrThrow()
 

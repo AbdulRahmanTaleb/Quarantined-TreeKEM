@@ -11,33 +11,39 @@ import java.security.SecureRandom
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
   val NB_MEMBERS = pow(2,5)
-  val NB_GHOSTS = 3
+  val NB_GHOSTS = 2
   val clientsList = mutableListOf<String>()
 
   for(i in 1..NB_MEMBERS){
     clientsList.add(i.toString())
   }
+  val (clients, groups) = initiateGroup(clientsList)
 
   val rand = SecureRandom()
   val idxGhosts = mutableListOf<Int>()
   for(i in 1..NB_GHOSTS){
-    idxGhosts.add(rand.nextInt(clientsList.size))
+    var elem = rand.nextInt(clientsList.size)
+    while(idxGhosts.contains(elem)) elem = rand.nextInt(clientsList.size)
+    idxGhosts.add(elem)
   }
-
-  val (clients, groups) = initiateGroup(clientsList)
-
-  var idxCommitter = rand.nextInt(clients.size)
-  while(idxGhosts.contains(idxCommitter)) idxCommitter = rand.nextInt(clients.size)
   println("idxGhosts = " + idxGhosts)
   idxGhosts.forEach { clients[it].declareAsGhost() }
 
   for(i in 0..<GroupState.INACTIVITY_DELAY.toInt()){
+    var idxCommitter = rand.nextInt(clients.size)
+    while(idxGhosts.contains(idxCommitter)) idxCommitter = rand.nextInt(clients.size)
     updateKeys(
       groups,
       clients,
       clientsList,
-      idxCommitter
+      idxCommitter,
+      excludeFromUpdate = if(i != 0) groups.indices.toList() else listOf()
     )
+
+    if(i == GroupState.INACTIVITY_DELAY.toInt()-2){
+//      println("idxCommitter = " + idxCommitter)
+      println(groups[idxCommitter].tree.print())
+    }
   }
 
 
