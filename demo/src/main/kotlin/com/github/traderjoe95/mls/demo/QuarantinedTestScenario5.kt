@@ -7,7 +7,7 @@ import org.bouncycastle.pqc.legacy.math.linearalgebra.IntegerFunctions.pow
 import java.security.SecureRandom
 
 //////////////////////////////////////////////////////////////////////
-// QUARANTINE TEST: testing horizontal method
+// QUARANTINE TEST: testing group with many members
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
   val NB_MEMBERS = pow(2,5)
