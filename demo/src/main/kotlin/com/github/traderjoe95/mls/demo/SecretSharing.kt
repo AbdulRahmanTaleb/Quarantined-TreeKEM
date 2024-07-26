@@ -19,6 +19,7 @@ import com.github.traderjoe95.mls.protocol.client.ActiveGroupClient
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing.SecretShare.Companion.encodeUnsafe
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolder
+import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.tree.LeafIndex
 import com.github.traderjoe95.mls.protocol.types.BasicCredential
 import com.github.traderjoe95.mls.protocol.types.crypto.HpkePublicKey
@@ -43,32 +44,41 @@ private data class ShamirSharingList(val listSecrets: List<ShamirSecretSharing.S
     }
 }
 
+internal data class Params(val t: Int, val m: Int);
+
 suspend fun main() {
 
-    val nbIters = 50
-    var totalGen = 0.0
-    var totalRecover = 0.0
+    val nbIters = 20
 
-    for(i in 1..nbIters){
 
-        val secret = SecureRandom().nextBytes(64)
+    IntRange(3,64).step(5).map{
+        Params(GroupState.computeSecretSharingTValue(it), it)
+    }.forEach {
+        println("m = " + it.m + " ,t = " + it.t)
+        var totalGen = 0.0
+        var totalRecover = 0.0
 
-        val shares:  List<ShamirSecretSharing.SecretShare>
+        for(i in 1..nbIters){
 
-        totalGen += measureTime {  shares = ShamirSecretSharing.generateShares(secret, 8,16) }.inWholeMilliseconds
+            val secret = SecureRandom().nextBytes(64)
 
-        val newShares = shares.map{
-            ShamirSecretSharing.SecretShare.decodeUnsafe(it.encodeUnsafe())
+            val shares:  List<ShamirSecretSharing.SecretShare>
+
+            totalGen += measureTime {  shares = ShamirSecretSharing.generateShares(secret, it.t, it.m) }.inWholeMilliseconds
+
+            val newShares = shares.map{
+                ShamirSecretSharing.SecretShare.decodeUnsafe(it.encodeUnsafe())
+            }
+
+            val sb: ByteArray
+
+            totalRecover += measureTime { sb = ShamirSecretSharing.retrieveSecret(newShares) }.inWholeMilliseconds
+
+            assert(BigInteger(1, sb) == BigInteger(1, secret))
         }
 
-        val sb: ByteArray
-
-        totalRecover += measureTime { sb = ShamirSecretSharing.retrieveSecret(newShares) }.inWholeMilliseconds
-
-        assert(BigInteger(1, sb) == BigInteger(1, secret))
+//        println("Generating shares took " + (totalGen / nbIters) + " ms")
+        println("Recovering secret took " + (totalRecover / nbIters) + " ms")
     }
-
-    println("Generating shares took " + (totalGen / nbIters) + " ms")
-    println("Recovering secret took " + (totalRecover / nbIters) + " ms")
 
 }

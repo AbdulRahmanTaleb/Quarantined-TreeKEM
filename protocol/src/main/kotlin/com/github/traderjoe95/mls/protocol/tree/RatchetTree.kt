@@ -34,6 +34,7 @@ import com.github.traderjoe95.mls.protocol.util.sliceArray
 import com.github.traderjoe95.mls.protocol.util.uSize
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
+import kotlin.math.max
 
 sealed interface RatchetTreeOps : SignaturePublicKeyLookup {
   val size: UInt
@@ -332,7 +333,7 @@ value class PublicRatchetTree private constructor(private val nodes: Array<Node?
       leaves[it.leafIndex.value] != null && leaves[it.leafIndex.value]!!.source != LeafNodeSource.Ghost &&
         !excludeLeaves.contains(it.leafIndex)
     }.let{
-      if(it.size >= minimumNb){
+      if(it.size.toUInt() >= max(minimumNb.toUInt(), root.level)){
         return it
       }
     }
