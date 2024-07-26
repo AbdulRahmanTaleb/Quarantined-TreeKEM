@@ -55,7 +55,7 @@ suspend fun main() {
 
         val shares:  List<ShamirSecretSharing.SecretShare>
 
-        totalGen += measureTime {  shares = ShamirSecretSharing.generateShares(secret, 32,64) }.inWholeMilliseconds
+        totalGen += measureTime {  shares = ShamirSecretSharing.generateShares(secret, 8,16) }.inWholeMilliseconds
 
         val newShares = shares.map{
             ShamirSecretSharing.SecretShare.decodeUnsafe(it.encodeUnsafe())

@@ -11,7 +11,7 @@ import java.security.SecureRandom
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
   val NB_MEMBERS = pow(2,5)
-  val NB_GHOSTS = 2
+  val NB_GHOSTS = 3
   val clientsList = mutableListOf<String>()
 
   for(i in 1..NB_MEMBERS){
@@ -40,10 +40,12 @@ suspend fun main() {
       excludeFromUpdate = if(i != 0) groups.indices.toList() else listOf()
     )
 
-    if(i == GroupState.INACTIVITY_DELAY.toInt()-2){
-//      println("idxCommitter = " + idxCommitter)
-      println(groups[idxCommitter].tree.print())
-    }
+    if(i == 0) groups[0].tree.print()
+
+//    if(i == GroupState.INACTIVITY_DELAY.toInt()-2){
+////      println("idxCommitter = " + idxCommitter)
+//      println(groups[idxCommitter].tree.print())
+//    }
   }
 
 

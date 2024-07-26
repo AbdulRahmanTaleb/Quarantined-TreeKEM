@@ -74,6 +74,10 @@ internal fun createUpdatePath(
     val directPath = originalTree.directPath(from)
     val filteredDirectPath = originalTree.filteredDirectPath(from)
 
+    println("filtered path size = " + filteredDirectPath.size)
+    println("nb encryptions = " + filteredDirectPath.fold(0) { acc, elem -> acc + elem.second.size })
+
+
     val pathSecrets = mutableListOf(leafPathSecret)
 
     val updatedTreeWithoutLeaf =
