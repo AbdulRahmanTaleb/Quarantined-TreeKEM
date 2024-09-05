@@ -120,6 +120,8 @@ internal fun generateSharesUsingDefaultShareDistribution(
       )
     }
 
+    val provisionalGroupCtx = groupContext.provisional(tree).encoded
+
     val ghostSharesToDistribute = filteredDirectPath.map { nodeAndRes ->
       val (nodeIdx, encryptFor) = nodeAndRes
       GhostShareDistribution(
@@ -128,7 +130,7 @@ internal fun generateSharesUsingDefaultShareDistribution(
           encryptWithLabel(
             tree.node(idx).encryptionKey,
             "GhostShareDistribution",
-            groupContext.provisional(tree).encoded,
+            provisionalGroupCtx,
             GhostShareHolderCommitList.construct(
               newGhostMembers,
               ghostSecretShares,
@@ -249,6 +251,8 @@ internal fun generateSharesUsingHorizontalShareDistribution(
       )
     }
 
+    val provisionalGroupCtx = groupContext.provisional(tree).encoded
+
     var shareIdx = 1
     val ghostSharesToDistribute = nodes.map{
       GhostShareDistribution(
@@ -256,7 +260,7 @@ internal fun generateSharesUsingHorizontalShareDistribution(
         listOf(encryptWithLabel(
           tree.node(it).encryptionKey,
           "GhostShareDistribution",
-          groupContext.provisional(tree).encoded,
+          provisionalGroupCtx,
           GhostShareHolderCommitList.construct(
             newGhostMembers,
             ghostSecretShares,

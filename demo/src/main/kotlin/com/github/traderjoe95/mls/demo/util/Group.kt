@@ -72,7 +72,7 @@ fun compareGroups(group1: ActiveGroupClient<String>, group2: ActiveGroupClient<S
   return true
 }
 
-suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<ActiveGroupClient<String>>> {
+suspend fun initiateGroup(clientsList: List<String>, update: Boolean = true): Pair<List<Client>, List<ActiveGroupClient<String>>> {
   val clients = mutableListOf<Client>()
   val groups = mutableListOf<ActiveGroupClient<String>>()
 
@@ -129,34 +129,31 @@ suspend fun initiateGroup(clientsList: List<String>): Pair<List<Client>, List<Ac
   // ADDING OTHERS TO THE GROUP
   //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////
-  for(i in 2..<clients.size){
-    println("ADDING " + clientsList[i].uppercase() + " TO THE GROUP")
-    println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    val otherKeyPackage = clients[i-1].getKeyPackageFor(Config.cipherSuite, clientsList[i])
-
-    if((i % GroupState.INACTIVITY_DELAY.toInt()) < 1){
-      for(j in 0..i-2){
-        val updateMember = groups[j].update().getOrThrow()
-        DeliveryService.sendMessageToGroup(updateMember, groups[j].groupId).getOrThrow()
-        clients.forEach {client ->
-          client.processNextMessage().getOrThrow()
-        }
-      }
-    }
-
-    val otherAddMemberCommit = groups[i-1].commit(listOf(Add(otherKeyPackage))).getOrThrow()
-    DeliveryService.sendMessageToGroup(otherAddMemberCommit, groups[i-1].groupId).getOrThrow()
-
-    clients.subList(0, i).forEach { it.processNextMessage().getOrThrow() }
-
-    groups.add(clients[i].processNextMessage().getOrThrow()!! as ActiveGroupClient<String>)
-
-    println("COMMIT DONE BY " + clientsList[i-1].uppercase())
-    println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    println()
+  println("ADDING OTHERS TO THE GROUP")
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  val otherKeyPackages = IntRange(2, clientsList.size - 1).map{
+    clients[0].getKeyPackageFor(Config.cipherSuite, clientsList[it])
   }
+  val proposals = otherKeyPackages.map{ Add(it) }
 
-  updateKeys(groups, clients, clientsList, 0)
+  val otherAddMembersCommit = groups[0].commit(proposals).getOrThrow()
+  DeliveryService.sendMessageToGroup(otherAddMembersCommit, groups[0].groupId).getOrThrow()
+  clients.subList(0, 2).forEach { it.processNextMessage().getOrThrow() }
+
+  IntRange(2, clientsList.size - 1).forEach {
+    print(it.toString() + ", ")
+    if(it % 50 == 0){ println("") }
+    groups.add(clients[it].processNextMessage().getOrThrow()!! as ActiveGroupClient<String>)
+  }
+  println("")
+
+  println("COMMIT DONE BY " + clientsList[0].uppercase())
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  println()
+
+  if(update){
+    updateKeys(groups, clients, clientsList, 0)
+  }
 
   printGroups(clients, groups, clientsList)
 
@@ -197,6 +194,38 @@ suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Clie
   clients.forEach {
     it.processNextMessage().getOrThrow()
   }
+}
+
+suspend fun updateKeysWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, excludeFromUpdate: List<Int> = listOf()){
+
+  println("UPDATING " + clientsList.slice(clients.indices.filter{ !clients[it].isGhost() && it!=committerIdx && !excludeFromUpdate.contains(it)}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+  clients.indices.forEach { updaterGroup ->
+    if((updaterGroup != committerIdx) && (!clients[updaterGroup].isGhost()) && !(excludeFromUpdate.contains(updaterGroup))){
+      val updateMember = groups[updaterGroup].update().getOrThrow()
+      DeliveryService.sendMessageToGroup(updateMember, groups[updaterGroup].groupId).getOrThrow()
+    }
+  }
+
+  commitWithoutProcessing(groups, clients, committerIdx)
+  println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+}
+
+suspend fun commitWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, committerIdx: Int){
+
+  val committerGroup = groups[committerIdx]
+  val committerClient = clients[committerIdx]
+  while(!committerClient.noMessagesToProcess()){
+    committerClient.processNextMessage().getOrThrow()
+  }
+
+  val commitMsg: ByteArray
+  val time = measureTime {
+    commitMsg = committerGroup.commit().getOrThrow()
+  }
+  println("Construction of commit message (" + commitMsg.size + " bytes) took " + time.inWholeMilliseconds + " ms")
+
+  DeliveryService.sendMessageToGroup(commitMsg, committerGroup.groupId).getOrThrow()
 }
 
 suspend fun basicConversation(clients: List<Client>, groups: List<ActiveGroupClient<String>>, id: String){

@@ -28,6 +28,7 @@ import com.github.traderjoe95.mls.protocol.types.framing.enums.ProtocolVersion
 import com.github.traderjoe95.mls.protocol.util.hex
 import de.traderjoe.ulid.ULID
 import de.traderjoe.ulid.blocking.new
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
 class Client(
@@ -107,6 +108,9 @@ class Client(
       }
       println("Finished processing cached messages")
     }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  suspend fun noMessagesToProcess(): Boolean = messages.isEmpty
 
   suspend fun processNextMessage(): Either<Any, GroupClient<String, *>?> =
     either {
