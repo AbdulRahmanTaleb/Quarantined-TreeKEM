@@ -132,7 +132,6 @@ internal fun generateSharesUsingDefaultShareDistribution(
             "GhostShareDistribution",
             provisionalGroupCtx,
             GhostShareHolderCommitList.construct(
-              newGhostMembers,
               ghostSecretShares,
               nodeIdx.level.toInt() - 1,
             ).encodeUnsafe()
@@ -151,6 +150,7 @@ internal fun decryptSharesUsingDefaultShareDistribution(
   from: LeafIndex,
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
+  newGhostUsers: List<GhostMemberCommit>,
   shares: List<GhostShareDistribution>,
 ): List<GhostShareHolder> {
 
@@ -194,8 +194,14 @@ internal fun decryptSharesUsingDefaultShareDistribution(
           tree.public.getLeafRankInSubtree(tree.leafIndex, filteredDirectPath[idxCommonAncestor].first.rightChild)
         }
 
-      return  GhostShareHolderCommitList.decodeUnsafe(it).ghostShareHolders.map { shareHolder ->
-        GhostShareHolder.create(shareHolder, rank)
+      return  GhostShareHolderCommitList.decodeUnsafe(it).ghostShareHolders.mapIndexed { idx, shareHolder ->
+        GhostShareHolder.create(
+          newGhostUsers[idx].ghostEncryptionKey,
+          newGhostUsers[idx].leafIndex,
+          groupContext.epoch,
+          shareHolder,
+          rank
+        )
       }
     }
 
@@ -262,7 +268,6 @@ internal fun generateSharesUsingHorizontalShareDistribution(
           "GhostShareDistribution",
           provisionalGroupCtx,
           GhostShareHolderCommitList.construct(
-            newGhostMembers,
             ghostSecretShares,
             if(from.isInSubtreeOf(it)) 0 else shareIdx++,
           ).encodeUnsafe()
@@ -280,6 +285,7 @@ internal fun decryptSharesUsingHorizontalShareDistribution(
   tree: RatchetTree,
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
+  newGhostUsers: List<GhostMemberCommit>,
   shares: List<GhostShareDistribution>,
 ): List<GhostShareHolder> {
 
@@ -307,8 +313,14 @@ internal fun decryptSharesUsingHorizontalShareDistribution(
       ).bind().let {
         val rank = tree.public.getLeafRankInSubtree(tree.leafIndex, nodeIdx)
 
-        return  GhostShareHolderCommitList.decodeUnsafe(it).ghostShareHolders.map { shareHolder ->
-          GhostShareHolder.create(shareHolder, rank)
+        return  GhostShareHolderCommitList.decodeUnsafe(it).ghostShareHolders.mapIndexed { idx, shareHolder ->
+          GhostShareHolder.create(
+            newGhostUsers[idx].ghostEncryptionKey,
+            newGhostUsers[idx].leafIndex,
+            groupContext.epoch,
+            shareHolder,
+            rank
+          )
         }
       }
     }

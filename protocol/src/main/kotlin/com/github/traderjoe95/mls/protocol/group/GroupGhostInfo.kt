@@ -57,7 +57,7 @@ data class GroupGhostInfo(
         val g = GhostMember(leafIndex)
         g.addNewEncryptionKey(epoch, encryptionKey)
         currentGhostMembers.add(g)
-        return GhostMemberCommit(leafIndex, encryptionKey, epoch)
+        return GhostMemberCommit(leafIndex, encryptionKey)
       }
       else{
         raise(GroupGhostInfoError.MemberIsAlreadyGhost(leafIndex))
@@ -75,7 +75,7 @@ data class GroupGhostInfo(
       }
       else{
         it.addNewEncryptionKey(epoch, encryptionKey)
-        return GhostMemberCommit(leafIndex, encryptionKey, epoch)
+        return GhostMemberCommit(leafIndex, encryptionKey)
       }
     }
   }
@@ -261,19 +261,6 @@ data class GhostShareHolder(
         ghostShareHolderRank
       )
 
-    fun create(
-      ghostShareHolderCommit: GhostShareHolderCommit,
-      ghostShareHolderRank: UInt
-    ): GhostShareHolder =
-
-      GhostShareHolder(
-        ghostShareHolderCommit.ghostEncryptionKey,
-        ghostShareHolderCommit.leafIndex,
-        ghostShareHolderCommit.epoch,
-        ghostShareHolderCommit.ghostShare,
-        ghostShareHolderRank
-      )
-
     fun copy(
       shareHolder: GhostShareHolder
     ): GhostShareHolder =
@@ -300,59 +287,26 @@ data class GhostShareHolderList(
   }
 }
 
-data class GhostShareHolderCommit(
-  val ghostEncryptionKey: HpkePublicKey,
-  val leafIndex: LeafIndex,
-  val epoch: ULong,
-  val ghostShare: ShamirSecretSharing.SecretShare,
-) : Struct4T.Shape<HpkePublicKey, LeafIndex, ULong, ShamirSecretSharing.SecretShare> {
-
-  fun create(
-    ghostEncryptionKey: HpkePublicKey,
-    leafIndex: LeafIndex,
-    epoch: ULong,
-    ghostShare: ShamirSecretSharing.SecretShare,
-  ): GhostShareHolderCommit =
-
-    GhostShareHolderCommit(
-      ghostEncryptionKey,
-      leafIndex,
-      epoch,
-      ghostShare,
-    )
-
-  companion object : Encodable<GhostShareHolderCommit> {
-    @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
-    override val T: DataType<GhostShareHolderCommit> =
-      struct("GhostShareHolder") {
-        it.field("ghost_encryption_key", HpkePublicKey.T)
-          .field("leaf_Index", LeafIndex.T)
-          .field("epoch", uint64.asULong)
-          .field("ghost_share", ShamirSecretSharing.SecretShare.T)
-      }.lift(::GhostShareHolderCommit)
-  }
-}
 
 data class GhostShareHolderCommitList(
-  val ghostShareHolders: List<GhostShareHolderCommit>
-) : Struct1T.Shape<List<GhostShareHolderCommit>> {
+  val ghostShareHolders: List<ShamirSecretSharing.SecretShare>
+) : Struct1T.Shape<List<ShamirSecretSharing.SecretShare>> {
 
   companion object : Encodable<GhostShareHolderCommitList> {
     @Suppress("kotlin:S6531", "ktlint:standard:property-naming")
     override val T: DataType<GhostShareHolderCommitList> =
       struct("GhostShareHolderCommitList") {
-        it.field("ghost_share_holders", GhostShareHolderCommit.T[V])
+        it.field("ghost_share_holders", ShamirSecretSharing.SecretShare.T[V])
       }.lift(::GhostShareHolderCommitList)
 
 
     fun construct(
-      ghostMembers: List<GhostMemberCommit>,
       ghostSecretShares: List<List<ShamirSecretSharing.SecretShare>>,
       shareIdx: Int,
       ): GhostShareHolderCommitList{
 
-      return GhostShareHolderCommitList(ghostMembers.mapIndexed{ idx, ghost ->
-        GhostShareHolderCommit(ghost.ghostEncryptionKey, ghost.leafIndex, ghost.ghostEncryptionKeyEpoch, ghostSecretShares[idx][shareIdx])
+      return GhostShareHolderCommitList(ghostSecretShares.mapIndexed{ idx, _ ->
+        ghostSecretShares[idx][shareIdx]
       })
 
     }
@@ -363,13 +317,11 @@ data class GhostShareHolderCommitList(
 data class GhostMemberCommit(
   val leafIndex: LeafIndex,
   val ghostEncryptionKey: HpkePublicKey,
-  val ghostEncryptionKeyEpoch: ULong,
-): Struct3T.Shape<LeafIndex, HpkePublicKey, ULong> {
+): Struct2T.Shape<LeafIndex, HpkePublicKey> {
 
   override fun hashCode(): Int {
     var result = leafIndex.hashCode()
     result = 31 * result + ghostEncryptionKey.hashCode()
-    result = 31 * result + ghostEncryptionKeyEpoch.hashCode()
     return result
   }
 
@@ -381,7 +333,6 @@ data class GhostMemberCommit(
 
     if (leafIndex != other.leafIndex) return false
     if (ghostEncryptionKey.eq(other.ghostEncryptionKey)) return false
-    if (ghostEncryptionKeyEpoch != other.ghostEncryptionKeyEpoch) return false
 
     return true
   }
@@ -392,7 +343,6 @@ data class GhostMemberCommit(
       struct("GhostShareHolderList") {
         it.field("leaf_index", LeafIndex.T)
           .field("ghost_encryption_key", HpkePublicKey.T)
-          .field("ghost_encryption_key_epoch", uint64.asULong)
       }.lift(::GhostMemberCommit)
   }
 

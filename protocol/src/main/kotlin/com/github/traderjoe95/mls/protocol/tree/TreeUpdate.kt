@@ -299,10 +299,10 @@ internal fun RatchetTree.extractCommonPathSecret(
   var ghostSecretShares: List<GhostShareHolder> = listOf()
   if(newGhostUsers.isNotEmpty()) {
     if(canUseDefaultShareDistribution(this, fromLeafIdx, excludeNewLeaves.map { it.leafIndex }.toSet())){
-      ghostSecretShares = decryptSharesUsingDefaultShareDistribution(this, fromLeafIdx, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, updatePath.shares)
+      ghostSecretShares = decryptSharesUsingDefaultShareDistribution(this, fromLeafIdx, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, newGhostUsers, updatePath.shares)
     }
     else if(canUseHorizontalShareDistribution(this, excludeNewLeaves.map { it.leafIndex }.toSet())){
-      ghostSecretShares = decryptSharesUsingHorizontalShareDistribution(this, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, updatePath.shares)
+      ghostSecretShares = decryptSharesUsingHorizontalShareDistribution(this, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, newGhostUsers, updatePath.shares)
     }
   }
 

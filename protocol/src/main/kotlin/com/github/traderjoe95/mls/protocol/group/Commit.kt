@@ -237,7 +237,7 @@ suspend fun <Identity : Any> GroupState.Active.processCommit(
     }
 
     val updatedTreeGhost =
-      processGhostMembers(preTree, commit.content.ghostUsers, commit.content.deadGhostsToDelete ,ghostKeyPair).bind()
+      processGhostMembers(groupContext, preTree, commit.content.ghostUsers, commit.content.deadGhostsToDelete ,ghostKeyPair).bind()
 
     val (updatedTree, commitSecret, ghostSecretShares) =
       updatePath.map { path ->
@@ -360,6 +360,7 @@ private fun GroupState.Active.updateGhostMembers(tree: RatchetTree): Either<Grou
   }
 
 private fun GroupState.Active.processGhostMembers(
+  groupContext: GroupContext,
   tree: RatchetTree,
   newGhostUsers: List<GhostMemberCommit>,
   deleteGhostMembers: List<LeafIndex>,
@@ -390,14 +391,14 @@ private fun GroupState.Active.processGhostMembers(
       leaf.extensions,
       Signature(ByteArray(1)),
       leaf.epk,
-      if(leaf.source == LeafNodeSource.Ghost) leaf.equar else ghostMember.ghostEncryptionKeyEpoch
+      if(leaf.source == LeafNodeSource.Ghost) leaf.equar else groupContext.epoch+1u
     )
 
 //    println(ghostMember.leafIndex.toString() + leaf.source)
     if(leaf.source == LeafNodeSource.Ghost){
-      groupGhostInfo.addNewGhostKey(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
+      groupGhostInfo.addNewGhostKey(ghostMember.leafIndex, groupContext.epoch+1u, ghostMember.ghostEncryptionKey)
     } else {
-      groupGhostInfo.addNewGhostMember(ghostMember.leafIndex, ghostMember.ghostEncryptionKeyEpoch, ghostMember.ghostEncryptionKey)
+      groupGhostInfo.addNewGhostMember(ghostMember.leafIndex, groupContext.epoch+1u, ghostMember.ghostEncryptionKey)
     }
 
     newTree = if(ghostMember.leafIndex.eq(newTree.leafIndex)){

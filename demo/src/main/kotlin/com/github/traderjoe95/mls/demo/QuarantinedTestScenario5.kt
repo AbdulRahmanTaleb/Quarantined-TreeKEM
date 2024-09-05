@@ -11,7 +11,7 @@ import java.security.SecureRandom
 // QUARANTINE TEST: testing group with many members
 //////////////////////////////////////////////////////////////////////
 suspend fun main() {
-  val NB_MEMBERS = pow(2,10)
+  val NB_MEMBERS = pow(2,7)
   val NB_GHOSTS = 2
   val clientsList = mutableListOf<String>()
 
