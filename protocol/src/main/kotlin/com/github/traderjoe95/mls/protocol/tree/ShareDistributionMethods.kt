@@ -2,11 +2,12 @@ package com.github.traderjoe95.mls.protocol.tree
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
+import com.github.traderjoe95.mls.codec.util.get
+import com.github.traderjoe95.mls.codec.util.uSize
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.error.HpkeDecryptError
 import com.github.traderjoe95.mls.protocol.error.SenderTreeUpdateError
 import com.github.traderjoe95.mls.protocol.error.UnexpectedError
-import com.github.traderjoe95.mls.protocol.group.GhostMember
 import com.github.traderjoe95.mls.protocol.group.GhostMemberCommit
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolder
 import com.github.traderjoe95.mls.protocol.group.GhostShareHolderCommitList
@@ -14,7 +15,9 @@ import com.github.traderjoe95.mls.protocol.group.GhostShareHolderCommitList.Comp
 import com.github.traderjoe95.mls.protocol.group.GroupContext
 import com.github.traderjoe95.mls.protocol.group.GroupState
 import com.github.traderjoe95.mls.protocol.types.crypto.Secret
+import com.github.traderjoe95.mls.protocol.types.crypto.Secret.Companion.asSecret
 import com.github.traderjoe95.mls.protocol.types.tree.GhostShareDistribution
+import com.github.traderjoe95.mls.protocol.types.tree.UpdatePathNode
 import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
 
 ///////////////////////////////////////////////////////
@@ -38,7 +41,6 @@ internal fun getFilteredDirectPathCleaned(
     } else {
       null
     }
-
   }
 }
 
@@ -78,33 +80,32 @@ internal fun generateSharesUsingDefaultShareDistribution(
   from: LeafIndex,
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
+  filteredDirectPath: List<Pair<NodeIndex, List<NodeIndex>>>,
+  pathSecrets: List<Secret>,
   newGhostMembers: List<GhostMemberCommit>,
   newGhostSecrets: List<Secret>,
-): Pair<List<GhostShareDistribution>, List<GhostShareHolder>> {
+): Pair<List<UpdatePathNode>, List<GhostShareHolder>> {
   with(tree.cipherSuite) {
 
     if (!canUseDefaultShareDistribution(tree, from, excludeNewLeaves)) {
       raise(UnexpectedError("NotEnoughNodesForDefaultShareDistributionMethod"))
     }
 
-    val filteredDirectPath = getFilteredDirectPathCleaned(tree, from, excludeNewLeaves)
-    val nbShares = getNbSharesWithDefaultMethodFromFilteredDirectPath(filteredDirectPath)
+    val filteredDirectPathCleaned = getFilteredDirectPathCleaned(tree, from, excludeNewLeaves)
+    val nbShares = getNbSharesWithDefaultMethodFromFilteredDirectPath(filteredDirectPathCleaned)
     val t = GroupState.computeSecretSharingTValue(nbShares)
     println("Default Share Distribution Method used")
     println("Parameters for secret sharing for this epoch: m = $nbShares, t = $t\n")
     println("Need to perform a total of " +
-      filteredDirectPath.fold(0) { acc, elem -> acc + elem.second.size }
+      filteredDirectPathCleaned.fold(0) { acc, elem -> acc + elem.second.size }
       + " encryptions")
-//    filteredDirectPath.forEach {
-//      println(it.second)
-//    }
 
     val ghostSecretShares = newGhostSecrets.map {
       ShamirSecretSharing.generateShares(it.bytes, t, nbShares)
     }
 
-    val ownRank: UInt = if ((filteredDirectPath[0].first.level == 1u) &&
-      (filteredDirectPath[0].second[0].leafIndex < from)
+    val ownRank: UInt = if ((filteredDirectPathCleaned[0].first.level == 1u) &&
+      (filteredDirectPathCleaned[0].second[0].leafIndex < from)
     ) {
       2u
     } else {
@@ -122,25 +123,44 @@ internal fun generateSharesUsingDefaultShareDistribution(
 
     val provisionalGroupCtx = groupContext.provisional(tree).encoded
 
-    val ghostSharesToDistribute = filteredDirectPath.map { nodeAndRes ->
-      val (nodeIdx, encryptFor) = nodeAndRes
-      GhostShareDistribution(
-        tree.parentNode(nodeIdx).encryptionKey,
-        encryptFor.map { idx ->
-          encryptWithLabel(
-            tree.node(idx).encryptionKey,
-            "GhostShareDistribution",
-            provisionalGroupCtx,
-            GhostShareHolderCommitList.construct(
-              ghostSecretShares,
-              nodeIdx.level.toInt() - 1,
-            ).encodeUnsafe()
-          ).bind()
-        }
-      )
-    }
+    val excludedNodeIndices = excludeNewLeaves.map { it.nodeIndex }.toSet()
+    val updatePathNodes =
+      filteredDirectPath.zip(pathSecrets).map { (nodeAndRes, pathSecret) ->
+        val (nodeIdx, resolution) = nodeAndRes
+        val encryptFor = resolution - excludedNodeIndices
 
-    return Pair(ghostSharesToDistribute, ownGhostSecretShares)
+        var encodedGhostShares:  GhostShareHolderCommitList? = null
+        var resolutionCleaned: List<NodeIndex> = listOf()
+        filteredDirectPathCleaned.indexOfFirst { it.first == nodeIdx }.let {
+//          println("it = " + it)
+          if(it != -1){
+//            println(filteredDirectPathCleaned[it].first.level)
+            encodedGhostShares = GhostShareHolderCommitList.construct(
+              ghostSecretShares,
+              it,
+              )
+            resolutionCleaned = filteredDirectPathCleaned[it].second
+          }
+        }
+
+        UpdatePathNode(
+          tree.parentNode(nodeIdx).encryptionKey,
+          encryptFor.map { idx ->
+            val bytes = if(encodedGhostShares != null && resolutionCleaned.contains(idx)){
+              pathSecret.bytes + encodedGhostShares!!.encodeUnsafe()
+            } else {
+              pathSecret.bytes
+            }
+            encryptWithLabel(
+              tree.node(idx).encryptionKey,
+              "UpdatePathNode",
+              provisionalGroupCtx,
+              bytes,
+            ).bind()
+          })
+      }
+
+    return Pair(updatePathNodes, ownGhostSecretShares)
   }
 }
 
@@ -151,61 +171,48 @@ internal fun decryptSharesUsingDefaultShareDistribution(
   excludeNewLeaves: Set<LeafIndex>,
   groupContext: GroupContext,
   newGhostUsers: List<GhostMemberCommit>,
-  shares: List<GhostShareDistribution>,
-): List<GhostShareHolder> {
+  updateNode: UpdatePathNode,
+  commonNodeIdx: NodeIndex,
+  resolution: List<NodeIndex>,
+): Pair<Secret, List<GhostShareHolder>> {
 
-  if (!canUseDefaultShareDistribution(tree, from, excludeNewLeaves)) {
-    raise(UnexpectedError("NotEnoughNodesForDefaultShareDistributionMethod"))
-  }
-
-  var idxCommonAncestor = -1
-  val filteredDirectPath = getFilteredDirectPathCleaned(tree, from, excludeNewLeaves)
-  for(i in filteredDirectPath.indices){
-    if(tree.leafIndex.isInSubtreeOf(filteredDirectPath[i].first)){
-      idxCommonAncestor = i
-      break
-    }
-  }
-  if(idxCommonAncestor == -1) { error("No ancestor of own leaf index found in filtered direct path of committer") }
-//  println("Common ancestor with " + tree.leafIndex + " is " + filteredDirectPath[idxCommonAncestor])
-//  println(filteredDirectPath[idxCommonAncestor].first.subtreeRange)
-
-  if(
-    !shares[idxCommonAncestor].encryptionKey.eq(tree.node(filteredDirectPath[idxCommonAncestor].first).encryptionKey)
-  ) { raise(UnexpectedError("UpdatePath Error in shares")) }
-
-  filteredDirectPath[idxCommonAncestor].second
-    .zip(shares[idxCommonAncestor].encryptedGhostSecrets)
-    .firstNotNullOfOrNull { (node, ciphertext) -> tree.getKeyPair(node)?.let(ciphertext::to) }
-    ?.let { (ciphertext, keyPair) ->
+  val decrypted = (resolution - excludeNewLeaves)
+    .zip(updateNode.encryptedPathSecret)
+    .firstNotNullOf { (node, ciphertext) -> tree.getKeyPair(node)?.let(ciphertext::to) }
+    .let { (ciphertext, keyPair) ->
       tree.cipherSuite.decryptWithLabel(
         keyPair,
-        "GhostShareDistribution",
+        "UpdatePathNode",
         groupContext.encoded,
         ciphertext,
       ).bind()
     }
-    ?.let{
 
-      val rank =
-        if (from.isInSubtreeOf(filteredDirectPath[idxCommonAncestor].first.rightChild)) {
-          tree.public.getLeafRankInSubtree(tree.leafIndex, filteredDirectPath[idxCommonAncestor].first.leftChild)
-        } else {
-          tree.public.getLeafRankInSubtree(tree.leafIndex, filteredDirectPath[idxCommonAncestor].first.rightChild)
-        }
+  val pathSecret = decrypted[UIntRange(0u, tree.cipherSuite.hashLen.toUInt()-1u)].asSecret
+  var shareHolders: List<GhostShareHolder> = listOf()
 
-      return  GhostShareHolderCommitList.decodeUnsafe(it).ghostShareHolders.mapIndexed { idx, shareHolder ->
-        GhostShareHolder.create(
-          newGhostUsers[idx].ghostEncryptionKey,
-          newGhostUsers[idx].leafIndex,
-          groupContext.epoch,
-          shareHolder,
-          rank
-        )
+  if(decrypted.size > tree.cipherSuite.hashLen.toInt()){
+    val rank =
+      if (from.isInSubtreeOf(commonNodeIdx.rightChild)) {
+        tree.public.getLeafRankInSubtree(tree.leafIndex, commonNodeIdx.leftChild)
+      } else {
+        tree.public.getLeafRankInSubtree(tree.leafIndex, commonNodeIdx.rightChild)
       }
-    }
 
-  return listOf()
+    shareHolders = GhostShareHolderCommitList.decodeUnsafe(
+      decrypted[UIntRange(tree.cipherSuite.hashLen.toUInt(), decrypted.uSize-1u)]
+    ).ghostShareHolders.mapIndexed { idx, shareHolder ->
+      GhostShareHolder.create(
+        newGhostUsers[idx].ghostEncryptionKey,
+        newGhostUsers[idx].leafIndex,
+        groupContext.epoch,
+        shareHolder,
+        rank
+      )
+    }
+  }
+
+  return Pair(pathSecret, shareHolders)
 }
 
 ///////////////////////////////////////////////////////

@@ -25,6 +25,7 @@ import com.github.traderjoe95.mls.protocol.types.tree.leaf.LeafNodeSource
 import com.github.traderjoe95.mls.protocol.util.foldWith
 import arrow.core.raise.either
 import arrow.core.raise.ensure
+import com.github.traderjoe95.mls.codec.util.get
 import com.github.traderjoe95.mls.protocol.crypto.secret_sharing.ShamirSecretSharing
 import com.github.traderjoe95.mls.protocol.error.UnexpectedError
 import com.github.traderjoe95.mls.protocol.group.GhostMemberCommit
@@ -130,41 +131,29 @@ internal fun createUpdatePath(
     val provisionalGroupCtx = groupContext.provisional(updatedTree)
     val excludedNodeIndices = excludeNewLeaves.map { it.nodeIndex }.toSet()
 
-    val updatePathNodes =
-      filteredDirectPath.zip(pathSecrets.drop(1)).map { (nodeAndRes, pathSecret) ->
-        val (nodeIdx, resolution) = nodeAndRes
-        val encryptFor = resolution - excludedNodeIndices
-
-        UpdatePathNode(
-          updatedTree.parentNode(nodeIdx).encryptionKey,
-          encryptFor.map { idx ->
-            encryptWithLabel(
-              originalTree.node(idx).encryptionKey,
-              "UpdatePathNode",
-              provisionalGroupCtx.encoded,
-              pathSecret.bytes,
-            ).bind()
-          })
-      }
-
     // Creating Ghost Shares and Distributing them
+    var updatePathNodes: List<UpdatePathNode> = listOf()
     var ghostShares: List<GhostShareDistribution> = listOf()
     var ownGhostSecretShares: List<GhostShareHolder> = listOf()
-    if (newGhostSecrets.isNotEmpty()) {
-      if(canUseDefaultShareDistribution(updatedTree, from, excludeNewLeaves)){
-        generateSharesUsingDefaultShareDistribution(
-          updatedTree,
-          from,
-          excludeNewLeaves,
-          groupContext,
-          newGhostMembers,
-          newGhostSecrets,
-        ).let{
-          ghostShares = it.first
-          ownGhostSecretShares = it.second
-        }
+
+    if(newGhostSecrets.isNotEmpty() && canUseDefaultShareDistribution(updatedTree, from, excludeNewLeaves)){
+      generateSharesUsingDefaultShareDistribution(
+        updatedTree,
+        from,
+        excludeNewLeaves,
+        groupContext,
+        filteredDirectPath,
+        pathSecrets.drop(1),
+        newGhostMembers,
+        newGhostSecrets,
+      ).let{
+        updatePathNodes = it.first
+        ownGhostSecretShares = it.second
       }
-      else if(canUseHorizontalShareDistribution(updatedTree, excludeNewLeaves)) {
+    }
+
+    else if(newGhostSecrets.isNotEmpty()){
+      if(canUseHorizontalShareDistribution(updatedTree, excludeNewLeaves)) {
         generateSharesUsingHorizontalShareDistribution(
           updatedTree,
           from,
@@ -181,6 +170,26 @@ internal fun createUpdatePath(
         raise(UnexpectedError("NotEnoughNodesForSecretSharing"))
       }
     }
+
+    if(updatePathNodes.size == 0){
+      updatePathNodes =
+        filteredDirectPath.zip(pathSecrets.drop(1)).map { (nodeAndRes, pathSecret) ->
+          val (nodeIdx, resolution) = nodeAndRes
+          val encryptFor = resolution - excludedNodeIndices
+
+          UpdatePathNode(
+            updatedTree.parentNode(nodeIdx).encryptionKey,
+            encryptFor.map { idx ->
+              encryptWithLabel(
+                originalTree.node(idx).encryptionKey,
+                "UpdatePathNode",
+                provisionalGroupCtx.encoded,
+                pathSecret.bytes,
+              ).bind()
+            })
+        }
+    }
+
 
     Tuple4(
       updatedTree,
@@ -283,30 +292,47 @@ internal fun RatchetTree.extractCommonPathSecret(
   val (nodeIdx, resolution) = filteredDirectPath[idxCommonAncestor]
   val updateNode = updatePath.nodes[idxCommonAncestor]
 
-  val pathSecret =
-    (resolution - excludeNewLeaves)
-      .zip(updateNode.encryptedPathSecret)
-      .firstNotNullOf { (node, ciphertext) -> getKeyPair(node)?.let(ciphertext::to) }
-      .let { (ciphertext, keyPair) ->
-        cipherSuite.decryptWithLabel(
-          keyPair,
-          "UpdatePathNode",
-          groupContext.encoded,
-          ciphertext,
-        ).bind().asSecret
-      }
-
+  var pathSecret: Secret? = null
+  val excludeNewNodes = excludeNewLeaves.map { it.leafIndex }.toSet()
   var ghostSecretShares: List<GhostShareHolder> = listOf()
-  if(newGhostUsers.isNotEmpty()) {
-    if(canUseDefaultShareDistribution(this, fromLeafIdx, excludeNewLeaves.map { it.leafIndex }.toSet())){
-      ghostSecretShares = decryptSharesUsingDefaultShareDistribution(this, fromLeafIdx, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, newGhostUsers, updatePath.shares)
+
+  if(newGhostUsers.isNotEmpty() && canUseDefaultShareDistribution(this, fromLeafIdx, excludeNewNodes)){
+    decryptSharesUsingDefaultShareDistribution(
+      this,
+      fromLeafIdx,
+      excludeNewNodes,
+      groupContext,
+      newGhostUsers,
+      updateNode,
+      nodeIdx,
+      resolution
+    ).let{
+      pathSecret = it.first
+      ghostSecretShares = it.second
     }
-    else if(canUseHorizontalShareDistribution(this, excludeNewLeaves.map { it.leafIndex }.toSet())){
-      ghostSecretShares = decryptSharesUsingHorizontalShareDistribution(this, excludeNewLeaves.map { it.leafIndex }.toSet(), groupContext, newGhostUsers, updatePath.shares)
+  }
+  else if(newGhostUsers.isNotEmpty()){
+    if(canUseHorizontalShareDistribution(this, excludeNewNodes)){
+      ghostSecretShares = decryptSharesUsingHorizontalShareDistribution(this, excludeNewNodes, groupContext, newGhostUsers, updatePath.shares)
     }
   }
 
-  return Triple(nodeIdx, pathSecret, ghostSecretShares)
+  if(pathSecret == null){
+    pathSecret =
+      (resolution - excludeNewLeaves)
+        .zip(updateNode.encryptedPathSecret)
+        .firstNotNullOf { (node, ciphertext) -> getKeyPair(node)?.let(ciphertext::to) }
+        .let { (ciphertext, keyPair) ->
+          cipherSuite.decryptWithLabel(
+            keyPair,
+            "UpdatePathNode",
+            groupContext.encoded,
+            ciphertext,
+          ).bind().asSecret
+        }
+  }
+
+  return Triple(nodeIdx, pathSecret!!, ghostSecretShares)
 }
 
 context(ICipherSuite, Raise<JoinError>)

@@ -196,7 +196,7 @@ suspend fun commit(committerGroup: ActiveGroupClient<String>, clients: List<Clie
   }
 }
 
-suspend fun updateKeysWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, excludeFromUpdate: List<Int> = listOf()){
+suspend fun updateKeysWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, clientsList: List<String>, committerIdx: Int, excludeFromUpdate: List<Int> = listOf()): Pair<Int, Long> {
 
   println("UPDATING " + clientsList.slice(clients.indices.filter{ !clients[it].isGhost() && it!=committerIdx && !excludeFromUpdate.contains(it)}).map { it.uppercase() } + " KEYS, COMMITTING BY " + clientsList[committerIdx].uppercase())
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -207,11 +207,14 @@ suspend fun updateKeysWithoutProcessing(groups: List<ActiveGroupClient<String>>,
     }
   }
 
-  commitWithoutProcessing(groups, clients, committerIdx)
+  val (size, time) = commitWithoutProcessing(groups, clients, committerIdx)
   println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+
+  return Pair(size, time)
 }
 
-suspend fun commitWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, committerIdx: Int){
+suspend fun commitWithoutProcessing(groups: List<ActiveGroupClient<String>>, clients: List<Client>, committerIdx: Int):
+ Pair<Int, Long> {
 
   val committerGroup = groups[committerIdx]
   val committerClient = clients[committerIdx]
@@ -226,6 +229,8 @@ suspend fun commitWithoutProcessing(groups: List<ActiveGroupClient<String>>, cli
   println("Construction of commit message (" + commitMsg.size + " bytes) took " + time.inWholeMilliseconds + " ms")
 
   DeliveryService.sendMessageToGroup(commitMsg, committerGroup.groupId).getOrThrow()
+
+  return Pair(commitMsg.size, time.inWholeMilliseconds)
 }
 
 suspend fun basicConversation(clients: List<Client>, groups: List<ActiveGroupClient<String>>, id: String){

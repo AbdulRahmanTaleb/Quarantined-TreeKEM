@@ -691,9 +691,15 @@ sealed class GroupState(
 
   companion object {
     val MINIMUM_SECRET_SHARING_NB: Int = 3
-  val INACTIVITY_DELAY: ULong = 5U
-    val UPDATE_QUARANTINE_KEYS_DELAY: ULong = 5u
-    val DELETE_FROM_QUARANTINE_DELAY: ULong = 20U
+    var INACTIVITY_DELAY: ULong = 10U
+    var UPDATE_QUARANTINE_KEYS_DELAY: ULong = 10u
+    var DELETE_FROM_QUARANTINE_DELAY: ULong = 30U
+
+    fun setGhostParams(inactivityDelay: ULong, updateQuarantineKeysDelay: ULong, deleteFromQuarantineDelay: ULong){
+      INACTIVITY_DELAY = inactivityDelay
+      UPDATE_QUARANTINE_KEYS_DELAY = updateQuarantineKeysDelay
+      DELETE_FROM_QUARANTINE_DELAY = deleteFromQuarantineDelay
+    }
 
     fun computeSecretSharingTValue(m: Int): Int {
       return ceil(m.toDouble()/2).toInt()
